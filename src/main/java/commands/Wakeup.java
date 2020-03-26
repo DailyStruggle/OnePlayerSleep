@@ -22,6 +22,7 @@ public class Wakeup implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		if(!sender.hasPermission("sleep.wakeup")) return false;
 		Player player = (Player) sender;
 		Boolean KickFromBed = this.config.config.getBoolean("kickFromBed");
 		Boolean otherWorldKick = this.config.config.getBoolean("kickFromBed");
