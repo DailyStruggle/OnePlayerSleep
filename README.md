@@ -2,6 +2,8 @@
 spigot plugin inspired by the OnePlayerSleep datapack
 Tired of waiting for everyone else to sleep? Now you can just get in bed to pass the night and clear those nasty thunderstorms! (as long as there are no objections)
 
+spigot page: https://www.spigotmc.org/resources/oneplayersleep.76534/
+
 ## Configurable Random Sleep Messages
 With this plugin, we can add any number of messages with custom text, custom hover text, custom wakeup text, and even bukkit color codes! </br>
 
