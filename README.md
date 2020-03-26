@@ -1,5 +1,5 @@
 # OnePlayerSleep
-spigot plugin inspired by the OnePlayerSleep datapack
+spigot plugin inspired by the OnePlayerSleep datapack </br>
 Tired of waiting for everyone else to sleep? Now you can just get in bed to pass the night and clear those nasty thunderstorms! (as long as there are no objections)
 
 spigot page: https://www.spigotmc.org/resources/oneplayersleep.76534/
