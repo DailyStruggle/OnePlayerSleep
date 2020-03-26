@@ -1,12 +1,11 @@
 # OnePlayerSleep
 spigot plugin inspired by the OnePlayerSleep datapack
+Tired of waiting for everyone else to sleep? Now you can just get in bed to pass the night and clear those nasty thunderstorms! (as long as there are no objections)
 
-## Configurable Sleep Messages
-We can add/remove messages at will, set custom text, hover text, and wakeup announcement text, and use bukkit color codes to spice things up! <br />
-We can also set a custom chance for each message to be selected.
+## Configurable Random Sleep Messages
+With this plugin, we can add any number of messages with custom text, custom hover text, custom wakeup text, and even bukkit color codes! </br>
 
-## Configurable Randomization
-By default, a sleep message is randomized once and distributed to relevant players. We can also randomize at distribution so that each player gets a potentially different randomly selected message.
+Each message has a configurable chance to be selected, out of the sum of all message chance values.
 
 ## Async Randomization
-Sleep messages and randomization are run asynchronously to maintain performance on the main thread. 
+Sleep messages and randomization are run asynchronously to maintain performance on the main thread.
