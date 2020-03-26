@@ -7,5 +7,5 @@ We can add/remove messages at will, set custom text, hover text, and wakeup anno
 ## Configurable Randomization
 by default, a sleep message is randomized once and distributed to relevant players. You can also randomize at distribution so that each player gets a potentially different randomly selected message.
 
-## Async randomization
+## Async Randomization
 Sleep messages and randomization are run asynchronously to maintain performance on the main thread. 
