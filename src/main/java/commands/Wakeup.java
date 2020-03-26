@@ -25,49 +25,28 @@ public class Wakeup implements CommandExecutor {
 		if(!sender.hasPermission("sleep.wakeup")) return false;
 		Player player = (Player) sender;
 		Boolean KickFromBed = this.config.config.getBoolean("kickFromBed");
-		Boolean otherWorldKick = this.config.config.getBoolean("kickFromBed");
+		Boolean cantKickAPlayer = false;
+		Boolean hasSleepingPlayers = false;
 		if( this.config.config.getBoolean("allowKickFromOtherWorld") ) {
-			Boolean hasSleepingPlayers = false;
-			if( !otherWorldKick ){
-				for(World w : this.plugin.doSleep.keySet()) {
-					this.plugin.doSleep.get(w).cancel();
-					this.plugin.doSleep.remove(w);
-					if(this.plugin.sleepingPlayers.get(w).size() > 0)
-						hasSleepingPlayers = true;
-					if(KickFromBed) 
-					{
-						for ( Player p : this.plugin.sleepingPlayers.get(w)) {
-							Double health = p.getHealth();
-							p.damage(1);
-							p.setHealth(health);
-						}
-					}else {
-						if(this.plugin.sleepingPlayers.get(w).size() > 0) {
-							hasSleepingPlayers = true;
-						}
-					}
-				}
-			}
-			else {
-				World w = player.getWorld();
-				this.plugin.doSleep.get(w).cancel();
-				this.plugin.doSleep.remove(w);
+			for(World w : this.plugin.doSleep.keySet()) {
 				if(this.plugin.sleepingPlayers.get(w).size() > 0)
 					hasSleepingPlayers = true;
-				if(KickFromBed) 
-				{
-					for ( Player p : this.plugin.sleepingPlayers.get(w)) {
+				for ( Player p : this.plugin.sleepingPlayers.get(w)) {
+					if(p.hasPermission("sleep.bypass")) {
+						cantKickAPlayer = true;
+						continue;
+					}
+					if(KickFromBed) {
 						Double health = p.getHealth();
 						p.damage(1);
 						p.setHealth(health);
 					}
 				}
+				if(!cantKickAPlayer && hasSleepingPlayers && this.plugin.doSleep.containsKey(w)) {
+					this.plugin.doSleep.get(w).cancel();
+					this.plugin.doSleep.remove(w);
+				}
 			}
-			if(!hasSleepingPlayers) {
-				player.sendMessage("no players sleeping!");
-				return true;
-			}
-			
 		}
 		else {
 			World w = player.getWorld();
@@ -75,26 +54,30 @@ public class Wakeup implements CommandExecutor {
 				player.sendMessage("no players sleeping!");
 				return true;
 			}
-			if(this.plugin.doSleep.containsKey(w)) {
+			hasSleepingPlayers = true;
+			for ( int idx = 0; idx < this.plugin.sleepingPlayers.get(w).size(); idx++) {
+				Player p = this.plugin.sleepingPlayers.get(w).get(idx);
+				if(p.hasPermission("sleep.bypass")) {
+					cantKickAPlayer = true;
+				}
+				else if(KickFromBed) {
+					Double health = p.getHealth();
+					p.damage(1);
+					p.setHealth(health);
+				}
+			}
+			if(!cantKickAPlayer && this.plugin.doSleep.containsKey(w)) {
 				this.plugin.doSleep.get(w).cancel();
 				this.plugin.doSleep.remove(w);
-				Message m = this.plugin.wakeData.get(player);
-				new AnnounceWakeup(this.plugin,this.config,player,m).runTaskAsynchronously(this.plugin);
-				
-				if(KickFromBed) 
-				{
-					for ( int idx = 0; idx < this.plugin.sleepingPlayers.get(w).size(); idx++) {
-						Player p = this.plugin.sleepingPlayers.get(w).get(idx);
-						Double health = p.getHealth();
-						p.damage(1);
-						p.setHealth(health);
-					}
-				}
-				
 			}
-			else {
-				
-			}
+		}
+		
+		Message m = this.plugin.wakeData.get(player);
+		if(!cantKickAPlayer && hasSleepingPlayers) {
+			new AnnounceWakeup(this.plugin,this.config,player,m).runTaskAsynchronously(this.plugin);
+		}
+		if(!hasSleepingPlayers) {
+			player.sendMessage("no players sleeping!");
 		}
 		return true;
 	}
