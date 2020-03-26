@@ -2,7 +2,8 @@
 #time, in ticks, to delay the task of passing of night
 sleepDelay: 60
 
-#server time to stop at for passing night
+#server time to allow passing night
+startTime: 12542
 stopTime: 23450
 
 #amount to increment by

@@ -1,12 +1,13 @@
 package events;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 
 import OnePlayerSleep.OnePlayerSleep;
-import async.AnnounceSleep;
-import async.DoSleep;
+import bukkitTasks.AnnounceSleep;
+import bukkitTasks.DoSleep;
 import tools.Config;
 
 public class onPlayerBedEnter implements Listener {
@@ -20,7 +21,9 @@ public class onPlayerBedEnter implements Listener {
 	
 	@EventHandler
 	public void onPlayerBedEnter(PlayerBedEnterEvent event) {
+		
 		if(event.getBedEnterResult() != PlayerBedEnterEvent.BedEnterResult.OK) return;
+		
 		if(this.plugin.sleepingPlayers.get(event.getPlayer().getWorld()).size() > 1) return;
 		this.plugin.sleepingPlayers.get(event.getPlayer().getWorld()).add(event.getPlayer());
 		new AnnounceSleep(this.plugin, this.config, event.getPlayer()).runTaskAsynchronously(this.plugin);

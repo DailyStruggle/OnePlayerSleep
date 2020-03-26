@@ -4,7 +4,7 @@ version: 1.15.2-R0.1-SNAPSHOT
 
 commands:
     sleep:
-        description: Displays sleep options menu
+        description: sleep help
         permission: sleep.see
         usage: |
             /sleep

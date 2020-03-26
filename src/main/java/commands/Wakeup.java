@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import OnePlayerSleep.OnePlayerSleep;
-import async.AnnounceWakeup;
+import bukkitTasks.AnnounceWakeup;
 import tools.Config;
 import types.Message;
 
@@ -24,15 +24,38 @@ public class Wakeup implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		Player player = (Player) sender;
 		Boolean KickFromBed = this.config.config.getBoolean("kickFromBed");
+		Boolean otherWorldKick = this.config.config.getBoolean("kickFromBed");
 		if( this.config.config.getBoolean("allowKickFromOtherWorld") ) {
 			Boolean hasSleepingPlayers = false;
-			for(World w : this.plugin.doSleep.keySet()) {
+			if( !otherWorldKick ){
+				for(World w : this.plugin.doSleep.keySet()) {
+					this.plugin.doSleep.get(w).cancel();
+					this.plugin.doSleep.remove(w);
+					if(this.plugin.sleepingPlayers.get(w).size() > 0)
+						hasSleepingPlayers = true;
+					if(KickFromBed) 
+					{
+						for ( Player p : this.plugin.sleepingPlayers.get(w)) {
+							Double health = p.getHealth();
+							p.damage(1);
+							p.setHealth(health);
+						}
+					}else {
+						if(this.plugin.sleepingPlayers.get(w).size() > 0) {
+							hasSleepingPlayers = true;
+						}
+					}
+				}
+			}
+			else {
+				World w = player.getWorld();
 				this.plugin.doSleep.get(w).cancel();
 				this.plugin.doSleep.remove(w);
+				if(this.plugin.sleepingPlayers.get(w).size() > 0)
+					hasSleepingPlayers = true;
 				if(KickFromBed) 
 				{
 					for ( Player p : this.plugin.sleepingPlayers.get(w)) {
-						hasSleepingPlayers = true;
 						Double health = p.getHealth();
 						p.damage(1);
 						p.setHealth(health);

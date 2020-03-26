@@ -16,16 +16,17 @@ import types.Message;
 public class Config {
 	public FileConfiguration config;
 	public FileConfiguration messages;
+	public String version;
 	
 	private ArrayList<Message> messageArray = new ArrayList<Message>(); 
-	
 	private Double totalChance = 0.0;
 	private ArrayList<Double> chanceRanges = new ArrayList<Double>();
-	
 	private OnePlayerSleep plugin;
 	
 	public Config(OnePlayerSleep plugin) {
 		this.plugin = plugin;
+		String s = this.plugin.getServer().getClass().getPackage().getName();
+		this.version = s.substring(s.lastIndexOf('.')+1);
 	}
 	
 	
@@ -73,18 +74,18 @@ public class Config {
 		//sleepDelay value
 		if(			!this.config.isSet("sleepDelay") 
 				||  !this.config.isInt("sleepDelay")) {
-			Bukkit.getConsoleSender().sendMessage("§3[OnePlayerSleep] error: no sleepDelay value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no sleepDelay value. Setting to default"); 
 			this.config.set("sleepDelay", 60);
 		}
 		if(this.config.getInt("sleepDelay") < 0) {
-			Bukkit.getConsoleSender().sendMessage("§3[OnePlayerSleep] error: invalid sleepDelay value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: invalid sleepDelay value. Setting to default"); 
 			this.config.set("sleepDelay", 60);
 		}
 		
 		//stopTime value
 		if(			!this.config.isSet("stopTime") 
 				||  !this.config.isInt("stopTime")) {
-			Bukkit.getConsoleSender().sendMessage("§3[OnePlayerSleep] error: no stopTime value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no stopTime value. Setting to default"); 
 			this.config.set("stopTime", 60);
 		}
 		this.config.set("stopTime", ((this.config.getLong("stopTime") % 24000) + 24000) % 24000); //guarantee a value within 0-23999
@@ -92,40 +93,47 @@ public class Config {
 		//increment value
 		if(			!this.config.isSet("increment") 
 				||  !this.config.isInt("increment")) {
-			Bukkit.getConsoleSender().sendMessage("§3[OnePlayerSleep] error: no increment value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no increment value. Setting to default"); 
 			this.config.set("increment", 10);
 		}
 		if(this.config.getInt("increment") < 0) {
-			Bukkit.getConsoleSender().sendMessage("§3[OnePlayerSleep] error: invalid increment value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: invalid increment value. Setting to default"); 
 			this.config.set("increment", 10);
 		}
 		
 		//showMessageToOtherWorld value
 		if(			!this.config.isSet("showMessageToOtherWorld") 
 				||  !this.config.isBoolean("showMessageToOtherWorld")) {
-			Bukkit.getConsoleSender().sendMessage("§3[OnePlayerSleep] error: no showMessageToOtherWorld value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no showMessageToOtherWorld value. Setting to default"); 
 			this.config.set("showMessageToOtherWorld", false);
 		}
 		
 		//allowKickFromOtherWorld value
 		if(			!this.config.isSet("allowKickFromOtherWorld") 
 				||  !this.config.isBoolean("allowKickFromOtherWorld")) {
-			Bukkit.getConsoleSender().sendMessage("§3[OnePlayerSleep] error: no allowKickFromOtherWorld value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no allowKickFromOtherWorld value. Setting to default"); 
 			this.config.set("allowKickFromOtherWorld", false);
 		}
 		
 		//kickFromBed value
 		if(			!this.config.isSet("kickFromBed") 
 				||  !this.config.isBoolean("kickFromBed")) {
-			Bukkit.getConsoleSender().sendMessage("§3[OnePlayerSleep] error: no kickFromBed value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no kickFromBed value. Setting to default"); 
 			this.config.set("kickFromBed", false);
 		}
 		
 		//randomPerPlayer value
 		if(			!this.config.isSet("randomPerPlayer") 
 				||  !this.config.isBoolean("randomPerPlayer")) {
-			Bukkit.getConsoleSender().sendMessage("§3[OnePlayerSleep] error: no randomPerPlayer value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no randomPerPlayer value. Setting to default"); 
 			this.config.set("randomPerPlayer", false);
+		}
+		
+		//onNoPlayerSleeping value
+		if(			!this.messages.isSet("onNoPlayersSleeping") 
+				||  !this.messages.isString("onNoPlayersSleeping")) {
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no onNoPlayersSleeping value. Setting to default"); 
+			this.messages.set("onNoPlayersSleeping", "No players sleeping!");
 		}
 	}
 	

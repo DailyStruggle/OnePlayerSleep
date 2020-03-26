@@ -1,9 +1,9 @@
 #default placeholders
-#[player] - player doing the thing, using displayname
+#[player] - player doing the thing, using username
 
+onNoPlayersSleeping: "No players sleeping!"
 
-
-#Messages to announce
+#Messages to announce on sleep
 #message001: arbitrary unique message name
 #    global: thing to say in global chat on player sleep
 #    hover: hover text
