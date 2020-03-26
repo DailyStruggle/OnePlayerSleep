@@ -13,7 +13,7 @@ messages:
     message001:
         global: "[player] &bfell asleep on the job"
         hover: "&eWake up!"
-        wakeup: "[player] says &cWake up!"
+        wakeup: "[player] says &cGet back to work!"
         chance: 0.067
     message002:
         global: "[player] &bis slacking"
@@ -23,12 +23,12 @@ messages:
     message003:
         global: "[player] &bis asleep at the wheel"
         hover: "&eWake up!"
-        wakeup: "[player] says &cWake up!" 
+        wakeup: "[player] says &4WHO'S DRIVING!?" 
         chance: 0.067
     message004:
         global: "[player] &bcrashed...hard..."
         hover: "&eWake up!"
-        wakeup: "[player] says &cWake up!" 
+        wakeup: "[player] says &chave some caffeine!" 
         chance: 0.067
     message005:
         global: "[player] &bis counting sheep"
@@ -43,7 +43,7 @@ messages:
     message007:
         global: "[player] &bis cat napping"
         hover: "&eWake up!"
-        wakeup: "[player] says &cWake up!" 
+        wakeup: "[player] says &cdogs are better!" 
         chance: 0.067
     message008:
         global: "[player] &bhas hit the hay"
@@ -53,17 +53,17 @@ messages:
     message009:
         global: "[player] &bnodded off"
         hover: "&eWake up!"
-        wakeup: "[player] says &cWake up!" 
+        wakeup: "[player] &esmacks desk" 
         chance: 0.067
     message010:
         global: "[player] &bneeds a beauty rest"
         hover: "&eWake up!"
-        wakeup: "[player] says &cWake up!" 
+        wakeup: "[player] says &cyou're handsome enough already!" 
         chance: 0.067
     message011:
         global: "[player] &bkeeps hitting snooze..."
         hover: "&eWake up!"
-        wakeup: "[player] says &cWake up!" 
+        wakeup: "[player] &cpulled the sheets!" 
         chance: 0.067
     message012:
         global: "[player] &bis enjoying peaceful slumber"
