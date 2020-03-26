@@ -1,0 +1,47 @@
+name: OnePlayerSleep
+main: OnePlayerSleep.OnePlayerSleep
+version: 1.15.2-R0.1-SNAPSHOT
+
+commands:
+    sleep:
+        description: Displays sleep options menu
+        permission: sleep.see
+        usage: |
+            /sleep
+    sleep reload:
+        description: Reloads the plugin configuration files
+        permission: sleep.reload
+        usage: |
+            /sleep reload
+    sleep wakeup:
+        description: kick from bed
+        permission: sleep.wakeup
+        usage: |
+            /sleep wakeup
+
+permissions:
+    sleep.*:
+        description: allows use of all sleep commands
+        default: op
+        children:
+            sleep.see: true
+            sleep.reload: true
+            sleep.wakeup: true
+            sleep.bypass: true
+            sleep.ignore: true
+    sleep.see:
+        description: can see the sleep options menu
+        default: op
+    sleep.reload: 
+        description: can reload sleep options
+        default: op
+    sleep.wakeup:
+        description: can kick from bed
+        default: true
+    sleep.bypass:
+        description: cannot kick this player from bed
+        default: op
+    sleep.ignore:
+        description: ignore player entirely
+        default: false
+    
