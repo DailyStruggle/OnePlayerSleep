@@ -14,6 +14,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import tools.Config;
 import types.Message;
+import commands.Help;
 import commands.Reload;
 import commands.Sleep;
 import commands.TabComplete;
@@ -32,9 +33,10 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 	public void onEnable() {		getCommand("sleep").setExecutor(new Sleep(this));
 		getCommand("sleep").setTabCompleter(new TabComplete());
 		
+		getCommand("sleep help").setExecutor(new Help());
 		getCommand("sleep reload").setExecutor(new Reload(this, this.config));
 		getCommand("sleep wakeup").setExecutor(new Wakeup(this, this.config));
-		
+
 		this.config.refreshConfigs();
 		this.config.checkConfigs();
 		
