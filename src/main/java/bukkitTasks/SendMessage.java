@@ -36,15 +36,18 @@ public class SendMessage extends BukkitRunnable{
 	
 	@Override
 	public void run() {
+		if(this.targetPlayer.hasPermission("sleep.ignore")) {
+			return;
+		}
 		if(this.doRandom) {
 			this.message = this.config.pickRandomMessage();
 			this.message = this.message.fillPlaceHolders(this.sourcePlayer);
 		}
-		targetPlayer.spigot().sendMessage(this.message.msg);
-		if(plugin.wakeData.containsKey(targetPlayer)) {
-			plugin.wakeData.remove(targetPlayer);
+		this.targetPlayer.spigot().sendMessage(this.message.msg);
+		if(this.plugin.wakeData.containsKey(targetPlayer)) {
+			this.plugin.wakeData.remove(targetPlayer);
 		}
-		plugin.wakeData.put(targetPlayer, this.message);
+		this.plugin.wakeData.put(this.targetPlayer, this.message);
 	}
 	
 }

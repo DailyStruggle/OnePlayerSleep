@@ -25,6 +25,9 @@ public class AnnounceWakeup extends BukkitRunnable{
 	public void run() {
 		Boolean otherWorldShow = config.config.getBoolean("showMessageToOtherWorld");
 		for (Player p : plugin.getServer().getOnlinePlayers()) {
+			if(p.hasPermission("sleep.ignore")) {
+				return;
+			}
 			if(		otherWorldShow &&
 					player.getWorld() != p.getWorld() )
 				continue;

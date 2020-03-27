@@ -1,5 +1,6 @@
 package events;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -20,7 +21,14 @@ public class onPlayerBedEnter implements Listener {
 	
 	@EventHandler
 	public void onPlayerBedEnter(PlayerBedEnterEvent event) {
-		if(event.getBedEnterResult() != PlayerBedEnterEvent.BedEnterResult.OK) return;
+		if(			config.version.contains("1_13") ||
+					config.version.contains("1_14") ||
+					config.version.contains("1_15")) {
+			if(event.getBedEnterResult() != PlayerBedEnterEvent.BedEnterResult.OK) return;
+		}
+		else { 
+			if(event.getPlayer().isSleeping()) return;
+		}
 		if(this.plugin.sleepingPlayers.get(event.getPlayer().getWorld()).size() > 0) return;
 		if(event.getPlayer().hasPermission("sleep.ignore")) return;
 		this.plugin.sleepingPlayers.get(event.getPlayer().getWorld()).add(event.getPlayer());

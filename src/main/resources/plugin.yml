@@ -35,7 +35,6 @@ permissions:
             sleep.reload: true
             sleep.wakeup: true
             sleep.bypass: true
-            sleep.ignore: true
     sleep.see:
         description: can see the sleep help menu
         default: true
