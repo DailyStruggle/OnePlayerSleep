@@ -21,7 +21,8 @@ public class onPlayerBedEnter implements Listener {
 	@EventHandler
 	public void onPlayerBedEnter(PlayerBedEnterEvent event) {
 		if(event.getBedEnterResult() != PlayerBedEnterEvent.BedEnterResult.OK) return;
-		if(this.plugin.sleepingPlayers.get(event.getPlayer().getWorld()).size() > 1) return;
+		if(this.plugin.sleepingPlayers.get(event.getPlayer().getWorld()).size() > 0) return;
+		if(event.getPlayer().hasPermission("sleep.ignore")) return;
 		this.plugin.sleepingPlayers.get(event.getPlayer().getWorld()).add(event.getPlayer());
 		new AnnounceSleep(this.plugin, this.config, event.getPlayer()).runTaskAsynchronously(this.plugin);
 		if(!plugin.doSleep.containsKey(event.getPlayer().getWorld())) {
