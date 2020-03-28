@@ -118,6 +118,13 @@ public class Config {
 			this.config.set("increment", 10);
 		}
 		
+		//globalNightSkipSync value
+		if(			!this.config.isSet("globalNightSkipSync") 
+				||  !this.config.isBoolean("globalNightSkipSync")) {
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no globalNightSkipSync value. Setting to default"); 
+			this.config.set("globalNightSkipSync", false);
+		}
+		
 		//showMessageToOtherWorld value
 		if(			!this.config.isSet("showMessageToOtherWorld") 
 				||  !this.config.isBoolean("showMessageToOtherWorld")) {
