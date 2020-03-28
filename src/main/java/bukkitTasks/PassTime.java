@@ -36,6 +36,7 @@ public class PassTime extends BukkitRunnable{
 			this.plugin.doSleep.put(this.world, new PassTime(this.plugin, this.config, this.world, this.didNightPass).runTaskLater(this.plugin, 1));
 			if(this.config.config.getBoolean("globalNightSkipSync")) {
 				for (World w : this.plugin.doSleep.keySet()) {
+					if(w == world) continue;
 					w.setTime(world.getTime());
 				}
 			}
@@ -45,13 +46,29 @@ public class PassTime extends BukkitRunnable{
 				|| this.world.getTime() < config.config.getInt("startTime") ) {
 			if(didNightPass) {
 				this.cancel();
-				this.plugin.doSleep.remove(this.world);
-				this.plugin.doSleep.put(this.world, new ClearWeather(this.world).runTask(this.plugin));
+				if(this.config.config.getBoolean("globalNightSkipSync")) {
+					for (World w : this.plugin.doSleep.keySet()) {
+						this.plugin.doSleep.remove(w);
+						this.plugin.doSleep.put(w, new ClearWeather(w).runTask(this.plugin));
+					}
+				}
+				else {
+					this.plugin.doSleep.remove(this.world);
+					this.plugin.doSleep.put(this.world, new ClearWeather(this.world).runTask(this.plugin));
+				}
 			}
 			else {
 				this.cancel();
-				this.plugin.doSleep.remove(this.world);
-				this.plugin.doSleep.put(this.world, new ClearWeather(this.world).runTaskLater(this.plugin, this.config.config.getLong("sleepDelay")));
+				if(this.config.config.getBoolean("globalNightSkipSync")) {
+					for (World w : this.plugin.doSleep.keySet()) {
+						this.plugin.doSleep.remove(w);
+						this.plugin.doSleep.put(w, new ClearWeather(w).runTaskLater(this.plugin, this.config.config.getLong("sleepDelay")));
+					}
+				}
+				else {
+					this.plugin.doSleep.remove(this.world);
+					this.plugin.doSleep.put(this.world, new ClearWeather(this.world).runTaskLater(this.plugin, this.config.config.getLong("sleepDelay")));
+				}
 			}
 		}
 	}
