@@ -51,6 +51,19 @@ public class Config {
 			this.messages = YamlConfiguration.loadConfiguration(f);
 		}
 		
+		if( 	this.messages.getDouble(version) < 1.1 || 
+				this.config.getDouble(version) < 1.0) {
+			updateConfigs();
+			
+			f = new File(this.plugin.getDataFolder(), "config.yml");
+			plugin.saveResource("config.yml", true);
+			this.config = YamlConfiguration.loadConfiguration(f);
+			
+			f = new File(this.plugin.getDataFolder(), "messages.yml");
+			plugin.saveResource("messages.yml", true);
+			this.messages = YamlConfiguration.loadConfiguration(f);
+		}
+		
 		Set<String> messageNames = this.messages.getConfigurationSection("messages").getKeys(false);
 		this.messageArray = new ArrayList<Message>();
 		this.totalChance = 0.0;
@@ -61,12 +74,16 @@ public class Config {
 			String msg = this.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("global"));
 			String hover_msg = this.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("hover"));
 			String response = this.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("wakeup"));
+			String cantWakeup = this.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("cantWakeup"));
 			Double chance = this.messages.getConfigurationSection("messages").getConfigurationSection(t).getDouble("chance");
-			this.messageArray.add(i, new Message( msg, hover_msg, response, chance) );
+			this.messageArray.add(i, new Message( msg, hover_msg, response, cantWakeup, chance) );
 			this.totalChance = this.totalChance + chance;
 			this.chanceRanges.add(i+1, this.chanceRanges.get(i) + chance);
 			i = i+1;
 		}
+		
+		String msg = this.fillColorCodes(this.messages.getString("onNoPlayersSleeping"));
+		this.messages.set("onNoPlayersSleeping", msg);
 	}
 	
 	//determine valid configuration variables
@@ -138,18 +155,17 @@ public class Config {
 	}
 	
 	//update config files based on version number
-	public boolean updateConfigs() {
-		if(!config.isSet("version")) {
-			config.set("version", "0.1");
-			plugin.saveResource("config.yml", false);
+	public void updateConfigs() {
+		if(this.messages.getDouble(version) == 1.0) {
+			Set<String> messageNames = this.messages.getConfigurationSection("messages").getKeys(false);
+			this.messageArray = new ArrayList<Message>();
+			for (String t : messageNames) {
+				this.messages.getConfigurationSection(t).set("cantWakeup", "&csomeone's a deep sleeper");
+			}
+			this.messages.set("version", 1.1);
 		}
 		
-		if(!messages.isSet("version")) {
-			messages.set("version", "0.1");
-			plugin.saveResource("messages.yml", false);
-		}
-		
-		return false;
+		return;
 	}
 	
 	public Message pickRandomMessage() {

@@ -75,10 +75,13 @@ public class Wakeup implements CommandExecutor {
 		Message m = this.plugin.wakeData.get(player);
 		if(!cantKickAPlayer && hasSleepingPlayers) {
 			new AnnounceWakeup(this.plugin,this.config,player,m).runTaskAsynchronously(this.plugin);
-			player.sendMessage("someone's a deep sleeper");
+		}
+		if(cantKickAPlayer && hasSleepingPlayers) {
+			player.sendMessage(m.cantWakeup);
 		}
 		if(!hasSleepingPlayers) {
-			player.sendMessage("no players sleeping!");
+			String msg = config.messages.getString("onNoPlayersSleeping");
+			player.sendMessage(msg);
 		}
 		return true;
 	}

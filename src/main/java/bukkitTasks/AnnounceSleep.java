@@ -24,7 +24,7 @@ public class AnnounceSleep extends BukkitRunnable{
 		Boolean otherWorldShow = config.config.getBoolean("showMessageToOtherWorld");
 		Boolean perPlayer = config.config.getBoolean("randomPerPlayer");
 		
-		Message resMsg = new Message("","","",0.0);
+		Message resMsg = new Message("","","","",0.0);
 		if(!perPlayer) {
 			resMsg = this.config.pickRandomMessage();
 			resMsg = resMsg.fillPlaceHolders(this.player);
