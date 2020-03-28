@@ -1,5 +1,6 @@
 package events;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -28,6 +29,10 @@ public class onPlayerBedEnter implements Listener {
 		else { 
 			if(event.getPlayer().isSleeping()) return;
 		}
+		int numPlayers = 0;
+		for (Player p : event.getPlayer().getWorld().getPlayers())
+			if(p.isSleepingIgnored() || p.hasPermission("sleep.ignore")) numPlayers = numPlayers + 1;
+		if(numPlayers == 1 && !this.config.config.getBoolean("showMessageToOtherWorld")) return;
 		if(this.plugin.sleepingPlayers.get(event.getPlayer().getWorld()).size() > 0) return;
 		if(event.getPlayer().hasPermission("sleep.ignore")) return;
 		this.plugin.sleepingPlayers.get(event.getPlayer().getWorld()).add(event.getPlayer());
