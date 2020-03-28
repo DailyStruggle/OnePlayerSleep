@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
@@ -56,15 +57,15 @@ public class Config {
 			this.messages = YamlConfiguration.loadConfiguration(f);
 		}
 		
-		if( this.messages.getDouble(version) < 1.1) {
-			plugin.getLogger().info("[Sleep] old messages.yml detected. Getting a newer version");
+		if( 	(this.messages.getDouble("version") < 1.1) ) {
+			plugin.getLogger().info("§b[OnePlayerSleep] old messages.yml detected. Getting a newer version");
 			this.renameFileInPluginDir("messages.yml","messages.old.yml");
 			
 			this.plugin.saveResource("messages.yml", false);
 			this.messages = YamlConfiguration.loadConfiguration(f);
 		}
-		if( this.config.getDouble(version) < 1.2) {
-			plugin.getLogger().info("[Sleep] old config.yml detected. Updating");
+		if( 	(this.config.getDouble("version") < 1.2) ) {
+			plugin.getLogger().info("§b[OnePlayerSleep] old config.yml detected. Updating");
 			
 			updateConfig();
 			
@@ -79,10 +80,10 @@ public class Config {
 		this.chanceRanges.add(0, 0.0);
 		int i = 0;
 		for (String t : messageNames) {
-			String msg = this.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("global"));
-			String hover_msg = this.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("hover"));
-			String response = this.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("wakeup"));
-			String cantWakeup = this.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("cantWakeup"));
+			String msg = this.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("global","[player] &bis sleeping"));
+			String hover_msg = this.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("hover","&eWake up!"));
+			String response = this.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("wakeup","[player] says &cWake up!"));
+			String cantWakeup = this.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("cantWakeup","&csomeone's a deep sleeper"));
 			Double chance = this.messages.getConfigurationSection("messages").getConfigurationSection(t).getDouble("chance");
 			this.messageArray.add(i, new Message( msg, hover_msg, response, cantWakeup, chance) );
 			this.totalChance = this.totalChance + chance;
@@ -284,6 +285,11 @@ public class Config {
 	private void renameFileInPluginDir(String oldName, String newName) {
 		File oldFile = new File(this.plugin.getDataFolder().getAbsolutePath() + File.separator + oldName);
 		File newFile = new File(this.plugin.getDataFolder().getAbsolutePath() + File.separator + newName);
+		try {
+			Files.deleteIfExists(newFile.toPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		oldFile.getAbsoluteFile().renameTo(newFile.getAbsoluteFile());
 	}
 }

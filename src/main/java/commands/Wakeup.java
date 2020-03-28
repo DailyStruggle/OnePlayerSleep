@@ -80,7 +80,7 @@ public class Wakeup implements CommandExecutor {
 			player.sendMessage(m.cantWakeup);
 		}
 		if(!hasSleepingPlayers) {
-			String msg = config.messages.getString("onNoPlayersSleeping");
+			String msg = config.messages.getString("onNoPlayersSleeping", "§cNo players sleeping!");
 			player.sendMessage(msg);
 		}
 		return true;

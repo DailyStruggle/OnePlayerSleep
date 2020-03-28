@@ -38,7 +38,7 @@ public class AnnounceSleep extends BukkitRunnable{
 				new SendMessage(this.plugin, this.config, this.player, p).runTaskAsynchronously(this.plugin);
 			}
 			else {
-				new SendMessage(this.plugin, this.config, resMsg, p).runTaskAsynchronously(this.plugin);
+				new SendMessage(this.plugin, this.config, resMsg, this.player, p).runTaskAsynchronously(this.plugin);
 			}
 			
 		}

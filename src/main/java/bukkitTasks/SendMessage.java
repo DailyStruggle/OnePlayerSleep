@@ -26,10 +26,11 @@ public class SendMessage extends BukkitRunnable{
 		this.doRandom = true;
 	}
 	
-	public SendMessage(OnePlayerSleep plugin, Config config, Message message, Player targetPlayer) {
+	public SendMessage(OnePlayerSleep plugin, Config config, Message message, Player sourcePlayer, Player targetPlayer) {
 		this.plugin = plugin;
 		this.config = config;
 		this.message = message;
+		this.sourcePlayer = sourcePlayer;
 		this.targetPlayer = targetPlayer;
 		this.doRandom = false;
 	}
