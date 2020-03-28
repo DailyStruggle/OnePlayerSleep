@@ -32,7 +32,7 @@ resetAllStatistics: true
 
 #whether to randomize the message for every player 
 #   instead of distributing 1 random message
-randomPerPlayer: true
+randomPerPlayer: false
 
 #DO NOT TOUCH VERSION NUMBER
 version: 1.3
