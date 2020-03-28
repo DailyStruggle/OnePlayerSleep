@@ -9,6 +9,9 @@ stopTime: 23450
 #amount of time to increment by
 increment: 75
 
+#option to sync all worlds on sleep task
+globalNightSkipSync: false
+
 #whether to show sleep message to players in other world,
 # such as the nether or the end.
 showMessageToOtherWorld: false
@@ -22,8 +25,12 @@ allowKickFromOtherWorld: false
 # which may make it harder for a player to stop phantom spawns.
 kickFromBed: true
 
+#whether to reset statistics for every player on sleep task
+resetAllStatistics: true
 
+#whether to randomize the message for every player 
+#   instead of distributing 1 random message
 randomPerPlayer: false
 
 #DO NOT TOUCH VERSION NUMBER
-version: 1.0
+version: 1.2

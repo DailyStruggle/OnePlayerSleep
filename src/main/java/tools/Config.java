@@ -52,7 +52,7 @@ public class Config {
 		}
 		
 		if( 	this.messages.getDouble(version) < 1.1 || 
-				this.config.getDouble(version) < 1.1) {
+				this.config.getDouble(version) < 1.2) {
 			updateConfigs();
 			
 			f = new File(this.plugin.getDataFolder(), "config.yml");
@@ -147,6 +147,13 @@ public class Config {
 		}
 		
 		//randomPerPlayer value
+		if(			!this.config.isSet("resetAllStatistics") 
+				||  !this.config.isBoolean("resetAllStatistics")) {
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no resetAllStatistics value. Setting to default"); 
+			this.config.set("resetAllStatistics", true);
+		}
+		
+		//randomPerPlayer value
 		if(			!this.config.isSet("randomPerPlayer") 
 				||  !this.config.isBoolean("randomPerPlayer")) {
 			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no randomPerPlayer value. Setting to default"); 
@@ -167,6 +174,11 @@ public class Config {
 			this.config.set("globalNightSkipSync", false);
 			this.config.set("version", 1.1);
 		}
+		if(this.config.getDouble(version) == 1.1) {
+			this.config.set("resetAllStatistics", true);
+			this.config.set("version", 1.2);
+		}
+		
 		
 		if(this.messages.getDouble(version) == 1.0) {
 			Set<String> messageNames = this.messages.getConfigurationSection("messages").getKeys(false);
