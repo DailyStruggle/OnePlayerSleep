@@ -6,7 +6,7 @@ sleepDelay: 60
 startTime: 12542
 stopTime: 23450
 
-#amount of time to increment by
+#amount of time to increment by, per server tick
 increment: 75
 
 #option to sync all worlds on sleep task
@@ -21,8 +21,7 @@ showMessageToOtherWorld: false
 # allows kick from all worlds
 allowKickFromOtherWorld: false
 
-#whether to fully kick a player from a bed on wakeup call,
-# which may make it harder for a player to stop phantom spawns.
+#whether to fully kick a player from a bed on wakeup call
 kickFromBed: true
 
 #whether to reset the TIME_SINCE_REST statistic for every player on sleep task
@@ -30,7 +29,7 @@ resetAllStatistics: true
 
 #whether to randomize the message for every player 
 #   instead of distributing 1 random message
-randomPerPlayer: false
+randomPerPlayer: true
 
 #DO NOT TOUCH VERSION NUMBER
 version: 1.2

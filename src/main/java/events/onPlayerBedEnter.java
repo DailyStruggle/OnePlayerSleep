@@ -1,13 +1,12 @@
 package events;
 
-import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 
 import OnePlayerSleep.OnePlayerSleep;
-import bukkitTasks.AnnounceSleep;
-import bukkitTasks.PassTime;
+import bukkitTasks.OnSleepChecks;
 import tools.Config;
 
 public class onPlayerBedEnter implements Listener {
@@ -26,26 +25,12 @@ public class onPlayerBedEnter implements Listener {
 					config.version.contains("1_15")) {
 			if(event.getBedEnterResult() != PlayerBedEnterEvent.BedEnterResult.OK) return;
 		}
-		else { 
-			if(event.getPlayer().isSleeping()) return;
+		if(		event.getPlayer().getWorld().getTime() < config.config.getInt("startTime") ||
+				event.getPlayer().getWorld().getTime() > config.config.getInt("stopTime") ) {
+			event.setUseBed(Result.DENY);
+			event.setCancelled(true);
+			return;
 		}
-		if(event.getPlayer().hasPermission("sleep.ignore")) return;
-		if(event.getPlayer().isSleepingIgnored()) return;
-		if(this.plugin.sleepingPlayers.get(event.getPlayer().getWorld()).size() > 0) return;
-		this.plugin.sleepingPlayers.get(event.getPlayer().getWorld()).add(event.getPlayer());
-		int numPlayers = 0;
-		if(this.config.config.getBoolean("showMessageToOtherWorld")) {
-			for (World w : (plugin.sleepingPlayers.keySet())){
-				numPlayers = numPlayers	+ plugin.sleepingPlayers.get(w).size();
-			}
-			if(numPlayers > 1) new AnnounceSleep(this.plugin, this.config, event.getPlayer()).runTaskAsynchronously(this.plugin);
-		}
-		else{
-			numPlayers = plugin.sleepingPlayers.get(event.getPlayer().getWorld()).size();
-		}
-		if(numPlayers > 1) new AnnounceSleep(this.plugin, this.config, event.getPlayer()).runTaskAsynchronously(this.plugin);
-		if(!plugin.doSleep.containsKey(event.getPlayer().getWorld())) {
-			plugin.doSleep.put(event.getPlayer().getWorld(), new PassTime(this.plugin, this.config, event.getPlayer().getWorld()).runTaskLater(this.plugin, config.config.getInt("sleepDelay")));
-		}
+		new OnSleepChecks(this.plugin, this.config, event.getPlayer()).runTaskAsynchronously(plugin);
 	}
 }
