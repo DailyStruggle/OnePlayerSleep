@@ -52,7 +52,7 @@ public class Config {
 		}
 		
 		if( 	this.messages.getDouble(version) < 1.1 || 
-				this.config.getDouble(version) < 1.0) {
+				this.config.getDouble(version) < 1.1) {
 			updateConfigs();
 			
 			f = new File(this.plugin.getDataFolder(), "config.yml");
@@ -156,6 +156,11 @@ public class Config {
 	
 	//update config files based on version number
 	public void updateConfigs() {
+		if(this.config.getDouble(version) == 1.0) {
+			this.config.set("globalNightSkipSync", false);
+			this.config.set("version", 1.1);
+		}
+		
 		if(this.messages.getDouble(version) == 1.0) {
 			Set<String> messageNames = this.messages.getConfigurationSection("messages").getKeys(false);
 			this.messageArray = new ArrayList<Message>();

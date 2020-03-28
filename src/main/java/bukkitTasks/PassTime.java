@@ -34,6 +34,11 @@ public class PassTime extends BukkitRunnable{
 			this.world.setTime(this.world.getTime() + config.config.getInt("increment"));
 			this.plugin.doSleep.remove(this.world);
 			this.plugin.doSleep.put(this.world, new PassTime(this.plugin, this.config, this.world, this.didNightPass).runTaskLater(this.plugin, 1));
+			if(this.config.config.getBoolean("globalNightSkipSync")) {
+				for (World w : this.plugin.doSleep.keySet()) {
+					w.setTime(world.getTime());
+				}
+			}
 			return;
 		}
 		if(this.world.getTime() >= config.config.getInt("stopTime") 

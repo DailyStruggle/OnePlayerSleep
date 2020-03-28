@@ -1,6 +1,6 @@
 package events;
 
-import org.bukkit.entity.Player;
+import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -29,14 +29,21 @@ public class onPlayerBedEnter implements Listener {
 		else { 
 			if(event.getPlayer().isSleeping()) return;
 		}
-		int numPlayers = 0;
-		for (Player p : event.getPlayer().getWorld().getPlayers())
-			if(p.isSleepingIgnored() || p.hasPermission("sleep.ignore")) numPlayers = numPlayers + 1;
-		if(numPlayers == 1 && !this.config.config.getBoolean("showMessageToOtherWorld")) return;
-		if(this.plugin.sleepingPlayers.get(event.getPlayer().getWorld()).size() > 0) return;
 		if(event.getPlayer().hasPermission("sleep.ignore")) return;
+		if(event.getPlayer().isSleepingIgnored()) return;
+		if(this.plugin.sleepingPlayers.get(event.getPlayer().getWorld()).size() > 0) return;
 		this.plugin.sleepingPlayers.get(event.getPlayer().getWorld()).add(event.getPlayer());
-		new AnnounceSleep(this.plugin, this.config, event.getPlayer()).runTaskAsynchronously(this.plugin);
+		int numPlayers = 0;
+		if(this.config.config.getBoolean("showMessageToOtherWorld")) {
+			for (World w : (plugin.sleepingPlayers.keySet())){
+				numPlayers = numPlayers	+ plugin.sleepingPlayers.get(w).size();
+			}
+			if(numPlayers > 1) new AnnounceSleep(this.plugin, this.config, event.getPlayer()).runTaskAsynchronously(this.plugin);
+		}
+		else{
+			numPlayers = plugin.sleepingPlayers.get(event.getPlayer().getWorld()).size();
+		}
+		if(numPlayers > 1) new AnnounceSleep(this.plugin, this.config, event.getPlayer()).runTaskAsynchronously(this.plugin);
 		if(!plugin.doSleep.containsKey(event.getPlayer().getWorld())) {
 			plugin.doSleep.put(event.getPlayer().getWorld(), new PassTime(this.plugin, this.config, event.getPlayer().getWorld()).runTaskLater(this.plugin, config.config.getInt("sleepDelay")));
 		}
