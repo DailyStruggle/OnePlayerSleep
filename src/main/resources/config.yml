@@ -25,7 +25,7 @@ allowKickFromOtherWorld: false
 # which may make it harder for a player to stop phantom spawns.
 kickFromBed: true
 
-#whether to reset statistics for every player on sleep task
+#whether to reset the TIME_SINCE_REST statistic for every player on sleep task
 resetAllStatistics: true
 
 #whether to randomize the message for every player 

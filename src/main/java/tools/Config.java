@@ -1,8 +1,13 @@
 package tools;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -51,17 +56,20 @@ public class Config {
 			this.messages = YamlConfiguration.loadConfiguration(f);
 		}
 		
-		if( 	this.messages.getDouble(version) < 1.1 || 
-				this.config.getDouble(version) < 1.2) {
-			updateConfigs();
+		if( this.messages.getDouble(version) < 1.1) {
+			plugin.getLogger().info("[Sleep] old messages.yml detected. Getting a newer version");
+			this.renameFileInPluginDir("messages.yml","messages.old.yml");
+			
+			this.plugin.saveResource("messages.yml", false);
+			this.messages = YamlConfiguration.loadConfiguration(f);
+		}
+		if( this.config.getDouble(version) < 1.2) {
+			plugin.getLogger().info("[Sleep] old config.yml detected. Updating");
+			
+			updateConfig();
 			
 			f = new File(this.plugin.getDataFolder(), "config.yml");
-			plugin.saveResource("config.yml", true);
 			this.config = YamlConfiguration.loadConfiguration(f);
-			
-			f = new File(this.plugin.getDataFolder(), "messages.yml");
-			plugin.saveResource("messages.yml", true);
-			this.messages = YamlConfiguration.loadConfiguration(f);
 		}
 		
 		Set<String> messageNames = this.messages.getConfigurationSection("messages").getKeys(false);
@@ -169,26 +177,52 @@ public class Config {
 	}
 	
 	//update config files based on version number
-	public void updateConfigs() {
-		if(this.config.getDouble(version) == 1.0) {
-			this.config.set("globalNightSkipSync", false);
-			this.config.set("version", 1.1);
-		}
-		if(this.config.getDouble(version) == 1.1) {
-			this.config.set("resetAllStatistics", true);
-			this.config.set("version", 1.2);
-		}
-		
-		
-		if(this.messages.getDouble(version) == 1.0) {
-			Set<String> messageNames = this.messages.getConfigurationSection("messages").getKeys(false);
-			this.messageArray = new ArrayList<Message>();
-			for (String t : messageNames) {
-				this.messages.getConfigurationSection(t).set("cantWakeup", "&csomeone's a deep sleeper");
+	public void updateConfig() {
+		this.renameFileInPluginDir("config.yml","config.old.yml");
+		plugin.saveResource("config.yml", false);
+		Map<String, Object> oldValues = this.config.getValues(false);
+		// Read default config to keep comments
+		ArrayList<String> linesInDefaultConfig = new ArrayList<String>();
+		try {
+			Scanner scanner = new Scanner(
+					new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "config.yml"));
+			while (scanner.hasNextLine()) {
+				linesInDefaultConfig.add(scanner.nextLine() + "");
 			}
-			this.messages.set("version", 1.1);
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
-		
+
+		ArrayList<String> newLines = new ArrayList<String>();
+		for (String line : linesInDefaultConfig) {
+			String newline = line;
+			if (line.startsWith("version:")) {
+				newline = "version: 1.2";
+			} else {
+				for (String node : oldValues.keySet()) {
+					if (line.startsWith(node + ":")) {
+						String quotes = "";
+						newline = node + ": " + quotes + oldValues.get(node).toString() + quotes;
+						break;
+					}
+				}
+			}
+			if (newline != null)
+				newLines.add(newline);
+		}
+
+		FileWriter fw;
+		String[] linesArray = newLines.toArray(new String[linesInDefaultConfig.size()]);
+		try {
+			fw = new FileWriter(plugin.getDataFolder().getAbsolutePath() + File.separator + "config.yml");
+			for (int i = 0; i < linesArray.length; i++) {
+				fw.write(linesArray[i] + "\n");
+			}
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return;
 	}
 	
@@ -245,5 +279,11 @@ public class Config {
 		res = res.replace("&m", ChatColor.STRIKETHROUGH.toString());
 		res = res.replace("&o", ChatColor.ITALIC.toString());
 		return res;
+	}
+	
+	private void renameFileInPluginDir(String oldName, String newName) {
+		File oldFile = new File(this.plugin.getDataFolder().getAbsolutePath() + File.separator + oldName);
+		File newFile = new File(this.plugin.getDataFolder().getAbsolutePath() + File.separator + newName);
+		oldFile.getAbsoluteFile().renameTo(newFile.getAbsoluteFile());
 	}
 }
