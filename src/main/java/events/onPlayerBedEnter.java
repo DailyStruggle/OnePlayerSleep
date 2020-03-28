@@ -2,6 +2,12 @@ package events;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 
@@ -12,6 +18,7 @@ import tools.Config;
 public class onPlayerBedEnter implements Listener {
 	private OnePlayerSleep plugin;
 	private Config config;
+	private Map<Player,Long> lastTme = new HashMap<Player,Long>();
 	
 	public onPlayerBedEnter(OnePlayerSleep plugin, Config config) {
 		this.plugin = plugin;
@@ -27,10 +34,19 @@ public class onPlayerBedEnter implements Listener {
 		}
 		if(		event.getPlayer().getWorld().getTime() < config.config.getInt("startTime") ||
 				event.getPlayer().getWorld().getTime() > config.config.getInt("stopTime") ) {
-			event.setUseBed(Result.DENY);
 			event.setCancelled(true);
 			return;
 		}
+		Long currentTime = System.currentTimeMillis();
+		if(		this.lastTme.containsKey(event.getPlayer()) &&
+				currentTime < this.lastTme.get(event.getPlayer()) + config.config.getLong("sleepCooldown")) {
+			event.setCancelled(true);
+			event.getPlayer().sendMessage(ChatColor.YELLOW.toString() + "You can't sleep again yet.");
+			return;
+		}
+		if(this.lastTme.containsKey(event.getPlayer())) 
+			this.lastTme.remove(event.getPlayer());
+		this.lastTme.put(event.getPlayer(), currentTime);
 		new OnSleepChecks(this.plugin, this.config, event.getPlayer()).runTaskAsynchronously(plugin);
 	}
 }

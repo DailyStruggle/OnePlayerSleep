@@ -58,14 +58,14 @@ public class Config {
 		}
 		
 		if( 	(this.messages.getDouble("version") < 1.1) ) {
-			plugin.getLogger().info("§b[OnePlayerSleep] old messages.yml detected. Getting a newer version");
+			Bukkit.getConsoleSender().sendMessage("§b[OnePlayerSleep] old messages.yml detected. Getting a newer version");
 			this.renameFileInPluginDir("messages.yml","messages.old.yml");
 			
 			this.plugin.saveResource("messages.yml", false);
 			this.messages = YamlConfiguration.loadConfiguration(f);
 		}
-		if( 	(this.config.getDouble("version") < 1.2) ) {
-			plugin.getLogger().info("§b[OnePlayerSleep] old config.yml detected. Updating");
+		if( 	(this.config.getDouble("version") < 1.3) ) {
+			Bukkit.getConsoleSender().sendMessage("§b[OnePlayerSleep] old config.yml detected. Updating");
 			
 			updateConfig();
 			
@@ -199,7 +199,7 @@ public class Config {
 		for (String line : linesInDefaultConfig) {
 			String newline = line;
 			if (line.startsWith("version:")) {
-				newline = "version: 1.2";
+				newline = "version: 1.3";
 			} else {
 				for (String node : oldValues.keySet()) {
 					if (line.startsWith(node + ":")) {
