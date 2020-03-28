@@ -31,7 +31,8 @@ public class Wakeup implements CommandExecutor {
 			for(World w : this.plugin.doSleep.keySet()) {
 				if(this.plugin.sleepingPlayers.get(w).size() > 0)
 					hasSleepingPlayers = true;
-				for ( Player p : this.plugin.sleepingPlayers.get(w)) {
+				for ( int idx = 0; idx < this.plugin.sleepingPlayers.get(w).size(); idx++) {
+					Player p = this.plugin.sleepingPlayers.get(w).get(idx);
 					if(p.hasPermission("sleep.bypass")) {
 						cantKickAPlayer = true;
 						continue;
