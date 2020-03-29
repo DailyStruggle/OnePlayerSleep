@@ -4,14 +4,14 @@
 #[world] - world the player is in, minus the dimension substring
 #[dimension] - dimension the player is in
 
-onNoPlayersSleeping: "&cNo players sleeping!"
+onNoPlayersSleeping: "&eNo players sleeping!"
 
 cooldownMessage: "&eYou can't sleep again yet"
 
-dimensions:
-    default: ""
-    _nether: "&cnether"
-    _the_end: "&bend"
+#dimensions
+default: ""
+_nether: "&cnether"
+_the_end: "&bend"
 
 #Messages to announce on sleep
 #message001: arbitrary unique message name

@@ -1,5 +1,6 @@
 package events;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -27,26 +28,37 @@ public class onPlayerBedLeave implements Listener {
 		Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
 		World world = event.getPlayer().getWorld();
 		this.plugin.sleepingPlayers.get(world).remove(event.getPlayer());
-		if(this.plugin.sleepingPlayers.get(world).isEmpty()) {
-			if(this.plugin.doSleep.containsKey(world)) {
-				this.plugin.doSleep.get(world).cancel();
-				this.plugin.doSleep.remove(world);
-			}
+		
+		Long sleepingPlayers = Long.valueOf(0);
+		for (World w : this.plugin.doSleep.keySet()) {
+			if( !doOtherWorld && !event.getPlayer().getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
+			if( !doOtherDim && !event.getPlayer().getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
+			sleepingPlayers = sleepingPlayers + this.plugin.sleepingPlayers.get(w).size();
 		}
-		if(		(doOtherWorld || doOtherDim) &&
-				event.getPlayer().getStatistic( Statistic.TIME_SINCE_REST ) < 10) {
+		if(sleepingPlayers > 0) {
 			for (World w : this.plugin.doSleep.keySet()) {
 				if( !doOtherWorld && !event.getPlayer().getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
 				if( !doOtherDim && !event.getPlayer().getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
-				if(w.getTime()!= world.getTime()) {
-					w.setTime(world.getTime());
+				if( this.plugin.doSleep.containsKey(w)) {
+					this.plugin.doSleep.get(w).cancel();
 					this.plugin.doSleep.remove(w);
-					this.plugin.doSleep.put(w, new ClearWeather(w).runTask(this.plugin));
-					if(this.config.config.getBoolean("resetAllStatistics")) {
-						for (Player p : w.getPlayers()) {
-							if(p.hasPermission("sleep.ignore")) continue;
-							p.setStatistic(Statistic.TIME_SINCE_REST, 0);
-						}
+				}
+			}
+		}
+		else if( event.getPlayer().getStatistic( Statistic.TIME_SINCE_REST ) < 3) {
+			for (World w : this.plugin.doSleep.keySet()) {
+				if( !doOtherWorld && !event.getPlayer().getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
+				if( !doOtherDim && !event.getPlayer().getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
+				if(w.getTime()!= world.getTime()) w.setTime(world.getTime());
+				this.plugin.doSleep.get(w).cancel();;
+				this.plugin.doSleep.remove(w);
+				this.plugin.clearWeather.get(w).cancel();;
+				this.plugin.clearWeather.remove(w);
+				this.plugin.clearWeather.put(w, new ClearWeather(w).runTask(this.plugin));
+				if(this.config.config.getBoolean("resetAllStatistics")) {
+					for (Player p : w.getPlayers()) {
+						if(p.hasPermission("sleep.ignore")) continue;
+						p.setStatistic(Statistic.TIME_SINCE_REST, 0);
 					}
 				}
 			}

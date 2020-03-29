@@ -14,7 +14,7 @@ public class LocalPlaceholders {
 	}
 	
 	public static String fillColorCodes(String in) {
-		if(in.isEmpty()) return in;
+		if(in == null) return "";
 		String res = in;
 		res = res.replace("&0", ChatColor.BLACK.toString());
 		res = res.replace("&1", ChatColor.DARK_BLUE.toString());

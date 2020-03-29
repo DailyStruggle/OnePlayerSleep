@@ -1,6 +1,5 @@
 package bukkitTasks;
 
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -46,13 +45,9 @@ public class PassTime extends BukkitRunnable{
 			return;
 		}
 		
-		Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] a2"); 
 		for (World w : this.plugin.doSleep.keySet()) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] a3"); 
 			if( !doOtherWorld && !this.world.getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] a4"); 
 			if( !doOtherDim && !this.world.getEnvironment().equals( w.getEnvironment() ) ) continue;
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] a5"); 
 			this.plugin.doSleep.remove(w);
 			if(didNightPass) this.plugin.doSleep.put(w, new ClearWeather(w).runTask(this.plugin));
 			else this.plugin.doSleep.put(w, new ClearWeather(w).runTaskLater(this.plugin,this.config.config.getLong("sleepDelay")));

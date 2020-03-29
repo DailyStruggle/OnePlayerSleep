@@ -57,6 +57,8 @@ public class Config {
 			this.messages = YamlConfiguration.loadConfiguration(f);
 		}
 		
+		checkConfigs();
+		
 		if( 	(this.messages.getDouble("version") < 1.2) ) {
 			Bukkit.getConsoleSender().sendMessage("§b[OnePlayerSleep] old messages.yml detected. Getting a newer version");
 			this.renameFileInPluginDir("messages.yml","messages.old.yml");
@@ -72,6 +74,13 @@ public class Config {
 			f = new File(this.plugin.getDataFolder(), "config.yml");
 			this.config = YamlConfiguration.loadConfiguration(f);
 		}
+		
+		this.messages.set("onNoPlayersSleeping", LocalPlaceholders.fillColorCodes(this.messages.getString("onNoPlayersSleeping")));
+		this.messages.set("cooldownMessage", LocalPlaceholders.fillColorCodes(this.messages.getString("cooldownMessage")));
+		
+		this.messages.set("default", LocalPlaceholders.fillColorCodes(this.messages.getString("default")));
+		this.messages.set("_nether", LocalPlaceholders.fillColorCodes(this.messages.getString("_nether")));
+		this.messages.set("_the_end", LocalPlaceholders.fillColorCodes(this.messages.getString("_the_end")));
 		
 		Set<String> messageNames = this.messages.getConfigurationSection("messages").getKeys(false);
 		this.messageArray = new ArrayList<Message>();
@@ -166,6 +175,13 @@ public class Config {
 				||  !this.messages.isString("onNoPlayersSleeping")) {
 			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no onNoPlayersSleeping value. Setting to default"); 
 			this.messages.set("onNoPlayersSleeping", ChatColor.YELLOW.toString() + "No players sleeping!");
+		}
+		
+		//cooldownMessage value
+		if(			!this.messages.isSet("cooldownMessage") 
+				||  !this.messages.isString("cooldownMessage")) {
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no cooldownMessage value. Setting to default"); 
+			this.messages.set("onNoPlayersSleeping", ChatColor.YELLOW.toString() + "You can't sleep again yet");
 		}
 	}
 	

@@ -4,7 +4,7 @@ sleepDelay: 60
 
 #server time to allow passing night
 startTime: 12010
-stopTime: 23460
+stopTime: 23992
 
 #amount of time to increment by, per server tick
 increment: 75

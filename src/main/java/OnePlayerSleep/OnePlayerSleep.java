@@ -26,6 +26,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 	private Config config = new Config(this);
 	
 	public Map<World,BukkitTask> doSleep = new HashMap<World,BukkitTask>();
+	public Map<World,BukkitTask> clearWeather = new HashMap<World,BukkitTask>();
 	public Map<Player, Message> wakeData = new HashMap<Player, Message>(); //list of players receiving wakeup option
 	public Map<World, ArrayList<Player>> sleepingPlayers = new HashMap<World, ArrayList<Player>>(); //list of sleeping players for each world
 	
@@ -38,7 +39,6 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		getCommand("sleep wakeup").setExecutor(new Wakeup(this, this.config));
 
 		this.config.refreshConfigs();
-		this.config.checkConfigs();
 		
 		for(World w : Bukkit.getWorlds()) {
 			sleepingPlayers.put(w, new ArrayList<Player>());
