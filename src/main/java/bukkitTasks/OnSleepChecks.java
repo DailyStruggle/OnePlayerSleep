@@ -26,8 +26,6 @@ public class OnSleepChecks extends BukkitRunnable{
 			this.cancel();
 			return;
 		}
-		if(this.player.hasPermission("sleep.ignore")) return;
-		if(this.player.isSleepingIgnored()) return;
 		
 		//add player to list of sleeping players
 		this.plugin.sleepingPlayers.get(this.player.getWorld()).add(this.player);

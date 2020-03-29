@@ -22,7 +22,9 @@ public class onPlayerBedLeave implements Listener {
 	
 	@EventHandler
 	public void onPlayerBedLeave (PlayerBedLeaveEvent event) {
-		if(event.getPlayer().hasPermission("sleep.ignore")) return; 
+		if(event.getPlayer().isSleepingIgnored() || event.getPlayer().hasPermission("sleep.ignore")) return; 
+		Boolean doOtherWorld = config.config.getBoolean("doOtherWorlds");
+		Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
 		World world = event.getPlayer().getWorld();
 		this.plugin.sleepingPlayers.get(world).remove(event.getPlayer());
 		if(this.plugin.sleepingPlayers.get(world).isEmpty()) {
@@ -31,9 +33,11 @@ public class onPlayerBedLeave implements Listener {
 				this.plugin.doSleep.remove(world);
 			}
 		}
-		if(		this.config.config.getBoolean("globalNightSkipSync") &&
+		if(		(doOtherWorld || doOtherDim) &&
 				event.getPlayer().getStatistic( Statistic.TIME_SINCE_REST ) < 10) {
 			for (World w : this.plugin.doSleep.keySet()) {
+				if( !doOtherWorld && !event.getPlayer().getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
+				if( !doOtherDim && !event.getPlayer().getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
 				if(w.getTime()!= world.getTime()) {
 					w.setTime(world.getTime());
 					this.plugin.doSleep.remove(w);

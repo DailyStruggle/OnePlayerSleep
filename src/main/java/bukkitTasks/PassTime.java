@@ -1,5 +1,6 @@
 package bukkitTasks;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -28,49 +29,35 @@ public class PassTime extends BukkitRunnable{
 	
 	@Override
 	public void run() {
+		Boolean doOtherWorld = this.config.config.getBoolean("doOtherWorlds");
+		Boolean doOtherDim = this.config.config.getBoolean("doOtherDimensions");
 		if(this.world.getTime() < config.config.getInt("stopTime") 
 				&& this.world.getTime() >= config.config.getInt("startTime")) {
-			this.didNightPass = true;
 			this.world.setTime(this.world.getTime() + config.config.getInt("increment"));
 			this.plugin.doSleep.remove(this.world);
-			this.plugin.doSleep.put(this.world, new PassTime(this.plugin, this.config, this.world, this.didNightPass).runTaskLater(this.plugin, 1));
-			if(this.config.config.getBoolean("globalNightSkipSync")) {
+			this.plugin.doSleep.put(this.world, new PassTime(this.plugin, this.config, this.world, true).runTaskLater(this.plugin, 1));
+			if( doOtherWorld || doOtherDim ) {
 				for (World w : this.plugin.doSleep.keySet()) {
-					if(w == world) continue;
+					if( !doOtherWorld && !this.world.getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
+					if( !doOtherDim && !this.world.getEnvironment().equals( w.getEnvironment() ) ) continue;
 					w.setTime(world.getTime());
 				}
 			}
 			return;
 		}
-		if(this.world.getTime() >= config.config.getInt("stopTime") 
-				|| this.world.getTime() < config.config.getInt("startTime") ) {
-			if(didNightPass) {
-				this.cancel();
-				if(this.config.config.getBoolean("globalNightSkipSync")) {
-					for (World w : this.plugin.doSleep.keySet()) {
-						this.plugin.doSleep.remove(w);
-						this.plugin.doSleep.put(w, new ClearWeather(w).runTask(this.plugin));
-					}
-				}
-				else {
-					this.plugin.doSleep.remove(this.world);
-					this.plugin.doSleep.put(this.world, new ClearWeather(this.world).runTask(this.plugin));
-				}
-			}
-			else {
-				this.cancel();
-				if(this.config.config.getBoolean("globalNightSkipSync")) {
-					for (World w : this.plugin.doSleep.keySet()) {
-						this.plugin.doSleep.remove(w);
-						this.plugin.doSleep.put(w, new ClearWeather(w).runTaskLater(this.plugin, this.config.config.getLong("sleepDelay")));
-					}
-				}
-				else {
-					this.plugin.doSleep.remove(this.world);
-					this.plugin.doSleep.put(this.world, new ClearWeather(this.world).runTaskLater(this.plugin, this.config.config.getLong("sleepDelay")));
-				}
-			}
+		
+		Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] a2"); 
+		for (World w : this.plugin.doSleep.keySet()) {
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] a3"); 
+			if( !doOtherWorld && !this.world.getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] a4"); 
+			if( !doOtherDim && !this.world.getEnvironment().equals( w.getEnvironment() ) ) continue;
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] a5"); 
+			this.plugin.doSleep.remove(w);
+			if(didNightPass) this.plugin.doSleep.put(w, new ClearWeather(w).runTask(this.plugin));
+			else this.plugin.doSleep.put(w, new ClearWeather(w).runTaskLater(this.plugin,this.config.config.getLong("sleepDelay")));
 		}
+		this.cancel();
 	}
 
 }

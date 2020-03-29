@@ -1,10 +1,12 @@
 package bukkitTasks;
 
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import OnePlayerSleep.OnePlayerSleep;
 import tools.Config;
+import tools.LocalPlaceholders;
 import types.Message;
 
 //set up message threads for all relevant players
@@ -23,19 +25,33 @@ public class AnnounceWakeup extends BukkitRunnable{
 	
 	@Override
 	public void run() {
-		Boolean otherWorldShow = config.config.getBoolean("showMessageToOtherWorld");
+		Boolean doOtherWorld = config.config.getBoolean("doOtherWorlds");
+		Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
 		for (Player p : plugin.getServer().getOnlinePlayers()) {
-			if(p.hasPermission("sleep.ignore")) {
-				return;
-			}
-			if(		otherWorldShow &&
-					player.getWorld() != p.getWorld() )
-				continue;
-			else {
-				msg.response = msg.response.replace("[player]", player.getName());
-				p.sendMessage(this.msg.response);
+			if(p.hasPermission("sleep.ignore")) continue;
+			if( !doOtherWorld && !this.player.getWorld().getName().replace("_nether","").replace("the_end","").equals( p.getWorld().getName().replace("_nether","").replace("the_end","") ) ) continue;
+			if( !doOtherDim && !this.player.getWorld().getEnvironment().equals( p.getWorld().getEnvironment() ) ) continue;
+			
+			int dim = this.player.getWorld().getEnvironment().equals(World.Environment.NETHER) ? 1 : 0;
+			dim = dim + (this.player.getWorld().getEnvironment().equals(World.Environment.THE_END) ? 2 : 0);
+			
+			String dimStr;
+			switch (dim) {
+				case 1:  dimStr = config.config.getString("_nether");
+					break;
+				case 2:  dimStr = config.config.getString("_the_end");
+					break;
+				default: dimStr = config.config.getString("default");
+					break;
 			}
 			
+			String wakeupMsg = LocalPlaceholders.fillPlaceHolders(
+					this.msg.wakeup, 
+					p.getName(), 
+					p.getDisplayName(), 
+					p.getWorld().getName(),
+					dimStr );
+			p.sendMessage(wakeupMsg);
 		}
 	}
 }

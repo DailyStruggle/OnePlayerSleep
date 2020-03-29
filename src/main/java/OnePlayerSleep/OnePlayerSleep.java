@@ -50,7 +50,6 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 			}
 		}
 		
-		
 		getServer().getPluginManager().registerEvents(new onPlayerBedEnter(this, config), this);
 		getServer().getPluginManager().registerEvents(new onPlayerBedLeave(this, config), this);
 		getServer().getPluginManager().registerEvents(this, this);

@@ -6,9 +6,7 @@ import org.bukkit.event.Listener;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Result;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 
 import OnePlayerSleep.OnePlayerSleep;
@@ -27,13 +25,15 @@ public class onPlayerBedEnter implements Listener {
 	
 	@EventHandler
 	public void onPlayerBedEnter(PlayerBedEnterEvent event) {
+		if(event.getPlayer().isSleepingIgnored() || event.getPlayer().hasPermission("sleep.ignore")) return; 
 		if(			config.version.contains("1_13") ||
 					config.version.contains("1_14") ||
 					config.version.contains("1_15")) {
 			if(event.getBedEnterResult() != PlayerBedEnterEvent.BedEnterResult.OK) return;
 		}
-		if(		event.getPlayer().getWorld().getTime() < config.config.getInt("startTime") ||
-				event.getPlayer().getWorld().getTime() > config.config.getInt("stopTime") ) {
+		if(	(	event.getPlayer().getWorld().getTime() < config.config.getInt("startTime") ||
+				event.getPlayer().getWorld().getTime() > config.config.getInt("stopTime") ) &&
+				!event.getPlayer().getWorld().hasStorm()) {
 			event.setCancelled(true);
 			return;
 		}
@@ -41,7 +41,7 @@ public class onPlayerBedEnter implements Listener {
 		if(		this.lastTme.containsKey(event.getPlayer()) &&
 				currentTime < this.lastTme.get(event.getPlayer()) + config.config.getLong("sleepCooldown")) {
 			event.setCancelled(true);
-			event.getPlayer().sendMessage(ChatColor.YELLOW.toString() + "You can't sleep again yet.");
+			event.getPlayer().sendMessage( config.messages.getString("cooldownMessage") );
 			return;
 		}
 		if(this.lastTme.containsKey(event.getPlayer())) 

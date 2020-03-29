@@ -57,14 +57,14 @@ public class Config {
 			this.messages = YamlConfiguration.loadConfiguration(f);
 		}
 		
-		if( 	(this.messages.getDouble("version") < 1.1) ) {
+		if( 	(this.messages.getDouble("version") < 1.2) ) {
 			Bukkit.getConsoleSender().sendMessage("§b[OnePlayerSleep] old messages.yml detected. Getting a newer version");
 			this.renameFileInPluginDir("messages.yml","messages.old.yml");
 			
 			this.plugin.saveResource("messages.yml", false);
 			this.messages = YamlConfiguration.loadConfiguration(f);
 		}
-		if( 	(this.config.getDouble("version") < 1.3) ) {
+		if( 	(this.config.getDouble("version") < 1.4) ) {
 			Bukkit.getConsoleSender().sendMessage("§b[OnePlayerSleep] old config.yml detected. Updating");
 			
 			updateConfig();
@@ -80,10 +80,10 @@ public class Config {
 		this.chanceRanges.add(0, 0.0);
 		int i = 0;
 		for (String t : messageNames) {
-			String msg = this.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("global","[player] &bis sleeping"));
-			String hover_msg = this.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("hover","&eWake up!"));
-			String response = this.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("wakeup","[player] says &cWake up!"));
-			String cantWakeup = this.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("cantWakeup","&csomeone's a deep sleeper"));
+			String msg = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("global","[player] &bis sleeping"));
+			String hover_msg = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("hover","&eWake up!"));
+			String response = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("wakeup","[player] says &cWake up!"));
+			String cantWakeup = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("cantWakeup","&csomeone's a deep sleeper"));
 			Double chance = this.messages.getConfigurationSection("messages").getConfigurationSection(t).getDouble("chance");
 			this.messageArray.add(i, new Message( msg, hover_msg, response, cantWakeup, chance) );
 			this.totalChance = this.totalChance + chance;
@@ -91,7 +91,7 @@ public class Config {
 			i = i+1;
 		}
 		
-		String msg = this.fillColorCodes(this.messages.getString("onNoPlayersSleeping"));
+		String msg = LocalPlaceholders.fillColorCodes(this.messages.getString("onNoPlayersSleeping"));
 		this.messages.set("onNoPlayersSleeping", msg);
 	}
 	
@@ -103,51 +103,29 @@ public class Config {
 			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no sleepDelay value. Setting to default"); 
 			this.config.set("sleepDelay", 60);
 		}
-		if(this.config.getInt("sleepDelay") < 0) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: invalid sleepDelay value. Setting to default"); 
-			this.config.set("sleepDelay", 60);
+		
+		//startTime value
+		if(			!this.config.isSet("startTime") 
+				||  !this.config.isInt("startTime")) {
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no stopTime value. Setting to default"); 
+			this.config.set("startTime", 12010);
 		}
 		
 		//stopTime value
 		if(			!this.config.isSet("stopTime") 
 				||  !this.config.isInt("stopTime")) {
 			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no stopTime value. Setting to default"); 
-			this.config.set("stopTime", 60);
+			this.config.set("stopTime", 23992);
 		}
-		this.config.set("stopTime", ((this.config.getLong("stopTime") % 24000) + 24000) % 24000); //guarantee a value within 0-23999
 		
 		//increment value
 		if(			!this.config.isSet("increment") 
-				||  !this.config.isInt("increment")) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no increment value. Setting to default"); 
-			this.config.set("increment", 10);
+				||  !this.config.isInt("increment")
+				|| 	this.config.getInt("increment") < 1) {
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no increment value or invalid value. Setting to default"); 
+			this.config.set("increment", 75);
 		}
-		if(this.config.getInt("increment") < 0) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: invalid increment value. Setting to default"); 
-			this.config.set("increment", 10);
-		}
-		
-		//globalNightSkipSync value
-		if(			!this.config.isSet("globalNightSkipSync") 
-				||  !this.config.isBoolean("globalNightSkipSync")) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no globalNightSkipSync value. Setting to default"); 
-			this.config.set("globalNightSkipSync", false);
-		}
-		
-		//showMessageToOtherWorld value
-		if(			!this.config.isSet("showMessageToOtherWorld") 
-				||  !this.config.isBoolean("showMessageToOtherWorld")) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no showMessageToOtherWorld value. Setting to default"); 
-			this.config.set("showMessageToOtherWorld", false);
-		}
-		
-		//allowKickFromOtherWorld value
-		if(			!this.config.isSet("allowKickFromOtherWorld") 
-				||  !this.config.isBoolean("allowKickFromOtherWorld")) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no allowKickFromOtherWorld value. Setting to default"); 
-			this.config.set("allowKickFromOtherWorld", false);
-		}
-		
+
 		//kickFromBed value
 		if(			!this.config.isSet("kickFromBed") 
 				||  !this.config.isBoolean("kickFromBed")) {
@@ -155,7 +133,7 @@ public class Config {
 			this.config.set("kickFromBed", false);
 		}
 		
-		//randomPerPlayer value
+		//ResetAllStatistics value
 		if(			!this.config.isSet("resetAllStatistics") 
 				||  !this.config.isBoolean("resetAllStatistics")) {
 			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no resetAllStatistics value. Setting to default"); 
@@ -169,11 +147,25 @@ public class Config {
 			this.config.set("randomPerPlayer", false);
 		}
 		
+		//doOtherWorlds value
+		if(			!this.config.isSet("doOtherWorlds") 
+				||  !this.config.isBoolean("doOtherWorlds")) {
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no doOtherWorlds value. Setting to default"); 
+			this.config.set("doOtherWorlds", false);
+		}
+		
+		//doOtherDimensions value
+		if(			!this.config.isSet("doOtherDimensions") 
+				||  !this.config.isBoolean("doOtherDimensions")) {
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no doOtherDimensions value. Setting to default"); 
+			this.config.set("doOtherDimensions", false);
+		}
+		
 		//onNoPlayerSleeping value
 		if(			!this.messages.isSet("onNoPlayersSleeping") 
 				||  !this.messages.isString("onNoPlayersSleeping")) {
 			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no onNoPlayersSleeping value. Setting to default"); 
-			this.messages.set("onNoPlayersSleeping", "No players sleeping!");
+			this.messages.set("onNoPlayersSleeping", ChatColor.YELLOW.toString() + "No players sleeping!");
 		}
 	}
 	
@@ -255,31 +247,6 @@ public class Config {
 			break;
 		}
 		return messageArray.get(i);
-	}
-	
-	private String fillColorCodes(String in) {
-		if(in.isEmpty()) return in;
-		String res = new String(in);
-		res = res.replace("&0", ChatColor.BLACK.toString());
-		res = res.replace("&1", ChatColor.DARK_BLUE.toString());
-		res = res.replace("&2", ChatColor.DARK_GREEN.toString());
-		res = res.replace("&3", ChatColor.DARK_AQUA.toString());
-		res = res.replace("&4", ChatColor.DARK_RED.toString());
-		res = res.replace("&5", ChatColor.DARK_PURPLE.toString());
-		res = res.replace("&6", ChatColor.GOLD.toString());
-		res = res.replace("&7", ChatColor.GRAY.toString());
-		res = res.replace("&8", ChatColor.DARK_GRAY.toString());
-		res = res.replace("&9", ChatColor.BLUE.toString());
-		res = res.replace("&a", ChatColor.GREEN.toString());
-		res = res.replace("&b", ChatColor.AQUA.toString());
-		res = res.replace("&c", ChatColor.RED.toString());
-		res = res.replace("&d", ChatColor.LIGHT_PURPLE.toString());
-		res = res.replace("&e", ChatColor.YELLOW.toString());
-		res = res.replace("&f", ChatColor.WHITE.toString());
-		res = res.replace("&l", ChatColor.BOLD.toString());
-		res = res.replace("&m", ChatColor.STRIKETHROUGH.toString());
-		res = res.replace("&o", ChatColor.ITALIC.toString());
-		return res;
 	}
 	
 	private void renameFileInPluginDir(String oldName, String newName) {
