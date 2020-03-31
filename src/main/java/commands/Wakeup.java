@@ -1,6 +1,8 @@
 package commands;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -33,7 +35,8 @@ public class Wakeup implements CommandExecutor {
 		Boolean KickFromBed = this.config.config.getBoolean("kickFromBed");
 		Boolean cantKickAPlayer = false;
 		Boolean hasSleepingPlayers = false;
-		for(World w : this.plugin.sleepingPlayers.keySet()) {
+		Set<World> worlds = new HashSet<World>(this.plugin.sleepingPlayers.keySet());
+		for(World w : worlds) {
 			if( isPlayer && !doOtherWorld && !((Player)sender).getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
 			if( isPlayer && !doOtherDim && !((Player)sender).getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
 			ArrayList<Player> sleepingPlayers = new ArrayList<Player>(this.plugin.sleepingPlayers.get(w));

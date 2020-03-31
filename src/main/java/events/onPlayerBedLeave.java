@@ -36,7 +36,7 @@ public class onPlayerBedLeave implements Listener {
 			if( !doOtherDim && !event.getPlayer().getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
 			sleepingPlayers = sleepingPlayers + this.plugin.sleepingPlayers.get(w).size();
 		}
-		if(sleepingPlayers > 0) {
+		if(sleepingPlayers == 0) {
 			for (World w : Bukkit.getWorlds()) {
 				if( !doOtherWorld && !event.getPlayer().getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
 				if( !doOtherDim && !event.getPlayer().getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
@@ -45,7 +45,9 @@ public class onPlayerBedLeave implements Listener {
 				}
 			}
 		}
-		else if( event.getPlayer().getStatistic( Statistic.TIME_SINCE_REST ) < 3) {
+		else if( event.getPlayer().getStatistic( Statistic.TIME_SINCE_REST ) < 3 &&
+					event.getPlayer().getWorld().getTime() >= 23460 &&
+					event.getPlayer().getWorld().getTime() <=  23999) {
 			for (World w : Bukkit.getWorlds()) {
 				if( !doOtherWorld && !event.getPlayer().getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
 				if( !doOtherDim && !event.getPlayer().getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
@@ -55,7 +57,7 @@ public class onPlayerBedLeave implements Listener {
 				this.plugin.clearWeather.remove(w);
 				this.plugin.clearWeather.put(w, new ClearWeather(w).runTask(this.plugin));
 				if(this.config.config.getBoolean("resetAllStatistics")) {
-					for (Player p : w.getPlayers()) {
+					for (Player p : w.getPlayers()) { 
 						if(p.isSleepingIgnored() || p.hasPermission("sleep.ignore")) continue;
 						p.setStatistic(Statistic.TIME_SINCE_REST, 0);
 					}

@@ -2,6 +2,7 @@ package bukkitTasks;
 
 import java.util.ArrayList;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -39,7 +40,7 @@ public class OnSleepChecks extends BukkitRunnable{
 		int numPlayers = 0;
 		int numSleepingPlayers = 0;
 		//check for valid players
-		for (World w : (this.plugin.doSleep.keySet())){
+		for (World w : Bukkit.getWorlds()){
 			if( !doOtherWorld && !this.player.getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
 			if( !doOtherDim && !this.player.getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
 			for (Player p : w.getPlayers()) {
@@ -51,10 +52,9 @@ public class OnSleepChecks extends BukkitRunnable{
 			}
 		}
 		//only announce the first bed entry, when there's more than one player to see it
-		if(numSleepingPlayers < 2 && numPlayers > 1) new AnnounceSleep(this.plugin, this.config, this.player).runTaskAsynchronously(this.plugin);
-		
-		//if not already doing sleep stuff in this world, start doing stuff
-		if(!plugin.doSleep.containsKey(this.player.getWorld())) {
+		if(numSleepingPlayers < 2 && numPlayers > 1) {
+			new AnnounceSleep(this.plugin, this.config, this.player).runTaskAsynchronously(this.plugin);
+			if(plugin.doSleep.containsKey(this.player.getWorld())) plugin.doSleep.remove(this.player.getWorld());
 			plugin.doSleep.put(this.player.getWorld(), new PassTime(this.plugin, this.config, this.player.getWorld()).runTaskLater(this.plugin, config.config.getInt("sleepDelay")));
 		}
 		
