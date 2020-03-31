@@ -34,11 +34,11 @@ public class AnnounceSleep extends BukkitRunnable{
 			
 			String dimStr;
 			switch (dim) {
-				case 1:  dimStr = config.config.getString("_nether");
+				case 1:  dimStr = config.messages.getString("_nether");
 					break;
-				case 2:  dimStr = config.config.getString("_the_end");
+				case 2:  dimStr = config.messages.getString("_the_end");
 					break;
-				default: dimStr = config.config.getString("default");
+				default: dimStr = config.messages.getString("default");
 					break;
 					
 			}

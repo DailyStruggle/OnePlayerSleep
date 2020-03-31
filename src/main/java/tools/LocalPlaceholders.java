@@ -8,8 +8,9 @@ public class LocalPlaceholders {
 		String res = in;
 		res = res.replace("[username]", username);
 		res = res.replace("[displayname]", displayname);
-		if(!worldname.isEmpty()) res = res.replace("[world]", worldname.replace("_nether","").replace("_the_end",""));
+		if(worldname != null) res = res.replace("[world]", worldname.replace("_nether","").replace("_the_end",""));
 		if(dimensionname!=null) res = res.replace("[dimension]", dimensionname);
+		res = LocalPlaceholders.fillColorCodes(res);
 		return res;
 	}
 	
