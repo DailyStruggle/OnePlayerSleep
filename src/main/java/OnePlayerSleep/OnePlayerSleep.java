@@ -37,7 +37,8 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		getCommand("sleep help").setExecutor(new Help());
 		getCommand("sleep reload").setExecutor(new Reload(this, this.config));
 		getCommand("sleep wakeup").setExecutor(new Wakeup(this, this.config));
-
+		getCommand("sleepwakeup").setExecutor(new Wakeup(this, this.config));
+		
 		this.config.refreshConfigs();
 		
 		for(World w : Bukkit.getWorlds()) {

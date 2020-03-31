@@ -72,7 +72,6 @@ public class SendMessage extends BukkitRunnable{
 					this.sourcePlayer.getWorld().getName(),
 					dimStr );
 		}
-		this.message = this.config.pickRandomMessage();
 		dim = this.sourcePlayer.getWorld().getEnvironment().equals(World.Environment.NETHER) ? 1 : 0;
 		dim = dim + (this.sourcePlayer.getWorld().getEnvironment().equals(World.Environment.THE_END) ? 2 : 0);
 		switch (dim) {
@@ -98,5 +97,4 @@ public class SendMessage extends BukkitRunnable{
 		}
 		this.plugin.wakeData.put(this.targetPlayer, this.message);
 	}
-	
 }

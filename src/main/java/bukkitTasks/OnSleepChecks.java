@@ -1,5 +1,7 @@
 package bukkitTasks;
 
+import java.util.ArrayList;
+
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -28,6 +30,7 @@ public class OnSleepChecks extends BukkitRunnable{
 		}
 		
 		//add player to list of sleeping players
+		if(!this.plugin.sleepingPlayers.containsKey(this.player.getWorld())) this.plugin.sleepingPlayers.put(this.player.getWorld(),new ArrayList<Player>());
 		this.plugin.sleepingPlayers.get(this.player.getWorld()).add(this.player);
 		
 		Boolean doOtherWorld = config.config.getBoolean("doOtherWorlds");
@@ -36,12 +39,16 @@ public class OnSleepChecks extends BukkitRunnable{
 		int numPlayers = 0;
 		int numSleepingPlayers = 0;
 		//check for valid players
-		for (World w : (this.plugin.sleepingPlayers.keySet())){
+		for (World w : (this.plugin.doSleep.keySet())){
 			if( !doOtherWorld && !this.player.getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
 			if( !doOtherDim && !this.player.getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
-			numSleepingPlayers = numSleepingPlayers	+ this.plugin.sleepingPlayers.get(w).size();
-			for ( Player p : w.getPlayers()) 
-				if(!p.isSleepingIgnored() && !p.hasPermission("sleep.ignore")) numPlayers = numPlayers + 1;
+			for (Player p : w.getPlayers()) {
+				if(p.isSleepingIgnored() || p.hasPermission("sleep.ignore")) continue;
+				numPlayers = numPlayers + 1;
+				if(!p.isSleeping()) continue;
+				numSleepingPlayers = numSleepingPlayers + 1;
+				if(numSleepingPlayers > 1) break;
+			}
 		}
 		//only announce the first bed entry, when there's more than one player to see it
 		if(numSleepingPlayers < 2 && numPlayers > 1) new AnnounceSleep(this.plugin, this.config, this.player).runTaskAsynchronously(this.plugin);

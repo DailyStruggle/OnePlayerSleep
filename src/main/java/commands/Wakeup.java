@@ -1,5 +1,7 @@
 package commands;
 
+import java.util.ArrayList;
+
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -23,7 +25,7 @@ public class Wakeup implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!sender.hasPermission("sleep.wakeup")) return false;
-		Player player = (Player) sender;
+		Boolean isPlayer = (sender instanceof Player);
 		
 		Boolean doOtherWorld= config.config.getBoolean("doOtherWorlds");
 		Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
@@ -31,18 +33,17 @@ public class Wakeup implements CommandExecutor {
 		Boolean KickFromBed = this.config.config.getBoolean("kickFromBed");
 		Boolean cantKickAPlayer = false;
 		Boolean hasSleepingPlayers = false;
-		for(World w : this.plugin.doSleep.keySet()) {
-			if( !doOtherWorld && !player.getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
-			if( !doOtherDim && !player.getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
-			if(this.plugin.sleepingPlayers.get(w).size() > 0)
+		for(World w : this.plugin.sleepingPlayers.keySet()) {
+			if( isPlayer && !doOtherWorld && !((Player)sender).getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
+			if( isPlayer && !doOtherDim && !((Player)sender).getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
+			ArrayList<Player> sleepingPlayers = new ArrayList<Player>(this.plugin.sleepingPlayers.get(w));
+			for ( Player p : sleepingPlayers) {
+				if(p.isSleepingIgnored() || p.hasPermission("sleep.ignore")) continue;
 				hasSleepingPlayers = true;
-			for ( int idx = 0; idx < this.plugin.sleepingPlayers.get(w).size(); idx++) {
-				Player p = this.plugin.sleepingPlayers.get(w).get(idx);
-				if(p.hasPermission("sleep.bypass")) {
+				if(p.hasPermission("sleep.bypass") && !isPlayer) {
 					cantKickAPlayer = true;
-					continue;
 				}
-				if(KickFromBed) {
+				else if(KickFromBed) {
 					Double health = p.getHealth();
 					p.damage(1);
 					p.setHealth(health);
@@ -50,24 +51,28 @@ public class Wakeup implements CommandExecutor {
 			}
 			if(!cantKickAPlayer && hasSleepingPlayers && this.plugin.doSleep.containsKey(w)) {
 				this.plugin.doSleep.get(w).cancel();
-				this.plugin.doSleep.remove(w);
 			}
 		}
-		if(hasSleepingPlayers) {
-			player.sendMessage(config.messages.getString("onNoPlayersSleeping"));
+		if(!hasSleepingPlayers) {
+			sender.sendMessage(config.messages.getString("onNoPlayersSleeping"));
 			return true;
 		}
 		
-		Message m = this.plugin.wakeData.get(player);
-		if(!cantKickAPlayer && hasSleepingPlayers) {
-			new AnnounceWakeup(this.plugin,this.config,player,m).runTaskAsynchronously(this.plugin);
+		if(isPlayer) {
+			Message m = this.plugin.wakeData.get(((Player)sender));
+			if(!cantKickAPlayer && hasSleepingPlayers) {
+				new AnnounceWakeup(this.plugin,this.config,((Player)sender),m).runTaskAsynchronously(this.plugin);
+			}
+			if(cantKickAPlayer && hasSleepingPlayers) {
+				sender.sendMessage(m.cantWakeup);
+			}
 		}
-		if(cantKickAPlayer && hasSleepingPlayers) {
-			player.sendMessage(m.cantWakeup);
+		else {
+			plugin.getServer().broadcastMessage("[server]: Everyone wake up!");
 		}
 		if(!hasSleepingPlayers) {
 			String msg = config.messages.getString("onNoPlayersSleeping", "§cNo players sleeping!");
-			player.sendMessage(msg);
+			sender.sendMessage(msg);
 		}
 		return true;
 	}
