@@ -29,6 +29,8 @@ public class Config {
 	private ArrayList<Double> chanceRanges = new ArrayList<Double>();
 	private OnePlayerSleep plugin;
 	
+	private Boolean hasPAPI = false;
+	
 	public Config(OnePlayerSleep plugin) {
 		this.plugin = plugin;
 		String s = this.plugin.getServer().getClass().getPackage().getName();
@@ -37,6 +39,10 @@ public class Config {
 	
 	
 	public void refreshConfigs() {
+		if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+			this.hasPAPI = true;
+		}
+		
 		//load config.yml file
 		File f = new File(this.plugin.getDataFolder(), "config.yml");
 		if(f.exists())
@@ -59,7 +65,7 @@ public class Config {
 		
 		checkConfigs();
 		
-		if( 	(this.messages.getDouble("version") < 1.2) ) {
+		if( 	(this.messages.getDouble("version") < 1.3) ) {
 			Bukkit.getConsoleSender().sendMessage("§b[OnePlayerSleep] old messages.yml detected. Getting a newer version");
 			this.renameFileInPluginDir("messages.yml","messages.old.yml");
 			
@@ -104,8 +110,43 @@ public class Config {
 		this.messages.set("onNoPlayersSleeping", msg);
 	}
 	
+	public Boolean hasPAPI() {
+		return this.hasPAPI;
+	}
+	
+	public Message pickRandomMessage() {
+		int numMessages = this.messageArray.size();;
+		if(numMessages == 1) return messageArray.get(0);
+		
+		//pick a random float
+		Random r = new Random();
+		double randomValue = (totalChance) * r.nextDouble();
+		
+		//lookup iterator by binary search of ranges
+		int iter_low = 0;
+		int iter_high = this.chanceRanges.size();
+		int i = iter_high/2;
+		while(true) {
+			double range_low = this.chanceRanges.get(i);
+			double range_high = this.chanceRanges.get(i+1);
+			if(randomValue <= range_low) {
+				iter_high = i;
+				i = (iter_high - iter_low)/2 + iter_low;
+				continue;
+			}
+			if(randomValue > range_high) {
+				iter_low = i;
+				i = (iter_high - iter_low)/2 + iter_low;
+				continue;
+			}
+			break;
+		}
+		return messageArray.get(i);
+	}
+	
+	
 	//determine valid configuration variables
-	public void checkConfigs() {
+	private void checkConfigs() {
 		//sleepDelay value
 		if(			!this.config.isSet("sleepDelay") 
 				||  !this.config.isInt("sleepDelay")) {
@@ -134,6 +175,14 @@ public class Config {
 			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no increment value or invalid value. Setting to default"); 
 			this.config.set("increment", 75);
 		}
+		
+		//sleepCooldown value
+		if(			!this.config.isSet("sleepCooldown") 
+				||  !this.config.isInt("sleepCooldown")
+				|| 	this.config.getInt("sleepCooldown") < 1) {
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no sleepCooldown value or invalid value. Setting to default"); 
+			this.config.set("sleepCooldown", 2000);
+		}
 
 		//kickFromBed value
 		if(			!this.config.isSet("kickFromBed") 
@@ -142,18 +191,18 @@ public class Config {
 			this.config.set("kickFromBed", false);
 		}
 		
-		//ResetAllStatistics value
-		if(			!this.config.isSet("resetAllStatistics") 
-				||  !this.config.isBoolean("resetAllStatistics")) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no resetAllStatistics value. Setting to default"); 
-			this.config.set("resetAllStatistics", true);
-		}
-		
 		//randomPerPlayer value
 		if(			!this.config.isSet("randomPerPlayer") 
 				||  !this.config.isBoolean("randomPerPlayer")) {
 			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no randomPerPlayer value. Setting to default"); 
 			this.config.set("randomPerPlayer", false);
+		}
+		
+		//ResetAllStatistics value
+		if(			!this.config.isSet("resetAllStatistics") 
+				||  !this.config.isBoolean("resetAllStatistics")) {
+			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no resetAllStatistics value. Setting to default"); 
+			this.config.set("resetAllStatistics", true);
 		}
 		
 		//doOtherWorlds value
@@ -186,7 +235,7 @@ public class Config {
 	}
 	
 	//update config files based on version number
-	public void updateConfig() {
+	private void updateConfig() {
 		this.renameFileInPluginDir("config.yml","config.old.yml");
 		plugin.saveResource("config.yml", false);
 		Map<String, Object> oldValues = this.config.getValues(false);
@@ -233,36 +282,6 @@ public class Config {
 			e.printStackTrace();
 		}
 		return;
-	}
-	
-	public Message pickRandomMessage() {
-		int numMessages = this.messageArray.size();;
-		if(numMessages == 1) return messageArray.get(0);
-		
-		//pick a random float
-		Random r = new Random();
-		double randomValue = (totalChance) * r.nextDouble();
-		
-		//lookup iterator by binary search of ranges
-		int iter_low = 0;
-		int iter_high = this.chanceRanges.size();
-		int i = iter_high/2;
-		while(true) {
-			double range_low = this.chanceRanges.get(i);
-			double range_high = this.chanceRanges.get(i+1);
-			if(randomValue <= range_low) {
-				iter_high = i;
-				i = (iter_high - iter_low)/2 + iter_low;
-				continue;
-			}
-			if(randomValue > range_high) {
-				iter_low = i;
-				i = (iter_high - iter_low)/2 + iter_low;
-				continue;
-			}
-			break;
-		}
-		return messageArray.get(i);
 	}
 	
 	private void renameFileInPluginDir(String oldName, String newName) {

@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 
 import OnePlayerSleep.OnePlayerSleep;
 import bukkitTasks.AnnounceWakeup;
+import me.clip.placeholderapi.PlaceholderAPI;
 import tools.Config;
 import types.Message;
 
@@ -56,8 +57,11 @@ public class Wakeup implements CommandExecutor {
 				this.plugin.doSleep.get(w).cancel();
 			}
 		}
+		
 		if(!hasSleepingPlayers) {
-			sender.sendMessage(config.messages.getString("onNoPlayersSleeping"));
+			String onNoPlayersSleeping = config.messages.getString("onNoPlayersSleeping");
+			if(isPlayer && this.config.hasPAPI()) onNoPlayersSleeping = PlaceholderAPI.setPlaceholders((Player)sender, onNoPlayersSleeping);
+			sender.sendMessage(onNoPlayersSleeping);
 			return true;
 		}
 		
@@ -66,16 +70,14 @@ public class Wakeup implements CommandExecutor {
 			if(!cantKickAPlayer && hasSleepingPlayers) {
 				new AnnounceWakeup(this.plugin,this.config,((Player)sender),m).runTaskAsynchronously(this.plugin);
 			}
+			String cantWakeup = m.cantWakeup;
+			if(this.config.hasPAPI()) cantWakeup = PlaceholderAPI.setPlaceholders((Player)sender, cantWakeup);
 			if(cantKickAPlayer && hasSleepingPlayers) {
-				sender.sendMessage(m.cantWakeup);
+				sender.sendMessage(cantWakeup);
 			}
 		}
 		else {
 			plugin.getServer().broadcastMessage("[server]: Everyone wake up!");
-		}
-		if(!hasSleepingPlayers) {
-			String msg = config.messages.getString("onNoPlayersSleeping", "§cNo players sleeping!");
-			sender.sendMessage(msg);
 		}
 		return true;
 	}

@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import OnePlayerSleep.OnePlayerSleep;
+import me.clip.placeholderapi.PlaceholderAPI;
 import tools.Config;
 import tools.LocalPlaceholders;
 import types.Message;
@@ -44,50 +45,35 @@ public class SendMessage extends BukkitRunnable{
 		}
 		String global = this.message.msg.getText();
 		String hover = this.message.hoverText;
-		int dim;
-		String dimStr;
+		String worldName = this.config.messages.getConfigurationSection("worlds").getString(this.sourcePlayer.getWorld().getName().replace("_nether","").replace("the_end",""));
+		String dimStr = this.config.messages.getConfigurationSection("dimensions").getString(this.sourcePlayer.getWorld().getEnvironment().name());
 		if(this.doRandom) {
 			this.message = this.config.pickRandomMessage();
-			dim = this.sourcePlayer.getWorld().getEnvironment().equals(World.Environment.NETHER) ? 1 : 0;
-			dim = dim + (this.sourcePlayer.getWorld().getEnvironment().equals(World.Environment.THE_END) ? 2 : 0);
-			switch (dim) {
-				case 1:  dimStr = config.config.getString("_nether");
-					break;
-				case 2:  dimStr = config.config.getString("_the_end");
-					break;
-				default: dimStr = config.config.getString("default");
-					break;
-			}
-			
 			global = LocalPlaceholders.fillPlaceHolders(
 					this.message.msg.getText(),
 					this.sourcePlayer.getName(),
 					this.sourcePlayer.getDisplayName(),
-					this.sourcePlayer.getWorld().getName(),
+					worldName,
 					dimStr );
 			hover = LocalPlaceholders.fillPlaceHolders(
 					this.message.hoverText,
 					this.sourcePlayer.getName(),
 					this.sourcePlayer.getDisplayName(),
-					this.sourcePlayer.getWorld().getName(),
+					worldName,
 					dimStr );
+			if(this.config.hasPAPI()) global = PlaceholderAPI.setPlaceholders(this.targetPlayer, global);
+			if(this.config.hasPAPI()) hover = PlaceholderAPI.setPlaceholders(this.sourcePlayer, hover);
 		}
-		dim = this.sourcePlayer.getWorld().getEnvironment().equals(World.Environment.NETHER) ? 1 : 0;
-		dim = dim + (this.sourcePlayer.getWorld().getEnvironment().equals(World.Environment.THE_END) ? 2 : 0);
-		switch (dim) {
-			case 1:  dimStr = config.config.getString("_nether");
-				break;
-			case 2:  dimStr = config.config.getString("_the_end");
-				break;
-			default: dimStr = config.config.getString("default");
-				break;
-		}
+		worldName = this.config.messages.getConfigurationSection("worlds").getString(this.targetPlayer.getWorld().getName().replace("_nether","").replace("the_end",""));
+		dimStr = this.config.messages.getConfigurationSection("dimensions").getString(this.targetPlayer.getWorld().getEnvironment().name());
 		String wakeup = LocalPlaceholders.fillPlaceHolders(
 				this.message.wakeup,
 				this.targetPlayer.getName(),
 				this.targetPlayer.getDisplayName(),
-				this.targetPlayer.getWorld().getName(),
+				worldName,
 				dimStr );
+		if(this.config.hasPAPI())
+			wakeup = PlaceholderAPI.setPlaceholders(this.targetPlayer, wakeup);
 		
 		this.message = new Message(global, hover, wakeup, this.message.cantWakeup, this.message.chance);
 		this.targetPlayer.spigot().sendMessage(this.message.msg);

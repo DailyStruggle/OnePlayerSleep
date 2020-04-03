@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import OnePlayerSleep.OnePlayerSleep;
+import me.clip.placeholderapi.PlaceholderAPI;
 import tools.Config;
 import tools.LocalPlaceholders;
 import types.Message;
@@ -32,25 +33,16 @@ public class AnnounceWakeup extends BukkitRunnable{
 			if( !doOtherWorld && !this.player.getWorld().getName().replace("_nether","").replace("the_end","").equals( p.getWorld().getName().replace("_nether","").replace("the_end","") ) ) continue;
 			if( !doOtherDim && !this.player.getWorld().getEnvironment().equals( p.getWorld().getEnvironment() ) ) continue;
 			
-			int dim = this.player.getWorld().getEnvironment().equals(World.Environment.NETHER) ? 1 : 0;
-			dim = dim + (this.player.getWorld().getEnvironment().equals(World.Environment.THE_END) ? 2 : 0);
-			
-			String dimStr;
-			switch (dim) {
-				case 1:  dimStr = config.messages.getString("_nether");
-					break;
-				case 2:  dimStr = config.messages.getString("_the_end");
-					break;
-				default: dimStr = config.messages.getString("default");
-					break;
-			}
+			String worldName = this.config.messages.getConfigurationSection("worlds").getString(p.getWorld().getName().replace("_nether","").replace("the_end",""));
+			String dimStr = this.config.messages.getConfigurationSection("dimensions").getString(p.getWorld().getEnvironment().name());
 			
 			String wakeupMsg = LocalPlaceholders.fillPlaceHolders(
 					this.msg.wakeup, 
 					p.getName(), 
 					p.getDisplayName(), 
-					p.getWorld().getName(),
+					worldName,
 					dimStr );
+			if(this.config.hasPAPI()) wakeupMsg = PlaceholderAPI.setPlaceholders(p, wakeupMsg);
 			p.sendMessage(wakeupMsg);
 		}
 	}

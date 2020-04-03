@@ -1,9 +1,11 @@
 name: OnePlayerSleep
 main: OnePlayerSleep.OnePlayerSleep
-version: 1.3.2
+version: 1.3.3
 api-version: 1.13
 author: leaf26
 website: https://github.com/DailyStruggle
+
+softdepend: [PlaceholderAPI]
 
 commands:
     sleep:

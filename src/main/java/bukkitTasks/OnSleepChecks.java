@@ -43,12 +43,11 @@ public class OnSleepChecks extends BukkitRunnable{
 		for (World w : Bukkit.getWorlds()){
 			if( !doOtherWorld && !this.player.getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
 			if( !doOtherDim && !this.player.getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
+			if( this.plugin.sleepingPlayers.containsKey(w) )numSleepingPlayers = numSleepingPlayers + this.plugin.sleepingPlayers.get(w).size();
 			for (Player p : w.getPlayers()) {
 				if(p.isSleepingIgnored() || p.hasPermission("sleep.ignore")) continue;
 				numPlayers = numPlayers + 1;
-				if(!p.isSleeping()) continue;
-				numSleepingPlayers = numSleepingPlayers + 1;
-				if(numSleepingPlayers > 1) break;
+				if(numPlayers > 1) break;
 			}
 		}
 		//only announce the first bed entry, when there's more than one player to see it

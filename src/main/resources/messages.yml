@@ -8,10 +8,15 @@ onNoPlayersSleeping: "&eNo players sleeping!"
 
 cooldownMessage: "&eYou can't sleep again yet"
 
-#dimensions
-default: ""
-_nether: "&cnether"
-_the_end: "&bend"
+#world placeholders
+worlds:
+    world: "&aworld"
+
+#dimension placeholders
+dimensions:
+    NORMAL: "&f[&aoverworld&f]"
+    NETHER: "&f[&cnether&f]"
+    THE_END: "&f[&bend&f]"
 
 #Messages to announce on sleep
 #message001: arbitrary unique message name
@@ -22,8 +27,8 @@ _the_end: "&bend"
 #    wakeup: thing to say in global chat on wakeup click
 #               ^player calling wakeup.
 #    cantWakeup: message to send if someone had sleep.bypass
-#               ^no placeholders
-#    chance: chance to use this message, out of the sum of all chances
+#               ^player calling wakeup
+#    chance: floating point chance to use this message, out of the sum of all chances
 messages:
     message001:
         global: "[username] &bfell asleep on the job"
@@ -117,4 +122,4 @@ messages:
         chance: 0.067
 
 #DO NOT TOUCH VERSION NUMBER
-version: 1.2
+version: 1.4
