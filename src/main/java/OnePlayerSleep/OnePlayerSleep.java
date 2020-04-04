@@ -22,6 +22,7 @@ import commands.TabComplete;
 import commands.Wakeup;
 import events.onPlayerBedEnter;
 import events.onPlayerBedLeave;
+import events.onWeatherChange;
 
 public final class OnePlayerSleep extends JavaPlugin implements Listener {
 	private Config config = new Config(this);
@@ -54,6 +55,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		
 		getServer().getPluginManager().registerEvents(new onPlayerBedEnter(this, config), this);
 		getServer().getPluginManager().registerEvents(new onPlayerBedLeave(this, config), this);
+		getServer().getPluginManager().registerEvents(new onWeatherChange(config), this);
 		getServer().getPluginManager().registerEvents(this, this);
 		
 		if(this.config.hasPAPI()) {

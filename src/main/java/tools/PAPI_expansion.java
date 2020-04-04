@@ -18,23 +18,16 @@ public class PAPI_expansion extends PlaceholderExpansion{
 	
 	@Override
     public boolean register(){
-  
-        // Make sure "SomePlugin" is on the server
-        if(!canRegister()){
+		if(!canRegister()){
             return false;
         }
         
         plugin = (OnePlayerSleep) Bukkit.getPluginManager().getPlugin("OnePlayerSleep");
         
-        // if for some reason we can not get our variable, we should return false.
         if(plugin == null){
             return false;
         }
         
-        /*
-         * Since we override the register method, we need to call the super method to actually
-         * register this hook
-         */
         return super.register();
     }
 	

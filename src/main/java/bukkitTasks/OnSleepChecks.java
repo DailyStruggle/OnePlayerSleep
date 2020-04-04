@@ -1,6 +1,7 @@
 package bukkitTasks;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -60,8 +61,12 @@ public class OnSleepChecks extends BukkitRunnable{
 		if(!plugin.clearWeather.containsKey(this.player.getWorld())) {
 			Long dT = (this.config.config.getLong("stopTime") - this.player.getWorld().getTime()) / this.config.config.getLong("increment");
 			Long cap = (this.player.getWorld().getTime() - this.config.config.getLong("startTime")) / this.config.config.getLong("increment");
-			if(dT>1 && cap>=0) plugin.clearWeather.put(this.player.getWorld(), new ClearWeather(this.player.getWorld()).runTaskLater(this.plugin, dT+this.config.config.getLong("sleepDelay")));
-			else plugin.clearWeather.put(this.player.getWorld(), new ClearWeather(this.player.getWorld()).runTaskLater(this.plugin, 2*this.config.config.getLong("sleepDelay")));
+			
+			Double randomFactor = new Random().nextDouble()*168000;
+			Long duration = 12000 + randomFactor.longValue();
+			
+			if(dT>1 && cap>=0) plugin.clearWeather.put(this.player.getWorld(), new ClearWeather(this.player.getWorld(),duration).runTaskLater(this.plugin, dT+this.config.config.getLong("sleepDelay")));
+			else plugin.clearWeather.put(this.player.getWorld(), new ClearWeather(this.player.getWorld(),duration).runTaskLater(this.plugin, 2*this.config.config.getLong("sleepDelay")));
 		}
 	}
 
