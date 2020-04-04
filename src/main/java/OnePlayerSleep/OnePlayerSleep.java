@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import tools.Config;
+import tools.PAPI_expansion;
 import types.Message;
 import commands.Help;
 import commands.Reload;
@@ -54,6 +55,10 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new onPlayerBedEnter(this, config), this);
 		getServer().getPluginManager().registerEvents(new onPlayerBedLeave(this, config), this);
 		getServer().getPluginManager().registerEvents(this, this);
+		
+		if(this.config.hasPAPI()) {
+			new PAPI_expansion().register();
+		}
 	}
 	
 	@Override

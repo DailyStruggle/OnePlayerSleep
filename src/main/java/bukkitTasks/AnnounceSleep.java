@@ -1,6 +1,5 @@
 package bukkitTasks;
 
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -55,8 +54,7 @@ public class AnnounceSleep extends BukkitRunnable{
 					this.player.getDisplayName(),
 					worldName,
 					dimStr );
-			if(this.config.hasPAPI()) hover = PlaceholderAPI.setPlaceholders(this.player, hover);
-			if(this.config.hasPAPI()) global = PlaceholderAPI.setPlaceholders(this.player, global);
+			
 			resMsg = new Message(global, hover, resMsg.wakeup, resMsg.cantWakeup, resMsg.chance);
 		}
 		
@@ -74,7 +72,7 @@ public class AnnounceSleep extends BukkitRunnable{
 			
 			for (Player p : w.getPlayers()) {
 				//skip if has perm
-				if(p.hasPermission("sleep.ignore")) continue;
+				if(p.isSleepingIgnored() || p.hasPermission("sleep.ignore")) continue; 
 				
 				if(perPlayer) {
 					new SendMessage(this.plugin, this.config, this.player, p).runTaskAsynchronously(this.plugin);

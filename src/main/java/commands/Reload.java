@@ -1,5 +1,6 @@
 package commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -19,8 +20,8 @@ public class Reload implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(sender.hasPermission("sleep.reload"))
 		{
-			String str = "reloading OnePlayerSleep";
-			System.out.println(str);
+			String str = "§b[OnePlayerSleep] reloading.";
+			Bukkit.getConsoleSender().sendMessage(str);
 			if(sender instanceof Player) {
 				if(this.plugin.getPluginConfig().hasPAPI()) str = PlaceholderAPI.setPlaceholders((Player)sender, str);
 				sender.sendMessage(str);
@@ -28,6 +29,13 @@ public class Reload implements CommandExecutor {
 			
 			Config config = plugin.getPluginConfig();
 			config.refreshConfigs();
+			
+			str = "§b[OnePlayerSleep] successfully reloaded.";
+			Bukkit.getConsoleSender().sendMessage(str);
+			if(sender instanceof Player) {
+				if(this.plugin.getPluginConfig().hasPAPI()) str = PlaceholderAPI.setPlaceholders((Player)sender, str);
+				sender.sendMessage(str);
+			}
 			
 			return true;
 		}

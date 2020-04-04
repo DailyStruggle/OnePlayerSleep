@@ -1,6 +1,5 @@
 package bukkitTasks;
 
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 

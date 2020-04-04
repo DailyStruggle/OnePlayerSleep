@@ -1,6 +1,5 @@
 package bukkitTasks;
 
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -61,9 +60,9 @@ public class SendMessage extends BukkitRunnable{
 					this.sourcePlayer.getDisplayName(),
 					worldName,
 					dimStr );
-			if(this.config.hasPAPI()) global = PlaceholderAPI.setPlaceholders(this.targetPlayer, global);
-			if(this.config.hasPAPI()) hover = PlaceholderAPI.setPlaceholders(this.sourcePlayer, hover);
 		}
+		if(this.config.hasPAPI()) global = PlaceholderAPI.setPlaceholders(this.targetPlayer, global);
+		if(this.config.hasPAPI()) hover = PlaceholderAPI.setPlaceholders(this.sourcePlayer, hover);
 		worldName = this.config.messages.getConfigurationSection("worlds").getString(this.targetPlayer.getWorld().getName().replace("_nether","").replace("the_end",""));
 		dimStr = this.config.messages.getConfigurationSection("dimensions").getString(this.targetPlayer.getWorld().getEnvironment().name());
 		String wakeup = LocalPlaceholders.fillPlaceHolders(
@@ -72,8 +71,7 @@ public class SendMessage extends BukkitRunnable{
 				this.targetPlayer.getDisplayName(),
 				worldName,
 				dimStr );
-		if(this.config.hasPAPI())
-			wakeup = PlaceholderAPI.setPlaceholders(this.targetPlayer, wakeup);
+		if(this.config.hasPAPI()) wakeup = PlaceholderAPI.setPlaceholders(this.targetPlayer, wakeup);
 		
 		this.message = new Message(global, hover, wakeup, this.message.cantWakeup, this.message.chance);
 		this.targetPlayer.spigot().sendMessage(this.message.msg);

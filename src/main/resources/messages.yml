@@ -1,8 +1,25 @@
-#default placeholders
+#default placeholders:
 #[username] - player doing the thing, using username
 #[displayname] - player doing the thing, using displayname
 #[world] - world the player is in, minus the dimension substring
 #[dimension] - dimension the player is in
+
+#useful PAPI placeholders:
+#   %player_name% 
+#   %player_displayname%
+#   %player_world_time_12%
+#   %player_world_time_24%
+#   %player_bed_x%
+#   %player_bed_y%
+#   %player_bed_z%
+#   %RainbowColor_<Text>%
+#   %server_time_<SimpleDateFormat>%
+#   %sound_<sound>-<volume>-<pitch>%
+#   
+#   %OnePlayerSleep_sleeping_player_count%
+#   %OnePlayerSleep_total_player_count%
+#
+#   %vault_prefix% (requires vault)
 
 onNoPlayersSleeping: "&eNo players sleeping!"
 
