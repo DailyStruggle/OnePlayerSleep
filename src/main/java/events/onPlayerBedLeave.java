@@ -1,5 +1,7 @@
 package events;
 
+import java.util.Set;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
 import org.bukkit.World;
@@ -31,7 +33,8 @@ public class onPlayerBedLeave implements Listener {
 		if(this.plugin.sleepingPlayers.get(world).size() == 0) this.plugin.sleepingPlayers.remove(world);
 		
 		Long sleepingPlayers = Long.valueOf(0);
-		for (World w : this.plugin.sleepingPlayers.keySet()) {
+		Set<World> sleepingWorlds = this.plugin.sleepingPlayers.keySet();
+		for (World w : sleepingWorlds) {
 			if( !doOtherWorld && !event.getPlayer().getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
 			if( !doOtherDim && !event.getPlayer().getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
 			sleepingPlayers = sleepingPlayers + this.plugin.sleepingPlayers.get(w).size();
@@ -45,8 +48,7 @@ public class onPlayerBedLeave implements Listener {
 				}
 			}
 		}
-		else if( event.getPlayer().getStatistic( Statistic.TIME_SINCE_REST ) < 3 &&
-					event.getPlayer().getWorld().getTime() >= 23460 &&
+		else if( event.getPlayer().getWorld().getTime() >= 23460 &&
 					event.getPlayer().getWorld().getTime() <=  23999) {
 			for (World w : Bukkit.getWorlds()) {
 				if( !doOtherWorld && !event.getPlayer().getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
