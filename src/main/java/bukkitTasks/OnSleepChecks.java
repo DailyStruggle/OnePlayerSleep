@@ -51,20 +51,28 @@ public class OnSleepChecks extends BukkitRunnable{
 				if(numPlayers > 1) break;
 			}
 		}
+		
 		//only announce the first bed entry, when there's more than one player to see it
 		if(numSleepingPlayers < 2 && numPlayers > 1) {
+			//async message selection and delivery
 			new AnnounceSleep(this.plugin, this.config, this.player).runTaskAsynchronously(this.plugin);
+			
+			//start sleep task
 			if(plugin.doSleep.containsKey(this.player.getWorld())) plugin.doSleep.remove(this.player.getWorld());
 			plugin.doSleep.put(this.player.getWorld(), new PassTime(this.plugin, this.config, this.player.getWorld()).runTaskLater(this.plugin, config.config.getInt("sleepDelay")));
 		}
 		
+		//set up clear weather task for later
 		if(!plugin.clearWeather.containsKey(this.player.getWorld())) {
+			//calculate how long to wait before clearing weather
 			Long dT = (this.config.config.getLong("stopTime") - this.player.getWorld().getTime()) / this.config.config.getLong("increment");
 			Long cap = (this.player.getWorld().getTime() - this.config.config.getLong("startTime")) / this.config.config.getLong("increment");
 			
+			//calculate how long to clear weather for
 			Double randomFactor = new Random().nextDouble()*168000;
 			Long duration = 12000 + randomFactor.longValue();
 			
+			//start task
 			if(dT>1 && cap>=0) plugin.clearWeather.put(this.player.getWorld(), new ClearWeather(this.player.getWorld(),duration).runTaskLater(this.plugin, dT+this.config.config.getLong("sleepDelay")));
 			else plugin.clearWeather.put(this.player.getWorld(), new ClearWeather(this.player.getWorld(),duration).runTaskLater(this.plugin, 2*this.config.config.getLong("sleepDelay")));
 		}

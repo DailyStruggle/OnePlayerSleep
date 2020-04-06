@@ -24,7 +24,8 @@ public class onWeatherChange implements Listener {
 		int i = worlds.indexOf(event.getWorld());
 		for (World w : worlds) {
 			if(w.equals(event.getWorld())) continue;
-			w.setStorm(worlds.get(i).hasStorm());
+			w.setStorm(event.toWeatherState());
+			//set a little longer than this world's weather duration so only one world causes the next weather update
 			w.setWeatherDuration(worlds.get(i).getWeatherDuration()+5);
 			w.setThundering(worlds.get(i).isThundering());
 			w.setThunderDuration(worlds.get(i).getThunderDuration()+5);

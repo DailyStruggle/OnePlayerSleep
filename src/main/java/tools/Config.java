@@ -29,7 +29,7 @@ public class Config {
 	private ArrayList<Double> chanceRanges = new ArrayList<Double>();
 	private OnePlayerSleep plugin;
 	
-	private Boolean hasPAPI = false;
+	private Boolean hasPAPI;
 	
 	public Config(OnePlayerSleep plugin) {
 		this.plugin = plugin;
@@ -39,6 +39,7 @@ public class Config {
 	
 	
 	public void refreshConfigs() {
+		this.hasPAPI = false;
 		if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
 			this.hasPAPI = true;
 		}

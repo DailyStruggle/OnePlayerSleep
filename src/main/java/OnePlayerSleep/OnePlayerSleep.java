@@ -33,26 +33,32 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 	public Map<World, ArrayList<Player>> sleepingPlayers = new HashMap<World, ArrayList<Player>>(); //list of sleeping players for each world
 	
 	@Override
-	public void onEnable() {		getCommand("sleep").setExecutor(new Sleep(this));
+	public void onEnable() {		//make /sleep work
+		getCommand("sleep").setExecutor(new Sleep(this));
+		
+		//let players tab for available subcommands
 		getCommand("sleep").setTabCompleter(new TabComplete());
 		
+		//set executors so i can look them up from /sleep
 		getCommand("sleep help").setExecutor(new Help());
 		getCommand("sleep reload").setExecutor(new Reload(this, this.config));
 		getCommand("sleep wakeup").setExecutor(new Wakeup(this, this.config));
+		
+		//other way to call wakeup, so sleep.wakeup doesn't depend on sleep.see
 		getCommand("sleepwakeup").setExecutor(new Wakeup(this, this.config));
 		
+		//load config files and check if they're up to date
+		// 	also check for hooks
 		this.config.refreshConfigs();
 		
-		for(World w : Bukkit.getWorlds()) {
-			sleepingPlayers.put(w, new ArrayList<Player>());
-		}
-		
+		//if this plugin got reloaded, redo bed enter events
 		for( Player p : Bukkit.getOnlinePlayers() ) {
 			if(p.isSleeping()) {
 				getServer().getPluginManager().callEvent(new PlayerBedEnterEvent(p, p.getWorld().getBlockAt(p.getBedLocation()), BedEnterResult.OK));
 			}
 		}
 		
+		//register all the spigot events I need
 		getServer().getPluginManager().registerEvents(new onPlayerBedEnter(this, config), this);
 		getServer().getPluginManager().registerEvents(new onPlayerBedLeave(this, config), this);
 		getServer().getPluginManager().registerEvents(new onWeatherChange(config), this);

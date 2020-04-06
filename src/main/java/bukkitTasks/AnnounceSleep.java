@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import OnePlayerSleep.OnePlayerSleep;
-import me.clip.placeholderapi.PlaceholderAPI;
 import tools.Config;
 import tools.LocalPlaceholders;
 import types.Message;
