@@ -37,7 +37,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		getCommand("sleep").setExecutor(new Sleep(this));
 		
 		//let players tab for available subcommands
-		getCommand("sleep").setTabCompleter(new TabComplete());
+		getCommand("sleep").setTabCompleter(new TabComplete(this.config));
 		
 		//set executors so i can look them up from /sleep
 		getCommand("sleep help").setExecutor(new Help());

@@ -9,14 +9,20 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
+import tools.Config;
+
 public class TabComplete implements TabCompleter {
 	private Map<String,String> subCommands = new HashMap<String,String>();
 	
-	public TabComplete() {
+	private Config config;
+	
+	public TabComplete(Config config) {
 		//load commands and permission nodes into map
 		subCommands.put("reload","sleep.reload");
 		subCommands.put("wakeup","sleep.wakeup");
+		subCommands.put("test","sleep.wakeup");
 		subCommands.put("help","sleep.help");
+		this.config = config;
 	}
 	
 	@Override

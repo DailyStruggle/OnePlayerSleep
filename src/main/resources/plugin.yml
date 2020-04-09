@@ -22,6 +22,11 @@ commands:
         permission: sleep.reload
         usage: |
             /sleep reload
+    sleep test:
+        description: test a sleep message
+        permission: sleep.test
+        usage: |
+            /sleep test
     sleep wakeup:
         description: kick from bed
         permission: sleep.wakeup
@@ -42,9 +47,10 @@ permissions:
             sleep.reload: true
             sleep.wakeup: true
             sleep.bypass: true
+            sleep.test: true
     sleep.see:
         description: can see the sleep help menu
-        default: false
+        default: true
     sleep.reload: 
         description: can reload sleep options
         default: op
@@ -53,6 +59,9 @@ permissions:
         default: true
     sleep.bypass:
         description: cannot kick this player from bed
+        default: op
+    sleep.test:
+        description: can run a sleep message in chat
         default: op
     sleep.ignore:
         description: ignore player entirely
