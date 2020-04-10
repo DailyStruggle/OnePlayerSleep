@@ -29,15 +29,26 @@ public class TabComplete implements TabCompleter {
 	public List<String> onTabComplete(CommandSender sender, Command command,
 			String alias, String[] args) {
 		if(!sender.hasPermission("sleep.see")) return null;
-		if(args.length == 1) 
-		{
-			//fill list based on command permission nodes
-			List<String> res = new ArrayList<String>(); 
-			for (Map.Entry<String, String> entry : subCommands.entrySet())
-		        if(sender.hasPermission(entry.getValue())) res.add(entry.getKey());
-			return res;
+
+		switch(args.length){
+			case 1: {
+				//fill list based on command permission nodes
+				List<String> res = new ArrayList<String>();
+				for (Map.Entry<String, String> entry : subCommands.entrySet())
+					if(sender.hasPermission(entry.getValue())) res.add(entry.getKey());
+				return res;
+			}
+			default: {
+				switch(args[0]){
+					case "test":{
+						return this.config.messageNames;
+					}
+					default: {
+						return null;
+					}
+				}
+			}
 		}
-		
-		return null;
+
 	}
 }

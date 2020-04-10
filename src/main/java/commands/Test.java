@@ -80,7 +80,7 @@ public class Test implements CommandExecutor {
 						//skip if has perm
 						if(p.isSleepingIgnored() || p.hasPermission("sleep.ignore")) continue;
 
-						new SendMessage(this.plugin, config, resMsg, player, p).runTaskAsynchronously(this.plugin);
+						new SendMessage(this.plugin, config, m, player, p).runTaskAsynchronously(this.plugin);
 					}
 				}
 			}

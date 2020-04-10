@@ -5,11 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,8 +19,9 @@ public class Config {
 	public FileConfiguration config;
 	public FileConfiguration messages;
 	public String version;
-	
-	private ArrayList<Message> messageArray = new ArrayList<Message>(); 
+	public List<String> messageNames = new ArrayList<String>();
+
+	private ArrayList<Message> messageArray = new ArrayList<Message>();
 	private Double totalChance = 0.0;
 	private ArrayList<Double> chanceRanges = new ArrayList<Double>();
 	private OnePlayerSleep plugin;
@@ -39,6 +36,11 @@ public class Config {
 	
 	
 	public void refreshConfigs() {
+		this.messageNames = new ArrayList<String>();
+		this.messageArray = new ArrayList<Message>();
+		this.totalChance = 0.0;
+		this.chanceRanges = new ArrayList<Double>();
+
 		this.hasPAPI = false;
 		if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
 			this.hasPAPI = true;
@@ -89,13 +91,13 @@ public class Config {
 		this.messages.set("_nether", LocalPlaceholders.fillColorCodes(this.messages.getString("_nether")));
 		this.messages.set("_the_end", LocalPlaceholders.fillColorCodes(this.messages.getString("_the_end")));
 		
-		Set<String> messageNames = this.messages.getConfigurationSection("messages").getKeys(false);
+		Set<String> allMessageNames = this.messages.getConfigurationSection("messages").getKeys(false);
 		this.messageArray = new ArrayList<Message>();
 		this.totalChance = 0.0;
 		this.chanceRanges = new ArrayList<Double>();
 		this.chanceRanges.add(0, 0.0);
 		int i = 0;
-		for (String t : messageNames) {
+		for (String t : allMessageNames) {
 			String msg = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("global","[player] &bis sleeping"));
 			String hover_msg = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("hover","&eWake up!"));
 			String response = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("wakeup","[player] says &cWake up!"));
@@ -104,6 +106,7 @@ public class Config {
 			this.messageArray.add(i, new Message( msg, hover_msg, response, cantWakeup, chance) );
 			this.totalChance = this.totalChance + chance;
 			this.chanceRanges.add(i+1, this.chanceRanges.get(i) + chance);
+			this.messageNames.add(t);
 			i = i+1;
 		}
 		
