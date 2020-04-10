@@ -5,11 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -17,14 +13,16 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import OnePlayerSleep.OnePlayerSleep;
+import org.bukkit.entity.Player;
 import types.Message;
 
 public class Config {
 	public FileConfiguration config;
 	public FileConfiguration messages;
 	public String version;
-	
-	private ArrayList<Message> messageArray = new ArrayList<Message>(); 
+	public List<String> messageNames = new ArrayList<String>();
+
+	private ArrayList<Message> messageArray = new ArrayList<Message>();
 	private Double totalChance = 0.0;
 	private ArrayList<Double> chanceRanges = new ArrayList<Double>();
 	private OnePlayerSleep plugin;
@@ -39,6 +37,11 @@ public class Config {
 	
 	
 	public void refreshConfigs() {
+		this.messageNames = new ArrayList<String>();
+		this.messageArray = new ArrayList<Message>();
+		this.totalChance = 0.0;
+		this.chanceRanges = new ArrayList<Double>();
+
 		this.hasPAPI = false;
 		if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
 			this.hasPAPI = true;
@@ -66,15 +69,15 @@ public class Config {
 		
 		checkConfigs();
 		
-		if( 	(this.messages.getDouble("version") < 1.3) ) {
-			Bukkit.getConsoleSender().sendMessage("§b[OnePlayerSleep] old messages.yml detected. Getting a newer version");
+		if( 	(this.messages.getDouble("version") < 1.5) ) {
+			Bukkit.getConsoleSender().sendMessage("ï¿½b[OnePlayerSleep] old messages.yml detected. Getting a newer version");
 			this.renameFileInPluginDir("messages.yml","messages.old.yml");
 			
 			this.plugin.saveResource("messages.yml", false);
 			this.messages = YamlConfiguration.loadConfiguration(f);
 		}
 		if( 	(this.config.getDouble("version") < 1.4) ) {
-			Bukkit.getConsoleSender().sendMessage("§b[OnePlayerSleep] old config.yml detected. Updating");
+			Bukkit.getConsoleSender().sendMessage("ï¿½b[OnePlayerSleep] old config.yml detected. Updating");
 			
 			updateConfig();
 			
@@ -89,13 +92,13 @@ public class Config {
 		this.messages.set("_nether", LocalPlaceholders.fillColorCodes(this.messages.getString("_nether")));
 		this.messages.set("_the_end", LocalPlaceholders.fillColorCodes(this.messages.getString("_the_end")));
 		
-		Set<String> messageNames = this.messages.getConfigurationSection("messages").getKeys(false);
+		Set<String> allMessageNames = this.messages.getConfigurationSection("messages").getKeys(false);
 		this.messageArray = new ArrayList<Message>();
 		this.totalChance = 0.0;
 		this.chanceRanges = new ArrayList<Double>();
 		this.chanceRanges.add(0, 0.0);
 		int i = 0;
-		for (String t : messageNames) {
+		for (String t : allMessageNames) {
 			String msg = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("global","[player] &bis sleeping"));
 			String hover_msg = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("hover","&eWake up!"));
 			String response = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("wakeup","[player] says &cWake up!"));
@@ -104,6 +107,7 @@ public class Config {
 			this.messageArray.add(i, new Message( msg, hover_msg, response, cantWakeup, chance) );
 			this.totalChance = this.totalChance + chance;
 			this.chanceRanges.add(i+1, this.chanceRanges.get(i) + chance);
+			this.messageNames.add(t);
 			i = i+1;
 		}
 		
@@ -144,28 +148,40 @@ public class Config {
 		}
 		return messageArray.get(i);
 	}
-	
-	
-	//determine valid configuration variables
+
+	public Message getMessage(String name, Player player) {
+		Message res;
+		String msg = LocalPlaceholders.fillPlaceHolders(this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("global","[player] &bis sleeping"), player, this);
+		String hover_msg = LocalPlaceholders.fillPlaceHolders(this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("hover","&eWake up!"), player, this);
+		String response = LocalPlaceholders.fillPlaceHolders(this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("wakeup","[player] says &cWake up!"), player, this);
+		String cantWakeup = LocalPlaceholders.fillPlaceHolders(this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("cantWakeup","&csomeone's a deep sleeper"), player, this);
+		Double chance = this.messages.getConfigurationSection("messages").getConfigurationSection(name).getDouble("chance");
+		res = new Message( msg, hover_msg, response, cantWakeup, chance);
+
+		return res;
+	}
+
+
+		//determine valid configuration variables
 	private void checkConfigs() {
 		//sleepDelay value
 		if(			!this.config.isSet("sleepDelay") 
 				||  !this.config.isInt("sleepDelay")) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no sleepDelay value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("ï¿½4[OnePlayerSleep] error: no sleepDelay value. Setting to default"); 
 			this.config.set("sleepDelay", 60);
 		}
 		
 		//startTime value
 		if(			!this.config.isSet("startTime") 
 				||  !this.config.isInt("startTime")) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no stopTime value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("ï¿½4[OnePlayerSleep] error: no stopTime value. Setting to default"); 
 			this.config.set("startTime", 12010);
 		}
 		
 		//stopTime value
 		if(			!this.config.isSet("stopTime") 
 				||  !this.config.isInt("stopTime")) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no stopTime value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("ï¿½4[OnePlayerSleep] error: no stopTime value. Setting to default"); 
 			this.config.set("stopTime", 23992);
 		}
 		
@@ -173,7 +189,7 @@ public class Config {
 		if(			!this.config.isSet("increment") 
 				||  !this.config.isInt("increment")
 				|| 	this.config.getInt("increment") < 1) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no increment value or invalid value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("ï¿½4[OnePlayerSleep] error: no increment value or invalid value. Setting to default"); 
 			this.config.set("increment", 75);
 		}
 		
@@ -181,56 +197,56 @@ public class Config {
 		if(			!this.config.isSet("sleepCooldown") 
 				||  !this.config.isInt("sleepCooldown")
 				|| 	this.config.getInt("sleepCooldown") < 1) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no sleepCooldown value or invalid value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("ï¿½4[OnePlayerSleep] error: no sleepCooldown value or invalid value. Setting to default"); 
 			this.config.set("sleepCooldown", 2000);
 		}
 
 		//kickFromBed value
 		if(			!this.config.isSet("kickFromBed") 
 				||  !this.config.isBoolean("kickFromBed")) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no kickFromBed value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("ï¿½4[OnePlayerSleep] error: no kickFromBed value. Setting to default"); 
 			this.config.set("kickFromBed", false);
 		}
 		
 		//randomPerPlayer value
 		if(			!this.config.isSet("randomPerPlayer") 
 				||  !this.config.isBoolean("randomPerPlayer")) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no randomPerPlayer value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("ï¿½4[OnePlayerSleep] error: no randomPerPlayer value. Setting to default"); 
 			this.config.set("randomPerPlayer", false);
 		}
 		
 		//ResetAllStatistics value
 		if(			!this.config.isSet("resetAllStatistics") 
 				||  !this.config.isBoolean("resetAllStatistics")) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no resetAllStatistics value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("ï¿½4[OnePlayerSleep] error: no resetAllStatistics value. Setting to default"); 
 			this.config.set("resetAllStatistics", true);
 		}
 		
 		//doOtherWorlds value
 		if(			!this.config.isSet("doOtherWorlds") 
 				||  !this.config.isBoolean("doOtherWorlds")) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no doOtherWorlds value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("ï¿½4[OnePlayerSleep] error: no doOtherWorlds value. Setting to default"); 
 			this.config.set("doOtherWorlds", false);
 		}
 		
 		//doOtherDimensions value
 		if(			!this.config.isSet("doOtherDimensions") 
 				||  !this.config.isBoolean("doOtherDimensions")) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no doOtherDimensions value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("ï¿½4[OnePlayerSleep] error: no doOtherDimensions value. Setting to default"); 
 			this.config.set("doOtherDimensions", false);
 		}
 		
 		//onNoPlayerSleeping value
 		if(			!this.messages.isSet("onNoPlayersSleeping") 
 				||  !this.messages.isString("onNoPlayersSleeping")) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no onNoPlayersSleeping value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("ï¿½4[OnePlayerSleep] error: no onNoPlayersSleeping value. Setting to default"); 
 			this.messages.set("onNoPlayersSleeping", ChatColor.YELLOW.toString() + "No players sleeping!");
 		}
 		
 		//cooldownMessage value
 		if(			!this.messages.isSet("cooldownMessage") 
 				||  !this.messages.isString("cooldownMessage")) {
-			Bukkit.getConsoleSender().sendMessage("§4[OnePlayerSleep] error: no cooldownMessage value. Setting to default"); 
+			Bukkit.getConsoleSender().sendMessage("ï¿½4[OnePlayerSleep] error: no cooldownMessage value. Setting to default"); 
 			this.messages.set("onNoPlayersSleeping", ChatColor.YELLOW.toString() + "You can't sleep again yet");
 		}
 	}

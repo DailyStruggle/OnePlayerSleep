@@ -29,7 +29,7 @@ public class onPlayerBedLeave implements Listener {
 		Boolean doOtherWorld = config.config.getBoolean("doOtherWorlds");
 		Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
 		World world = event.getPlayer().getWorld();
-		this.plugin.sleepingPlayers.get(world).remove(event.getPlayer());
+		if(this.plugin.sleepingPlayers.get(world).contains(event.getPlayer())) this.plugin.sleepingPlayers.get(world).remove(event.getPlayer());
 		if(this.plugin.sleepingPlayers.get(world).size() == 0) this.plugin.sleepingPlayers.remove(world);
 		
 		Long sleepingPlayers = Long.valueOf(0);

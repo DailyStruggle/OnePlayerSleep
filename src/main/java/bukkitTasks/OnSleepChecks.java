@@ -16,24 +16,33 @@ public class OnSleepChecks extends BukkitRunnable{
 	private OnePlayerSleep plugin;
 	private Config config;
 	private Player player;
+	private Boolean bypassSleep = false;
 	
 	public OnSleepChecks(OnePlayerSleep plugin, Config config, Player player) {
 		this.plugin = plugin;
 		this.config = config;
 		this.player = player;
+
 	}
-	
+
+	public OnSleepChecks(OnePlayerSleep plugin, Config config, Player player, Boolean bypassSleep) {
+		this.plugin = plugin;
+		this.config = config;
+		this.player = player;
+		this.bypassSleep = bypassSleep;
+	}
+
 	@Override
 	public void run() {
 		//if player isn't sleeping anymore when the server gets here, pull out
-		if( !(this.player.isSleeping()) ) {
+		if( !(this.player.isSleeping())  && !this.bypassSleep) {
 			this.cancel();
 			return;
 		}
 		
 		//add player to list of sleeping players
 		if(!this.plugin.sleepingPlayers.containsKey(this.player.getWorld())) this.plugin.sleepingPlayers.put(this.player.getWorld(),new ArrayList<Player>());
-		this.plugin.sleepingPlayers.get(this.player.getWorld()).add(this.player);
+		if(!this.plugin.sleepingPlayers.get(this.player.getWorld()).contains(this.player)) this.plugin.sleepingPlayers.get(this.player.getWorld()).add(this.player);
 		
 		Boolean doOtherWorld = config.config.getBoolean("doOtherWorlds");
 		Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
@@ -55,7 +64,8 @@ public class OnSleepChecks extends BukkitRunnable{
 		//only announce the first bed entry, when there's more than one player to see it
 		if(numSleepingPlayers < 2 && numPlayers > 1) {
 			//async message selection and delivery
-			new AnnounceSleep(this.plugin, this.config, this.player).runTaskAsynchronously(this.plugin);
+			//skip if called by a test function
+			if(!this.bypassSleep) new AnnounceSleep(this.plugin, this.config, this.player).runTaskAsynchronously(this.plugin);
 			
 			//start sleep task
 			if(plugin.doSleep.containsKey(this.player.getWorld())) plugin.doSleep.remove(this.player.getWorld());

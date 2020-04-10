@@ -25,6 +25,10 @@ onNoPlayersSleeping: "&eNo players sleeping!"
 
 cooldownMessage: "&eYou can't sleep again yet"
 
+badArgs: "&cinvalid sleep command arguments"
+
+
+
 #world placeholders
 worlds:
     world: "&aworld"
@@ -139,4 +143,4 @@ messages:
         chance: 0.067
 
 #DO NOT TOUCH VERSION NUMBER
-version: 1.4
+version: 1.5
