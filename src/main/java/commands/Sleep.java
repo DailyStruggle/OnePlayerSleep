@@ -27,6 +27,7 @@ public class Sleep implements CommandExecutor {
 			switch(args.length) {
 				case 0: {
 					plugin.getCommand("sleep help").execute(sender, label, args);
+					break;
 				}
 				default: {
 					String cmd = command.toString();

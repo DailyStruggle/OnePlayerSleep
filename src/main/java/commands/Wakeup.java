@@ -48,6 +48,8 @@ public class Wakeup implements CommandExecutor {
 					cantKickAPlayer = true;
 				}
 				else if(KickFromBed) {
+					if(this.plugin.sleepingPlayers.get(w).contains(p)) this.plugin.sleepingPlayers.get(w).remove(p);
+					if(this.plugin.sleepingPlayers.get(w).size() == 0) this.plugin.sleepingPlayers.remove(w);
 					Double health = p.getHealth();
 					p.damage(1);
 					p.setHealth(health);

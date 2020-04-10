@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import OnePlayerSleep.OnePlayerSleep;
+import org.bukkit.entity.Player;
 import types.Message;
 
 public class Config {
@@ -68,7 +69,7 @@ public class Config {
 		
 		checkConfigs();
 		
-		if( 	(this.messages.getDouble("version") < 1.3) ) {
+		if( 	(this.messages.getDouble("version") < 1.5) ) {
 			Bukkit.getConsoleSender().sendMessage("�b[OnePlayerSleep] old messages.yml detected. Getting a newer version");
 			this.renameFileInPluginDir("messages.yml","messages.old.yml");
 			
@@ -148,12 +149,12 @@ public class Config {
 		return messageArray.get(i);
 	}
 
-	public Message getMessage(String name) {
+	public Message getMessage(String name, Player player) {
 		Message res;
-		String msg = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("global","[player] &bis sleeping"));
-		String hover_msg = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("hover","&eWake up!"));
-		String response = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("wakeup","[player] says &cWake up!"));
-		String cantWakeup = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("cantWakeup","&csomeone's a deep sleeper"));
+		String msg = LocalPlaceholders.fillPlaceHolders(this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("global","[player] &bis sleeping"), player, this);
+		String hover_msg = LocalPlaceholders.fillPlaceHolders(this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("hover","&eWake up!"), player, this);
+		String response = LocalPlaceholders.fillPlaceHolders(this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("wakeup","[player] says &cWake up!"), player, this);
+		String cantWakeup = LocalPlaceholders.fillPlaceHolders(this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("cantWakeup","&csomeone's a deep sleeper"), player, this);
 		Double chance = this.messages.getConfigurationSection("messages").getConfigurationSection(name).getDouble("chance");
 		res = new Message( msg, hover_msg, response, cantWakeup, chance);
 

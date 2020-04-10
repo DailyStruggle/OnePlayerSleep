@@ -1,7 +1,9 @@
 package commands;
 
 import bukkitTasks.AnnounceSleep;
+import bukkitTasks.OnSleepChecks;
 import bukkitTasks.SendMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -13,6 +15,8 @@ import org.bukkit.entity.Player;
 import tools.Config;
 import tools.LocalPlaceholders;
 import types.Message;
+
+import java.util.ArrayList;
 
 public class Test implements CommandExecutor {
 	private OnePlayerSleep plugin;
@@ -43,6 +47,7 @@ public class Test implements CommandExecutor {
 			worldName = worlds.getString(worldName);
 			String dimStr = config.messages.getConfigurationSection("dimensions").getString(player.getWorld().getEnvironment().name());
 
+			new OnSleepChecks(this.plugin, config, player, true).runTaskAsynchronously(this.plugin);
 
 			Message[] res;
 			switch(args.length) {
@@ -50,6 +55,10 @@ public class Test implements CommandExecutor {
 					//if just /sleep test, pick a random message
 					res = new Message[1];
 					res[0] = this.plugin.getPluginConfig().pickRandomMessage();
+					String global = LocalPlaceholders.fillPlaceHolders(res[0].msg.getText(), player, config);
+					String hover = LocalPlaceholders.fillPlaceHolders(res[0].hoverText, player, config);
+					res[0] = new Message(global, hover, res[0].wakeup, res[0].cantWakeup, res[0].chance);
+					break;
 				}
 				default: {
 					//if trying to specify message
@@ -59,10 +68,11 @@ public class Test implements CommandExecutor {
 							sender.sendMessage(config.messages.getString("badArgs"));
 							return true;
 						}
-						res[i] = config.getMessage(args[i]);
+						res[i] = config.getMessage(args[i], player);
 					}
 				}
 			}
+
 			for( Message m : res) {
 				for (World w : plugin.getServer().getWorlds()) {
 					worldName = w.getName().replace("_nether","").replace("the_end","");

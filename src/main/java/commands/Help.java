@@ -33,6 +33,13 @@ public class Help implements CommandExecutor{
 			msg.setClickEvent( new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/sleep reload"));
 			sender.spigot().sendMessage(msg);
 		}
+
+		if(sender.hasPermission("sleep.test")) {
+			msg = new TextComponent(ChatColor.BLUE.toString() + "/sleep test - test sleep messages");
+			msg.setHoverEvent( new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder( "/sleep test" ).create()));
+			msg.setClickEvent( new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sleep test"));
+			sender.spigot().sendMessage(msg);
+		}
 		return true;
 	}
 	
