@@ -28,36 +28,24 @@ public class Sleep implements CommandExecutor {
 				case 0: {
 					plugin.getCommand("sleep help").execute(sender, label, args);
 				}
-				case 1: {
+				default: {
 					String cmd = command.toString();
 					for(int i = 0; i<args.length; i++)
 						cmd = cmd + args[i].toString();
-					if(		args.length == 1 && subCommands.containsKey(args[0])) {
-						if(sender.hasPermission(subCommands.get(args[0]))) {
-							plugin.getCommand("sleep " + args[0]).execute(sender, label, args);
-							return true;
+					if(subCommands.containsKey(args[0])) {
+						if(!sender.hasPermission(subCommands.get(args[0]))) return false;
+						String[] new_args = new String[args.length-1];
+						for(int i = 1; i<args.length; i++) {
+							new_args[i-1] = args[i];
 						}
-						else {
-							return false;
-						}
+						plugin.getCommand("sleep " + args[0]).execute(sender, label, new_args);
+						return true;
 					}
-					if(!subCommands.containsKey(args[0])) {
-						sender.sendMessage(this.plugin.getPluginConfig().messages.getString("invalidSubCommand"));
+					else { 
+						sender.sendMessage(this.plugin.getPluginConfig().messages.getString("badArgs"));
 					}
 					return true; 
 				}
-				case 2: {
-					//check first argument
-					switch(args[0]) {
-						case "test": {
-							
-						}
-						default: {
-							
-						}
-					}
-				}
-				
 			}
 		}
 		return true;

@@ -20,7 +20,7 @@ public class TabComplete implements TabCompleter {
 		//load commands and permission nodes into map
 		subCommands.put("reload","sleep.reload");
 		subCommands.put("wakeup","sleep.wakeup");
-		subCommands.put("test","sleep.wakeup");
+		subCommands.put("test","sleep.test");
 		subCommands.put("help","sleep.help");
 		this.config = config;
 	}
@@ -28,7 +28,8 @@ public class TabComplete implements TabCompleter {
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command,
 			String alias, String[] args) {
-		if(args.length == 1 && sender.hasPermission("sleep.see")) 
+		if(!sender.hasPermission("sleep.see")) return null;
+		if(args.length == 1) 
 		{
 			//fill list based on command permission nodes
 			List<String> res = new ArrayList<String>(); 

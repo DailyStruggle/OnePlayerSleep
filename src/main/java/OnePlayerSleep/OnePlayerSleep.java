@@ -19,6 +19,7 @@ import commands.Help;
 import commands.Reload;
 import commands.Sleep;
 import commands.TabComplete;
+import commands.Test;
 import commands.Wakeup;
 import events.onPlayerBedEnter;
 import events.onPlayerBedLeave;
@@ -42,6 +43,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		//set executors so i can look them up from /sleep
 		getCommand("sleep help").setExecutor(new Help());
 		getCommand("sleep reload").setExecutor(new Reload(this, this.config));
+		getCommand("sleep test").setExecutor(new Test(this));
 		getCommand("sleep wakeup").setExecutor(new Wakeup(this, this.config));
 		
 		//other way to call wakeup, so sleep.wakeup doesn't depend on sleep.see
