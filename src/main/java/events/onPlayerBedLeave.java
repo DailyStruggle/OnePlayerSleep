@@ -1,7 +1,7 @@
 package events;
 
-import java.util.Set;
-
+import OnePlayerSleep.OnePlayerSleep;
+import bukkitTasks.ClearWeather;
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
 import org.bukkit.World;
@@ -9,10 +9,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
-
-import OnePlayerSleep.OnePlayerSleep;
-import bukkitTasks.ClearWeather;
 import tools.Config;
+
+import java.util.Set;
 
 public class onPlayerBedLeave implements Listener {
 	private OnePlayerSleep plugin;
@@ -29,9 +28,12 @@ public class onPlayerBedLeave implements Listener {
 		Boolean doOtherWorld = config.config.getBoolean("doOtherWorlds");
 		Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
 		World world = event.getPlayer().getWorld();
-		if(this.plugin.sleepingPlayers.get(world).contains(event.getPlayer())) this.plugin.sleepingPlayers.get(world).remove(event.getPlayer());
-		if(this.plugin.sleepingPlayers.get(world).size() == 0) this.plugin.sleepingPlayers.remove(world);
-		
+		if(		this.plugin.sleepingPlayers.containsKey(world) &&
+				this.plugin.sleepingPlayers.get(world).contains(event.getPlayer())){
+			this.plugin.sleepingPlayers.get(world).remove(event.getPlayer());
+			if(this.plugin.sleepingPlayers.get(world).size() == 0) this.plugin.sleepingPlayers.remove(world);
+		}
+
 		Long sleepingPlayers = Long.valueOf(0);
 		Set<World> sleepingWorlds = this.plugin.sleepingPlayers.keySet();
 		for (World w : sleepingWorlds) {

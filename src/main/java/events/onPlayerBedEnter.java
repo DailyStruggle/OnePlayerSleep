@@ -1,17 +1,15 @@
 package events;
 
+import OnePlayerSleep.OnePlayerSleep;
+import bukkitTasks.OnSleepChecks;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerBedEnterEvent;
+import tools.Config;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerBedEnterEvent;
-
-import OnePlayerSleep.OnePlayerSleep;
-import bukkitTasks.OnSleepChecks;
-import tools.Config;
 
 public class onPlayerBedEnter implements Listener {
 	private OnePlayerSleep plugin;

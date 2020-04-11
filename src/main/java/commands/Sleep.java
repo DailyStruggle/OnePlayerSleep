@@ -1,13 +1,12 @@
 package commands;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import OnePlayerSleep.OnePlayerSleep;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import OnePlayerSleep.OnePlayerSleep;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Sleep implements CommandExecutor {
 	private OnePlayerSleep plugin;
@@ -36,11 +35,8 @@ public class Sleep implements CommandExecutor {
 					if(subCommands.containsKey(args[0])) {
 						if(!sender.hasPermission(subCommands.get(args[0]))) return false;
 						String[] new_args = new String[args.length-1];
-						for(int i = 1; i<args.length; i++) {
-							new_args[i-1] = args[i];
-						}
+						for(int i = 1; i<args.length; i++) new_args[i-1] = args[i];
 						plugin.getCommand("sleep " + args[0]).execute(sender, label, new_args);
-						return true;
 					}
 					else { 
 						sender.sendMessage(this.plugin.getPluginConfig().messages.getString("badArgs"));

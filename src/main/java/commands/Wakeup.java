@@ -1,20 +1,19 @@
 package commands;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
+import OnePlayerSleep.OnePlayerSleep;
+import bukkitTasks.AnnounceWakeup;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import OnePlayerSleep.OnePlayerSleep;
-import bukkitTasks.AnnounceWakeup;
-import me.clip.placeholderapi.PlaceholderAPI;
 import tools.Config;
 import types.Message;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Wakeup implements CommandExecutor {
 	OnePlayerSleep plugin;
@@ -29,14 +28,32 @@ public class Wakeup implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!sender.hasPermission("sleep.wakeup")) return false;
 		Boolean isPlayer = (sender instanceof Player);
-		
 		Boolean doOtherWorld= config.config.getBoolean("doOtherWorlds");
 		Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
-		
 		Boolean KickFromBed = this.config.config.getBoolean("kickFromBed");
 		Boolean cantKickAPlayer = false;
 		Boolean hasSleepingPlayers = false;
 		Set<World> worlds = new HashSet<World>(this.plugin.sleepingPlayers.keySet());
+		Message msg = null;
+
+		switch(args.length) {
+			case 0: { //if no args, use last message given to player
+				if( isPlayer ) msg = this.plugin.wakeData.get(((Player)sender));
+				else msg = config.pickRandomMessage();
+				break;
+			}
+			case 1: { //if 1 arg, look up message name
+				if(isPlayer) msg = config.getMessage(args[0], (Player)sender);
+				else msg = config.getMessage(args[0]);
+
+				break;
+			}
+			default: { //else bad args
+				sender.sendMessage(this.plugin.getPluginConfig().messages.getString("badArgs"));
+				return true;
+			}
+		}
+
 		for(World w : worlds) {
 			if( isPlayer && !doOtherWorld && !((Player)sender).getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
 			if( isPlayer && !doOtherDim && !((Player)sender).getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
@@ -67,20 +84,9 @@ public class Wakeup implements CommandExecutor {
 			return true;
 		}
 		
-		if(isPlayer) {
-			Message m = this.plugin.wakeData.get(((Player)sender));
-			if(!cantKickAPlayer && hasSleepingPlayers) {
-				new AnnounceWakeup(this.plugin,this.config,((Player)sender),m).runTaskAsynchronously(this.plugin);
-			}
-			String cantWakeup = m.cantWakeup;
-			if(this.config.hasPAPI()) cantWakeup = PlaceholderAPI.setPlaceholders((Player)sender, cantWakeup);
-			if(cantKickAPlayer && hasSleepingPlayers) {
-				sender.sendMessage(cantWakeup);
-			}
-		}
-		else {
-			plugin.getServer().broadcastMessage("[server]: Everyone wake up!");
-		}
+		if(isPlayer && cantKickAPlayer) sender.sendMessage(PlaceholderAPI.setPlaceholders((Player)sender, msg.cantWakeup));
+		else new AnnounceWakeup(this.plugin,this.config,((Player)sender),msg).runTaskAsynchronously(this.plugin);
+
 		return true;
 	}
 }

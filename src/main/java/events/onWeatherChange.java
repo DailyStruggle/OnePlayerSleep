@@ -1,14 +1,13 @@
 package events;
 
-import java.util.ArrayList;
-
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.weather.WeatherChangeEvent;
-
 import tools.Config;
+
+import java.util.ArrayList;
 
 public class onWeatherChange implements Listener {
 	private Config config;

@@ -1,12 +1,11 @@
 package tools;
 
+import OnePlayerSleep.OnePlayerSleep;
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
-
-import OnePlayerSleep.OnePlayerSleep;
-import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 
 public class PAPI_expansion extends PlaceholderExpansion{
 	private OnePlayerSleep plugin;
@@ -43,7 +42,7 @@ public class PAPI_expansion extends PlaceholderExpansion{
 
 	@Override
     public String getVersion(){
-        return "1.3.6";
+        return "1.3.7";
     }
 	
 	@Override

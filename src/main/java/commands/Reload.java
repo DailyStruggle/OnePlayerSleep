@@ -1,14 +1,13 @@
 package commands;
 
+import OnePlayerSleep.OnePlayerSleep;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import OnePlayerSleep.OnePlayerSleep;
-import me.clip.placeholderapi.PlaceholderAPI;
 import tools.Config;
 
 public class Reload implements CommandExecutor {

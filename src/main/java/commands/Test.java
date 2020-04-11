@@ -1,22 +1,17 @@
 package commands;
 
-import bukkitTasks.AnnounceSleep;
+import OnePlayerSleep.OnePlayerSleep;
 import bukkitTasks.OnSleepChecks;
 import bukkitTasks.SendMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-
-import OnePlayerSleep.OnePlayerSleep;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import tools.Config;
 import tools.LocalPlaceholders;
 import types.Message;
-
-import java.util.ArrayList;
 
 public class Test implements CommandExecutor {
 	private OnePlayerSleep plugin;
@@ -38,7 +33,7 @@ public class Test implements CommandExecutor {
 			Boolean doOtherWorld= config.config.getBoolean("doOtherWorlds");
 			Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
 			Boolean perPlayer = config.config.getBoolean("randomPerPlayer");
-			Message resMsg = new Message("","","","",0.0);
+			Message resMsg = new Message("","","","","",0.0);
 			ConfigurationSection worlds = config.messages.getConfigurationSection("worlds");
 			String worldName = player.getWorld().getName().replace("_nether","").replace("the_end","");
 			if(!worlds.contains(worldName)) {
@@ -57,7 +52,7 @@ public class Test implements CommandExecutor {
 					res[0] = this.plugin.getPluginConfig().pickRandomMessage();
 					String global = LocalPlaceholders.fillPlaceHolders(res[0].msg.getText(), player, config);
 					String hover = LocalPlaceholders.fillPlaceHolders(res[0].hoverText, player, config);
-					res[0] = new Message(global, hover, res[0].wakeup, res[0].cantWakeup, res[0].chance);
+					res[0] = new Message(res[0].name, global, hover, res[0].wakeup, res[0].cantWakeup, res[0].chance);
 					break;
 				}
 				default: {

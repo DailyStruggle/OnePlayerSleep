@@ -1,10 +1,9 @@
 package bukkitTasks;
 
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import OnePlayerSleep.OnePlayerSleep;
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import tools.Config;
 import tools.LocalPlaceholders;
 import types.Message;
@@ -73,7 +72,7 @@ public class SendMessage extends BukkitRunnable{
 				dimStr );
 		if(this.config.hasPAPI()) wakeup = PlaceholderAPI.setPlaceholders(this.targetPlayer, wakeup);
 		
-		this.message = new Message(global, hover, wakeup, this.message.cantWakeup, this.message.chance);
+		this.message = new Message(this.message.name, global, hover, wakeup, this.message.cantWakeup, this.message.chance);
 		this.targetPlayer.spigot().sendMessage(this.message.msg);
 		
 		if(this.plugin.wakeData.containsKey(targetPlayer)) {

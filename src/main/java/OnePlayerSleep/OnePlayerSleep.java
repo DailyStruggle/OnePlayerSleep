@@ -1,8 +1,9 @@
 package OnePlayerSleep;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
+import commands.*;
+import events.onPlayerBedEnter;
+import events.onPlayerBedLeave;
+import events.onWeatherChange;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -11,19 +12,13 @@ import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent.BedEnterResult;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
-
 import tools.Config;
 import tools.PAPI_expansion;
 import types.Message;
-import commands.Help;
-import commands.Reload;
-import commands.Sleep;
-import commands.TabComplete;
-import commands.Test;
-import commands.Wakeup;
-import events.onPlayerBedEnter;
-import events.onPlayerBedLeave;
-import events.onWeatherChange;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class OnePlayerSleep extends JavaPlugin implements Listener {
 	private Config config = new Config(this);
@@ -34,7 +29,8 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 	public Map<World, ArrayList<Player>> sleepingPlayers = new HashMap<World, ArrayList<Player>>(); //list of sleeping players for each world
 	
 	@Override
-	public void onEnable() {		//make /sleep work
+	public void onEnable() {
+		//make /sleep work
 		getCommand("sleep").setExecutor(new Sleep(this));
 		
 		//let players tab for available subcommands

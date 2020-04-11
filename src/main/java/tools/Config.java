@@ -1,20 +1,19 @@
 package tools;
 
+import OnePlayerSleep.OnePlayerSleep;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import types.Message;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-
-import OnePlayerSleep.OnePlayerSleep;
-import org.bukkit.entity.Player;
-import types.Message;
 
 public class Config {
 	public FileConfiguration config;
@@ -104,7 +103,7 @@ public class Config {
 			String response = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("wakeup","[player] says &cWake up!"));
 			String cantWakeup = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("cantWakeup","&csomeone's a deep sleeper"));
 			Double chance = this.messages.getConfigurationSection("messages").getConfigurationSection(t).getDouble("chance");
-			this.messageArray.add(i, new Message( msg, hover_msg, response, cantWakeup, chance) );
+			this.messageArray.add(i, new Message(t, msg, hover_msg, response, cantWakeup, chance) );
 			this.totalChance = this.totalChance + chance;
 			this.chanceRanges.add(i+1, this.chanceRanges.get(i) + chance);
 			this.messageNames.add(t);
@@ -149,6 +148,17 @@ public class Config {
 		return messageArray.get(i);
 	}
 
+	public Message getMessage(String name) {
+		Message res;
+		String msg = this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("global","[player] &bis sleeping");
+		String hover_msg = this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("hover","&eWake up!");
+		String response = this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("wakeup","[player] says &cWake up!");
+		String cantWakeup = this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("cantWakeup","&csomeone's a deep sleeper");
+		Double chance = this.messages.getConfigurationSection("messages").getConfigurationSection(name).getDouble("chance");
+		res = new Message(name, msg, hover_msg, response, cantWakeup, chance);
+
+		return res;
+	}
 	public Message getMessage(String name, Player player) {
 		Message res;
 		String msg = LocalPlaceholders.fillPlaceHolders(this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("global","[player] &bis sleeping"), player, this);
@@ -156,7 +166,7 @@ public class Config {
 		String response = LocalPlaceholders.fillPlaceHolders(this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("wakeup","[player] says &cWake up!"), player, this);
 		String cantWakeup = LocalPlaceholders.fillPlaceHolders(this.messages.getConfigurationSection("messages").getConfigurationSection(name).getString("cantWakeup","&csomeone's a deep sleeper"), player, this);
 		Double chance = this.messages.getConfigurationSection("messages").getConfigurationSection(name).getDouble("chance");
-		res = new Message( msg, hover_msg, response, cantWakeup, chance);
+		res = new Message(name, msg, hover_msg, response, cantWakeup, chance);
 
 		return res;
 	}

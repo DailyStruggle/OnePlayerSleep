@@ -1,16 +1,15 @@
 package commands;
 
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.util.StringUtil;
+import tools.Config;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
-
-import org.bukkit.util.StringUtil;
-import tools.Config;
 
 public class TabComplete implements TabCompleter {
 	private Map<String,String> subCommands = new HashMap<String,String>();
@@ -33,7 +32,6 @@ public class TabComplete implements TabCompleter {
 
 		List<String> res = null;
 
-
 		switch(args.length){
 			case 1: {
 				res = new ArrayList<String>();
@@ -44,20 +42,19 @@ public class TabComplete implements TabCompleter {
 						subCom.add(entry.getKey());
 				}
 				StringUtil.copyPartialMatches(args[0],subCom,res);
-				return res;
+				break;
 			}
 			default: {
 				switch(args[0]){
-					case "test":{
+					case "test":
+					case "wakeup": {
 						res = new ArrayList<String>();
 						StringUtil.copyPartialMatches(args[args.length-1],this.config.messageNames,res);
-						return res;
-					}
-					default: {
-						return null;
 					}
 				}
 			}
 		}
+
+		return res;
 	}
 }

@@ -1,10 +1,9 @@
 package bukkitTasks;
 
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import OnePlayerSleep.OnePlayerSleep;
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import tools.Config;
 import tools.LocalPlaceholders;
 import types.Message;

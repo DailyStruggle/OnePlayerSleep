@@ -1,9 +1,9 @@
 package bukkitTasks;
 
-import java.util.Random;
-
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.Random;
 
 public class ClearWeather extends BukkitRunnable{
 	private World world;

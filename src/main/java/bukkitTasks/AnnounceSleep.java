@@ -1,11 +1,10 @@
 package bukkitTasks;
 
+import OnePlayerSleep.OnePlayerSleep;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import OnePlayerSleep.OnePlayerSleep;
 import tools.Config;
 import tools.LocalPlaceholders;
 import types.Message;
@@ -27,7 +26,7 @@ public class AnnounceSleep extends BukkitRunnable{
 		Boolean doOtherWorld= config.config.getBoolean("doOtherWorlds");
 		Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
 		Boolean perPlayer = config.config.getBoolean("randomPerPlayer");
-		Message resMsg = new Message("","","","",0.0);
+		Message resMsg = new Message( "", "","","","",0.0);
 		ConfigurationSection worlds = this.config.messages.getConfigurationSection("worlds");
 		String worldName = this.player.getWorld().getName().replace("_nether","").replace("the_end","");
 		if(!worlds.contains(worldName)) {
@@ -54,7 +53,7 @@ public class AnnounceSleep extends BukkitRunnable{
 					worldName,
 					dimStr );
 			
-			resMsg = new Message(global, hover, resMsg.wakeup, resMsg.cantWakeup, resMsg.chance);
+			resMsg = new Message(resMsg.name, global, hover, resMsg.wakeup, resMsg.cantWakeup, resMsg.chance);
 		}
 		
 		for (World w : plugin.getServer().getWorlds()) {

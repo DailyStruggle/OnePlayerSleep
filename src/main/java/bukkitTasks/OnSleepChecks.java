@@ -1,16 +1,14 @@
 package bukkitTasks;
 
-import java.util.ArrayList;
-import java.util.Random;
-
+import OnePlayerSleep.OnePlayerSleep;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-
-
-import OnePlayerSleep.OnePlayerSleep;
 import tools.Config;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public class OnSleepChecks extends BukkitRunnable{
 	private OnePlayerSleep plugin;
