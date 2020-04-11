@@ -1,9 +1,7 @@
 package OnePlayerSleep;
 
 import commands.*;
-import events.onPlayerBedEnter;
-import events.onPlayerBedLeave;
-import events.onWeatherChange;
+import events.*;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -13,6 +11,7 @@ import org.bukkit.event.player.PlayerBedEnterEvent.BedEnterResult;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import tools.Config;
+import tools.Metrics;
 import tools.PAPI_expansion;
 import types.Message;
 
@@ -34,6 +33,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 
 	@Override
 	public void onEnable() {
+		this.numPlayers = 0;
 		this.numSleepingPlayers = 0;
 		this.doSleep = new HashMap<World,BukkitTask>();
 		this.clearWeather = new HashMap<World,BukkitTask>();
@@ -82,12 +82,17 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		//register all the spigot events I need
 		getServer().getPluginManager().registerEvents(new onPlayerBedEnter(this, config), this);
 		getServer().getPluginManager().registerEvents(new onPlayerBedLeave(this, config), this);
+		getServer().getPluginManager().registerEvents(new onPlayerJoin(this, config), this);
+		getServer().getPluginManager().registerEvents(new onPlayerQuit(this, config), this);
 		getServer().getPluginManager().registerEvents(new onWeatherChange(config), this);
 		getServer().getPluginManager().registerEvents(this, this);
 		
 		if(this.config.hasPAPI()) {
 			new PAPI_expansion().register();
 		}
+
+		int pluginId = 7096; // <-- Replace with the id of your plugin!
+		Metrics metrics = new Metrics(this, pluginId);
 	}
 	
 	@Override

@@ -45,16 +45,13 @@ public class TabComplete implements TabCompleter {
 				break;
 			}
 			default: {
-				switch(args[0]){
-					case "test":
-					case "wakeup": {
-						res = new ArrayList<String>();
-						StringUtil.copyPartialMatches(args[args.length-1],this.config.messageNames,res);
-					}
+				if( 	(args[0].equalsIgnoreCase("test")  && sender.hasPermission("sleep.test") ) ||
+						(args[0].equalsIgnoreCase("wakeup")  && sender.hasPermission("sleep.wakeup") ) ) {
+					res = new ArrayList<String>();
+					StringUtil.copyPartialMatches(args[args.length-1],this.config.messageNames,res);
 				}
 			}
 		}
-
 		return res;
 	}
 }
