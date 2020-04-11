@@ -53,25 +53,12 @@ public class PAPI_expansion extends PlaceholderExpansion{
         
 		// %OnePlayerSleep_sleeping_player_count%
         if(identifier.equals("sleeping_player_count")){
-            Integer res = 0;
-            for (org.bukkit.World w : plugin.sleepingPlayers.keySet()) {
-            	res = res + plugin.sleepingPlayers.get(w).size();
-            }
-        	return res.toString();
+            return this.plugin.numSleepingPlayers.toString();
         }
         
         // %OnePlayerSleep_total_player_count%
         if(identifier.equals("total_player_count")){
-            Integer res = 0;
-            Boolean doOtherDim = plugin.getPluginConfig().config.getBoolean("doOtherDimensions");
-    		for (org.bukkit.World w : Bukkit.getWorlds()) {
-            	if( !doOtherDim && !w.getEnvironment().equals( Environment.NORMAL ) ) continue;
-    			for (Player p : w.getPlayers()) {
-    				if(p.isSleepingIgnored() || p.hasPermission("sleep.ignore")) continue; 
-    				res = res + 1;
-    			}
-            }
-        	return res.toString();
+            return this.plugin.numPlayers.toString();
         }
         
         return null;

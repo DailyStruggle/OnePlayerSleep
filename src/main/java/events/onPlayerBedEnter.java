@@ -52,5 +52,6 @@ public class onPlayerBedEnter implements Listener {
 		
 		//do other relevant checks asynchronously
 		new OnSleepChecks(this.plugin, this.config, event.getPlayer()).runTaskAsynchronously(plugin);
+		this.plugin.numSleepingPlayers++;
 	}
 }
