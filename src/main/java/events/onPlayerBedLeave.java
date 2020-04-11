@@ -25,6 +25,7 @@ public class onPlayerBedLeave implements Listener {
 	@EventHandler
 	public void onPlayerBedLeave (PlayerBedLeaveEvent event) {
 		if(event.getPlayer().isSleepingIgnored() || event.getPlayer().hasPermission("sleep.ignore")) return; 
+		this.plugin.numSleepingPlayers--;
 		Boolean doOtherWorld = config.config.getBoolean("doOtherWorlds");
 		Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
 		World world = event.getPlayer().getWorld();

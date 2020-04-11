@@ -22,14 +22,37 @@ import java.util.Map;
 
 public final class OnePlayerSleep extends JavaPlugin implements Listener {
 	private Config config = new Config(this);
-	
-	public Map<World,BukkitTask> doSleep = new HashMap<World,BukkitTask>();
-	public Map<World,BukkitTask> clearWeather = new HashMap<World,BukkitTask>();
-	public Map<Player, Message> wakeData = new HashMap<Player, Message>(); //list of players receiving wakeup option
-	public Map<World, ArrayList<Player>> sleepingPlayers = new HashMap<World, ArrayList<Player>>(); //list of sleeping players for each world
-	
+
+	public Map<World,BukkitTask> doSleep;
+	public Map<World,BukkitTask> clearWeather;
+	public Map<Player, Message> wakeData; //list of players receiving wakeup option
+	public Map<World, ArrayList<Player>> sleepingPlayers; //list of sleeping players for each world
+
+	public Integer numPlayers;
+	public Integer numSleepingPlayers;
+
+
 	@Override
 	public void onEnable() {
+		this.numSleepingPlayers = 0;
+		this.doSleep = new HashMap<World,BukkitTask>();
+		this.clearWeather = new HashMap<World,BukkitTask>();
+		this.wakeData = new HashMap<Player, Message>();
+		this.sleepingPlayers = new HashMap<World, ArrayList<Player>>();
+		for (org.bukkit.World w : Bukkit.getWorlds()) {
+			for (Player p : w.getPlayers()){
+				if(p.isSleepingIgnored() || p.hasPermission("sleep.ignore")) continue;
+				this.numPlayers++;
+				if(p.isSleeping()){
+					this.numSleepingPlayers++;
+					if(!this.sleepingPlayers.containsKey(w)){
+						this.sleepingPlayers.put(w, new ArrayList<Player>());
+					}
+					this.sleepingPlayers.get(w).add(p);
+				}
+			}
+		}
+
 		//make /sleep work
 		getCommand("sleep").setExecutor(new Sleep(this));
 		
