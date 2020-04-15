@@ -1,12 +1,12 @@
-package bukkitTasks;
+package OnePlayerSleep.bukkitTasks;
 
-import OnePlayerSleep.OnePlayerSleep;
+import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import tools.Config;
-import tools.LocalPlaceholders;
-import types.Message;
+import OnePlayerSleep.tools.Config;
+import OnePlayerSleep.tools.LocalPlaceholders;
+import OnePlayerSleep.types.Message;
 
 //set up message threads for all relevant players
 public class AnnounceWakeup extends BukkitRunnable{

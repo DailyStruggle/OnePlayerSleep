@@ -1,9 +1,9 @@
-package bukkitTasks;
+package OnePlayerSleep.bukkitTasks;
 
-import OnePlayerSleep.OnePlayerSleep;
+import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
-import tools.Config;
+import OnePlayerSleep.tools.Config;
 
 public class PassTime extends BukkitRunnable{
 	private OnePlayerSleep plugin;

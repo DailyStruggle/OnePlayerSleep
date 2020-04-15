@@ -1,4 +1,4 @@
-package bukkitTasks;
+package OnePlayerSleep.bukkitTasks;
 
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;

@@ -1,12 +1,12 @@
-package events;
+package OnePlayerSleep.events;
 
-import OnePlayerSleep.OnePlayerSleep;
-import bukkitTasks.OnSleepChecks;
+import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
+import OnePlayerSleep.bukkitTasks.OnSleepChecks;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
-import tools.Config;
+import OnePlayerSleep.tools.Config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,21 +23,21 @@ public class onPlayerBedEnter implements Listener {
 	@EventHandler
 	public void onPlayerBedEnter(PlayerBedEnterEvent event) {
 		//skip if player needs to be ignored by the plugin
-		if(event.getPlayer().isSleepingIgnored() || event.getPlayer().hasPermission("sleep.ignore")) return; 
-		
-		if(			config.version.contains("1_13") ||
-					config.version.contains("1_14") ||
-					config.version.contains("1_15")) {
-			if(event.getBedEnterResult() != PlayerBedEnterEvent.BedEnterResult.OK) return;
-		}
-		
 		if(	(	event.getPlayer().getWorld().getTime() < config.config.getInt("startTime") ||
 				event.getPlayer().getWorld().getTime() > config.config.getInt("stopTime") ) &&
 				!event.getPlayer().getWorld().hasStorm()) {
 			event.setCancelled(true);
 			return;
 		}
-		
+
+		if(event.getPlayer().isSleepingIgnored() || event.getPlayer().hasPermission("sleep.ignore")) return;
+
+		if(			config.version.contains("1_13") ||
+				config.version.contains("1_14") ||
+				config.version.contains("1_15")) {
+			if(event.getBedEnterResult() != PlayerBedEnterEvent.BedEnterResult.OK) return;
+		}
+
 		//cooldown logic
 		Long currentTime = System.currentTimeMillis();
 		if(		this.lastTme.containsKey(event.getPlayer()) &&

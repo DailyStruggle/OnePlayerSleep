@@ -1,10 +1,10 @@
-package commands;
+package OnePlayerSleep.commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.util.StringUtil;
-import tools.Config;
+import OnePlayerSleep.tools.Config;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ public class TabComplete implements TabCompleter {
 	private Config config;
 	
 	public TabComplete(Config config) {
-		//load commands and permission nodes into map
+		//load OnePlayerSleep.commands and permission nodes into map
 		subCommands.put("reload","sleep.reload");
 		subCommands.put("wakeup","sleep.wakeup");
 		subCommands.put("test","sleep.test");

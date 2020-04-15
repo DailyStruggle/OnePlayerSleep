@@ -1,4 +1,4 @@
-package tools;
+package OnePlayerSleep.tools;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;

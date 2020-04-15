@@ -1,11 +1,11 @@
-package events;
+package OnePlayerSleep.events;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.weather.WeatherChangeEvent;
-import tools.Config;
+import OnePlayerSleep.tools.Config;
 
 import java.util.ArrayList;
 

@@ -1,15 +1,15 @@
-package commands;
+package OnePlayerSleep.commands;
 
-import OnePlayerSleep.OnePlayerSleep;
-import bukkitTasks.AnnounceWakeup;
+import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
+import OnePlayerSleep.bukkitTasks.AnnounceWakeup;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import tools.Config;
-import types.Message;
+import OnePlayerSleep.tools.Config;
+import OnePlayerSleep.types.Message;
 
 import java.util.ArrayList;
 import java.util.HashSet;

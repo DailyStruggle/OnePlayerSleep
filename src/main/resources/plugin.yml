@@ -1,5 +1,5 @@
 name: OnePlayerSleep
-main: OnePlayerSleep.OnePlayerSleep
+main: OnePlayerSleep.OnePlayerSleep.OnePlayerSleep
 version: 1.4.0
 api-version: 1.13
 author: leaf26

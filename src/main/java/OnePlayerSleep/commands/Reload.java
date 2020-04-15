@@ -1,6 +1,6 @@
-package commands;
+package OnePlayerSleep.commands;
 
-import OnePlayerSleep.OnePlayerSleep;
+import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -8,7 +8,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import tools.Config;
+import OnePlayerSleep.tools.Config;
 
 public class Reload implements CommandExecutor {
 	private OnePlayerSleep plugin;

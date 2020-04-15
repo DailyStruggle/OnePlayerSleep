@@ -1,12 +1,12 @@
-package tools;
+package OnePlayerSleep.tools;
 
-import OnePlayerSleep.OnePlayerSleep;
+import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import types.Message;
+import OnePlayerSleep.types.Message;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -86,11 +86,7 @@ public class Config {
 		
 		this.messages.set("onNoPlayersSleeping", LocalPlaceholders.fillColorCodes(this.messages.getString("onNoPlayersSleeping")));
 		this.messages.set("cooldownMessage", LocalPlaceholders.fillColorCodes(this.messages.getString("cooldownMessage")));
-		
-		this.messages.set("default", LocalPlaceholders.fillColorCodes(this.messages.getString("default")));
-		this.messages.set("_nether", LocalPlaceholders.fillColorCodes(this.messages.getString("_nether")));
-		this.messages.set("_the_end", LocalPlaceholders.fillColorCodes(this.messages.getString("_the_end")));
-		
+
 		Set<String> allMessageNames = this.messages.getConfigurationSection("messages").getKeys(false);
 		this.messageArray = new ArrayList<Message>();
 		this.totalChance = 0.0;
@@ -133,17 +129,10 @@ public class Config {
 		while(true) {
 			double range_low = this.chanceRanges.get(i);
 			double range_high = this.chanceRanges.get(i+1);
-			if(randomValue <= range_low) {
-				iter_high = i;
-				i = (iter_high - iter_low)/2 + iter_low;
-				continue;
-			}
-			if(randomValue > range_high) {
-				iter_low = i;
-				i = (iter_high - iter_low)/2 + iter_low;
-				continue;
-			}
-			break;
+			if(randomValue <= range_low) iter_high = i;
+			else if(randomValue > range_high) iter_low = i;
+			else break;
+			i = (iter_high - iter_low)/2 + iter_low;
 		}
 		return messageArray.get(i);
 	}

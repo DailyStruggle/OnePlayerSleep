@@ -1,11 +1,10 @@
-package events;
+package OnePlayerSleep.events;
 
-import OnePlayerSleep.OnePlayerSleep;
-import bukkitTasks.OnSleepChecks;
+import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import tools.Config;
+import OnePlayerSleep.tools.Config;
 
 public class onPlayerJoin implements Listener {
     private OnePlayerSleep plugin;

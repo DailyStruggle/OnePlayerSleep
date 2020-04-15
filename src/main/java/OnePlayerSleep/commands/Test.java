@@ -1,17 +1,17 @@
-package commands;
+package OnePlayerSleep.commands;
 
-import OnePlayerSleep.OnePlayerSleep;
-import bukkitTasks.OnSleepChecks;
-import bukkitTasks.SendMessage;
+import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
+import OnePlayerSleep.bukkitTasks.OnSleepChecks;
+import OnePlayerSleep.bukkitTasks.SendMessage;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import tools.Config;
-import tools.LocalPlaceholders;
-import types.Message;
+import OnePlayerSleep.tools.Config;
+import OnePlayerSleep.tools.LocalPlaceholders;
+import OnePlayerSleep.types.Message;
 
 public class Test implements CommandExecutor {
 	private OnePlayerSleep plugin;

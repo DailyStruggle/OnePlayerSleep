@@ -1,11 +1,11 @@
-package bukkitTasks;
+package OnePlayerSleep.bukkitTasks;
 
-import OnePlayerSleep.OnePlayerSleep;
+import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import tools.Config;
+import OnePlayerSleep.tools.Config;
 
 import java.util.ArrayList;
 import java.util.Random;

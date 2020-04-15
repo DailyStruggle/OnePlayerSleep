@@ -1,7 +1,7 @@
-package events;
+package OnePlayerSleep.events;
 
-import OnePlayerSleep.OnePlayerSleep;
-import bukkitTasks.ClearWeather;
+import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
+import OnePlayerSleep.bukkitTasks.ClearWeather;
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
 import org.bukkit.World;
@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
-import tools.Config;
+import OnePlayerSleep.tools.Config;
 
 import java.util.Set;
 

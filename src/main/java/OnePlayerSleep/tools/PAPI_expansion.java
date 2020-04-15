@@ -1,10 +1,9 @@
-package tools;
+package OnePlayerSleep.tools;
 
-import OnePlayerSleep.OnePlayerSleep;
+import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
 
 public class PAPI_expansion extends PlaceholderExpansion{
