@@ -28,42 +28,26 @@ public class AnnounceSleep extends BukkitRunnable{
 		Boolean perPlayer = config.config.getBoolean("randomPerPlayer");
 		Message resMsg = new Message( "", "","","","",0.0);
 		ConfigurationSection worlds = this.config.messages.getConfigurationSection("worlds");
-		String worldName = this.player.getWorld().getName().replace("_nether","").replace("the_end","");
-		if(!worlds.contains(worldName)) {
-			worlds.set(worldName, "&a" + worldName);
-		}
-		worldName = worlds.getString(worldName);
-		
+
 		if(!perPlayer) {
 			resMsg = this.config.pickRandomMessage();
 			
-			String dimStr = this.config.messages.getConfigurationSection("dimensions").getString(this.player.getWorld().getEnvironment().name());
-			
 			String global = LocalPlaceholders.fillPlaceHolders(
 					resMsg.msg.getText(),
-					this.player.getName(),
-					this.player.getDisplayName(),
-					worldName,
-					dimStr );
+					this.player,
+					this.config);
 			
 			String hover = LocalPlaceholders.fillPlaceHolders(
 					resMsg.hoverText,
-					this.player.getName(),
-					this.player.getDisplayName(),
-					worldName,
-					dimStr );
+					this.player,
+					this.config);
 			
 			resMsg = new Message(resMsg.name, global, hover, resMsg.wakeup, resMsg.cantWakeup, resMsg.chance);
 		}
 		
 		for (World w : plugin.getServer().getWorlds()) {
-			worldName = w.getName().replace("_nether","").replace("the_end","");
-			if(!worlds.contains(worldName)) {
-				worlds.set(worldName, "&a" + worldName);
-			}
-			
 			//skip if player's world isn't the same as receiver's world, disregarding the difference between dimension names
-			if( !doOtherWorld && !player.getWorld().getName().replace("_nether","").replace("the_end","").equals( worldName ) ) continue;
+			if( !doOtherWorld && !player.getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
 			
 			//skip if player is in another dimension
 			if( !doOtherDim && !player.getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;

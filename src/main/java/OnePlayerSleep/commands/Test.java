@@ -90,7 +90,7 @@ public class Test implements CommandExecutor {
 				}
 			}
 		}
-		return false;
+		return true;
 	}
 	
 }

@@ -31,15 +31,10 @@ public class AnnounceWakeup extends BukkitRunnable{
 			if( !doOtherWorld && !this.player.getWorld().getName().replace("_nether","").replace("the_end","").equals( p.getWorld().getName().replace("_nether","").replace("the_end","") ) ) continue;
 			if( !doOtherDim && !this.player.getWorld().getEnvironment().equals( p.getWorld().getEnvironment() ) ) continue;
 			
-			String worldName = this.config.messages.getConfigurationSection("worlds").getString(p.getWorld().getName().replace("_nether","").replace("the_end",""));
-			String dimStr = this.config.messages.getConfigurationSection("dimensions").getString(p.getWorld().getEnvironment().name());
-			
 			String wakeupMsg = LocalPlaceholders.fillPlaceHolders(
 					this.msg.wakeup, 
-					p.getName(), 
-					p.getDisplayName(), 
-					worldName,
-					dimStr );
+					p,
+					this.config);
 			if(this.config.hasPAPI()) wakeupMsg = PlaceholderAPI.setPlaceholders(p, wakeupMsg);
 			p.sendMessage(wakeupMsg);
 		}

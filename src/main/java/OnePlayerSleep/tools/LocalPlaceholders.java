@@ -25,17 +25,6 @@ public class LocalPlaceholders {
 		return res;
 	}
 
-	public static String fillPlaceHolders(String in, String username, String displayname, String worldname, String dimensionname) {
-		if(in.isEmpty()) return in;
-		String res = in;
-		res = res.replace("[username]", username);
-		res = res.replace("[displayname]", displayname);
-		if(worldname != null) res = res.replace("[world]", worldname.replace("_nether","").replace("_the_end",""));
-		if(dimensionname!=null) res = res.replace("[dimension]", dimensionname);
-		res = LocalPlaceholders.fillColorCodes(res);
-		return res;
-	}
-	
 	public static String fillColorCodes(String in) {
 		if(in == null) return "";
 		String res = in;

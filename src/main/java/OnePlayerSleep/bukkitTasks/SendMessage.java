@@ -43,33 +43,23 @@ public class SendMessage extends BukkitRunnable{
 		}
 		String global = this.message.msg.getText();
 		String hover = this.message.hoverText;
-		String worldName = this.config.messages.getConfigurationSection("worlds").getString(this.sourcePlayer.getWorld().getName().replace("_nether","").replace("the_end",""));
-		String dimStr = this.config.messages.getConfigurationSection("dimensions").getString(this.sourcePlayer.getWorld().getEnvironment().name());
 		if(this.doRandom) {
 			this.message = this.config.pickRandomMessage();
 			global = LocalPlaceholders.fillPlaceHolders(
 					this.message.msg.getText(),
-					this.sourcePlayer.getName(),
-					this.sourcePlayer.getDisplayName(),
-					worldName,
-					dimStr );
+					this.sourcePlayer,
+					this.config);
 			hover = LocalPlaceholders.fillPlaceHolders(
 					this.message.hoverText,
-					this.sourcePlayer.getName(),
-					this.sourcePlayer.getDisplayName(),
-					worldName,
-					dimStr );
+					this.sourcePlayer,
+					this.config);
 		}
 		if(this.config.hasPAPI()) global = PlaceholderAPI.setPlaceholders(this.targetPlayer, global);
 		if(this.config.hasPAPI()) hover = PlaceholderAPI.setPlaceholders(this.sourcePlayer, hover);
-		worldName = this.config.messages.getConfigurationSection("worlds").getString(this.targetPlayer.getWorld().getName().replace("_nether","").replace("the_end",""));
-		dimStr = this.config.messages.getConfigurationSection("dimensions").getString(this.targetPlayer.getWorld().getEnvironment().name());
 		String wakeup = LocalPlaceholders.fillPlaceHolders(
 				this.message.wakeup,
-				this.targetPlayer.getName(),
-				this.targetPlayer.getDisplayName(),
-				worldName,
-				dimStr );
+				this.targetPlayer,
+				this.config );
 		if(this.config.hasPAPI()) wakeup = PlaceholderAPI.setPlaceholders(this.targetPlayer, wakeup);
 		
 		this.message = new Message(this.message.name, global, hover, wakeup, this.message.cantWakeup, this.message.chance);
