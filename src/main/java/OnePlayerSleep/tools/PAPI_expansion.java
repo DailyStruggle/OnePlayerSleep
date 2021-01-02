@@ -2,31 +2,23 @@ package OnePlayerSleep.tools;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class PAPI_expansion extends PlaceholderExpansion{
 	private OnePlayerSleep plugin;
-	
+
+	public PAPI_expansion(OnePlayerSleep plugin){
+	    this.plugin = plugin;
+    }
+
+    @Override
+    public boolean persist(){
+        return true;
+    }
+
 	@Override
     public boolean canRegister(){
         return true;
-    }
-	
-	@Override
-    public boolean register(){
-		if(!canRegister()){
-            return false;
-        }
-        
-        plugin = (OnePlayerSleep) Bukkit.getPluginManager().getPlugin("OnePlayerSleep");
-        
-        if(plugin == null){
-            return false;
-        }
-        
-        return super.register();
     }
 	
 	@Override
@@ -36,31 +28,12 @@ public class PAPI_expansion extends PlaceholderExpansion{
 
 	@Override
 	public String getIdentifier() {
-		return "OnePlayerSleep";
+		return "oneplayersleep";
 	}
 
 	@Override
     public String getVersion(){
-        return "1.4.0";
-    }
-	
-	@Override
-    public String onRequest(OfflinePlayer player, String identifier){
-		if(player == null){
-            return "";
-        }
-        
-		// %OnePlayerSleep_sleeping_player_count%
-        if(identifier.equalsIgnoreCase("sleeping_player_count")){
-            return this.plugin.numSleepingPlayers.toString();
-        }
-        
-        // %OnePlayerSleep_total_player_count%
-        if(identifier.equalsIgnoreCase("total_player_count")){
-            return this.plugin.numPlayers.toString();
-        }
-        
-        return null;
+        return "1.4.1";
     }
 	
 	@Override
@@ -69,12 +42,12 @@ public class PAPI_expansion extends PlaceholderExpansion{
             return "";
         }
 
-        // %OnePlayerSleep_sleeping_player_count%
+        // %oneplayersleep_sleeping_player_count%
         if(identifier.equalsIgnoreCase("sleeping_player_count")){
             return this.plugin.numSleepingPlayers.toString();
         }
 
-        // %OnePlayerSleep_total_player_count%
+        // %oneplayersleep_total_player_count%
         if(identifier.equalsIgnoreCase("total_player_count")){
             return this.plugin.numPlayers.toString();
         }
