@@ -89,11 +89,11 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(this, this);
 		
 		if(this.config.hasPAPI()) {
-			new PAPI_expansion().register();
+			new PAPI_expansion(this).register();
 		}
 
 		int pluginId = 7096; // <-- Replace with the id of your plugin!
-		Metrics metrics = new Metrics(this, pluginId);
+		new Metrics(this, pluginId);
 	}
 	
 	@Override
