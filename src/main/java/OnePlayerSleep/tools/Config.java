@@ -84,8 +84,8 @@ public class Config {
 			this.config = YamlConfiguration.loadConfiguration(f);
 		}
 		
-		this.messages.set("onNoPlayersSleeping", LocalPlaceholders.fillColorCodes(this.messages.getString("onNoPlayersSleeping")));
-		this.messages.set("cooldownMessage", LocalPlaceholders.fillColorCodes(this.messages.getString("cooldownMessage")));
+		this.messages.set("onNoPlayersSleeping", ChatColor.translateAlternateColorCodes('&',this.messages.getString("onNoPlayersSleeping")));
+		this.messages.set("cooldownMessage", ChatColor.translateAlternateColorCodes('&',this.messages.getString("cooldownMessage")));
 
 		Set<String> allMessageNames = this.messages.getConfigurationSection("messages").getKeys(false);
 		this.messageArray = new ArrayList<Message>();
@@ -94,10 +94,10 @@ public class Config {
 		this.chanceRanges.add(0, 0.0);
 		int i = 0;
 		for (String t : allMessageNames) {
-			String msg = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("global","[player] &bis sleeping"));
-			String hover_msg = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("hover","&eWake up!"));
-			String response = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("wakeup","[player] says &cWake up!"));
-			String cantWakeup = LocalPlaceholders.fillColorCodes(this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("cantWakeup","&csomeone's a deep sleeper"));
+			String msg = ChatColor.translateAlternateColorCodes('&',this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("global","[player] &bis sleeping"));
+			String hover_msg = ChatColor.translateAlternateColorCodes('&',this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("hover","&eWake up!"));
+			String response = ChatColor.translateAlternateColorCodes('&',this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("wakeup","[player] says &cWake up!"));
+			String cantWakeup = ChatColor.translateAlternateColorCodes('&',this.messages.getConfigurationSection("messages").getConfigurationSection(t).getString("cantWakeup","&csomeone's a deep sleeper"));
 			Double chance = this.messages.getConfigurationSection("messages").getConfigurationSection(t).getDouble("chance");
 			this.messageArray.add(i, new Message(t, msg, hover_msg, response, cantWakeup, chance) );
 			this.totalChance = this.totalChance + chance;
@@ -106,7 +106,7 @@ public class Config {
 			i = i+1;
 		}
 		
-		String msg = LocalPlaceholders.fillColorCodes(this.messages.getString("onNoPlayersSleeping"));
+		String msg = ChatColor.translateAlternateColorCodes('&',this.messages.getString("onNoPlayersSleeping"));
 		this.messages.set("onNoPlayersSleeping", msg);
 	}
 	
