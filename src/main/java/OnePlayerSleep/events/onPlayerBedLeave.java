@@ -24,8 +24,10 @@ public class onPlayerBedLeave implements Listener {
 	
 	@EventHandler
 	public void onPlayerBedLeave (PlayerBedLeaveEvent event) {
-		if(event.getPlayer().isSleepingIgnored() || event.getPlayer().hasPermission("sleep.ignore")) return; 
-		this.plugin.numSleepingPlayers--;
+		Boolean useSleepingIgnored = config.config.getBoolean("useSleepingIgnored", true);
+		if(useSleepingIgnored && event.getPlayer().isSleepingIgnored()) return;
+		if(event.getPlayer().hasPermission("sleep.ignore")) return;
+		if(this.plugin.numSleepingPlayers > 0) this.plugin.numSleepingPlayers--;
 		Boolean doOtherWorld = config.config.getBoolean("doOtherWorlds");
 		Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
 		World world = event.getPlayer().getWorld();
@@ -62,8 +64,9 @@ public class onPlayerBedLeave implements Listener {
 				this.plugin.clearWeather.remove(w);
 				this.plugin.clearWeather.put(w, new ClearWeather(w).runTask(this.plugin));
 				if(this.config.config.getBoolean("resetAllStatistics")) {
-					for (Player p : w.getPlayers()) { 
-						if(p.isSleepingIgnored() || p.hasPermission("sleep.ignore")) continue;
+					for (Player p : w.getPlayers()) {
+						if(useSleepingIgnored && p.isSleepingIgnored()) continue;
+						if(p.hasPermission("sleep.ignore")) continue;
 						p.setStatistic(Statistic.TIME_SINCE_REST, 0);
 					}
 				}

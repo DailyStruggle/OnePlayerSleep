@@ -19,13 +19,14 @@ public class onPlayerQuit implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event){
-        if(event.getPlayer().isSleepingIgnored() || event.getPlayer().isSleepingIgnored())
+        if(config.config.getBoolean("useSleepingIgnored", true)
+                && event.getPlayer().isSleepingIgnored())
+        if(event.getPlayer().hasPermission("sleep.ignore"))
             return;
         Boolean doOtherWorld = config.config.getBoolean("doOtherWorlds");
         Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
         this.plugin.numPlayers--;
         if(event.getPlayer().isSleeping()){
-
             this.plugin.numSleepingPlayers--;
             if(this.plugin.numSleepingPlayers < 0) this.plugin.numSleepingPlayers = 0;
             if(this.plugin.numSleepingPlayers == 0) {

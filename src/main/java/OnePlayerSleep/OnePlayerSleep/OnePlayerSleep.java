@@ -40,19 +40,6 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		this.clearWeather = new HashMap<World,BukkitTask>();
 		this.wakeData = new HashMap<Player, Message>();
 		this.sleepingPlayers = new HashMap<World, ArrayList<Player>>();
-		for (org.bukkit.World w : Bukkit.getWorlds()) {
-			for (Player p : w.getPlayers()){
-				if(p.isSleepingIgnored() || p.hasPermission("sleep.ignore")) continue;
-				this.numPlayers++;
-				if(p.isSleeping()){
-					this.numSleepingPlayers++;
-					if(!this.sleepingPlayers.containsKey(w)){
-						this.sleepingPlayers.put(w, new ArrayList<Player>());
-					}
-					this.sleepingPlayers.get(w).add(p);
-				}
-			}
-		}
 
 		//make /sleep work
 		getCommand("sleep").setExecutor(new Sleep(this));
@@ -68,11 +55,11 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		
 		//other way to call wakeup, so sleep.wakeup doesn't depend on sleep.see
 		getCommand("sleepwakeup").setExecutor(new Wakeup(this, this.config));
-		
+
 		//load config files and check if they're up to date
 		// 	also check for hooks
 		this.config.refreshConfigs();
-		
+
 		//if this plugin got reloaded, redo bed enter OnePlayerSleep.events
 		for( Player p : Bukkit.getOnlinePlayers() ) {
 			if(p.isSleeping()) {
@@ -94,6 +81,22 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 
 		int pluginId = 7096; // <-- Replace with the id of your plugin!
 		new Metrics(this, pluginId);
+
+		Boolean useSleepingIgnored = this.config.config.getBoolean("useSleepingIgnored", true);
+		for (org.bukkit.World w : Bukkit.getWorlds()) {
+			for (Player p : w.getPlayers()){
+				if(useSleepingIgnored && p.isSleepingIgnored()) continue;
+				if(p.hasPermission("sleep.ignore")) continue;
+				this.numPlayers++;
+				if(p.isSleeping()){
+					this.numSleepingPlayers++;
+					if(!this.sleepingPlayers.containsKey(w)){
+						this.sleepingPlayers.put(w, new ArrayList<Player>());
+					}
+					this.sleepingPlayers.get(w).add(p);
+				}
+			}
+		}
 	}
 	
 	@Override

@@ -26,6 +26,7 @@ public class AnnounceSleep extends BukkitRunnable{
 		Boolean doOtherWorld= config.config.getBoolean("doOtherWorlds");
 		Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
 		Boolean perPlayer = config.config.getBoolean("randomPerPlayer");
+		Boolean useSleepingIgnored = config.config.getBoolean("useSleepingIgnored", true);
 		Message resMsg = new Message( "", "","","","",0.0);
 		ConfigurationSection worlds = this.config.messages.getConfigurationSection("worlds");
 
@@ -53,8 +54,10 @@ public class AnnounceSleep extends BukkitRunnable{
 			if( !doOtherDim && !player.getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
 			
 			for (Player p : w.getPlayers()) {
+				if(useSleepingIgnored && p.isSleepingIgnored()) continue;
+
 				//skip if has perm
-				if(p.isSleepingIgnored() || p.hasPermission("sleep.ignore")) continue; 
+				if(p.hasPermission("sleep.ignore")) continue;
 				
 				if(perPlayer) {
 					new SendMessage(this.plugin, this.config, this.player, p).runTaskAsynchronously(this.plugin);

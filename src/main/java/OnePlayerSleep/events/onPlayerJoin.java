@@ -17,7 +17,10 @@ public class onPlayerJoin implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
-        if(event.getPlayer().isSleepingIgnored() || event.getPlayer().isSleepingIgnored())
+        if(config.config.getBoolean("useSleepingIgnored", true)
+                && event.getPlayer().isSleepingIgnored())
+            return;
+        if(event.getPlayer().hasPermission("sleep.ignore"))
             return;
         this.plugin.numPlayers++;
     }

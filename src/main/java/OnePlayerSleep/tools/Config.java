@@ -75,7 +75,7 @@ public class Config {
 			this.plugin.saveResource("messages.yml", false);
 			this.messages = YamlConfiguration.loadConfiguration(f);
 		}
-		if( 	(this.config.getDouble("version") < 1.4) ) {
+		if( 	(this.config.getDouble("version") < 1.5) ) {
 			Bukkit.getConsoleSender().sendMessage("�b[OnePlayerSleep] old config.yml detected. Updating");
 			
 			updateConfig();
@@ -272,7 +272,7 @@ public class Config {
 		for (String line : linesInDefaultConfig) {
 			String newline = line;
 			if (line.startsWith("version:")) {
-				newline = "version: 1.4";
+				newline = "version: 1.5";
 			} else {
 				for (String node : oldValues.keySet()) {
 					if (line.startsWith(node + ":")) {

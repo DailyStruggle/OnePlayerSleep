@@ -30,7 +30,10 @@ public class onPlayerBedEnter implements Listener {
 			return;
 		}
 
-		if(event.getPlayer().isSleepingIgnored() || event.getPlayer().hasPermission("sleep.ignore")) return;
+		if(config.config.getBoolean("useSleepingIgnored", true)
+				&& event.getPlayer().isSleepingIgnored()) return;
+
+		if(event.getPlayer().hasPermission("sleep.ignore")) return;
 
 		if(			config.version.contains("1_13") ||
 				config.version.contains("1_14") ||

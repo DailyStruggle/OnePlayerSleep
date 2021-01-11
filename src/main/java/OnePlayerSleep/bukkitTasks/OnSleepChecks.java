@@ -37,7 +37,9 @@ public class OnSleepChecks extends BukkitRunnable{
 			this.cancel();
 			return;
 		}
-		
+
+		Boolean useSleepingIgnored = config.config.getBoolean("useSleepingIgnored", true);
+
 		//add player to list of sleeping players
 		if(!this.plugin.sleepingPlayers.containsKey(this.player.getWorld())) this.plugin.sleepingPlayers.put(this.player.getWorld(),new ArrayList<Player>());
 		if(!this.plugin.sleepingPlayers.get(this.player.getWorld()).contains(this.player)) this.plugin.sleepingPlayers.get(this.player.getWorld()).add(this.player);
@@ -53,7 +55,8 @@ public class OnSleepChecks extends BukkitRunnable{
 			if( !doOtherDim && !this.player.getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
 			if( this.plugin.sleepingPlayers.containsKey(w) )numSleepingPlayers = numSleepingPlayers + this.plugin.sleepingPlayers.get(w).size();
 			for (Player p : w.getPlayers()) {
-				if(p.isSleepingIgnored() || p.hasPermission("sleep.ignore")) continue;
+				if(useSleepingIgnored && p.isSleepingIgnored()) continue;
+				if(p.hasPermission("sleep.ignore")) continue;
 				numPlayers = numPlayers + 1;
 				if(numPlayers > 1) break;
 			}

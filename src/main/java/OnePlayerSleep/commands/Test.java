@@ -22,6 +22,7 @@ public class Test implements CommandExecutor {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		Boolean useSleepingIgnored = plugin.getPluginConfig().config.getBoolean("useSleepingIgnored", true);
 		if(command.getName().equalsIgnoreCase("sleep test")) {
 			if(!(sender instanceof Player)){
 				sender.sendMessage("[sleep] only players can use this command!");
@@ -82,8 +83,9 @@ public class Test implements CommandExecutor {
 					if( !doOtherDim && !player.getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
 
 					for (Player p : w.getPlayers()) {
+						if(useSleepingIgnored && p.isSleepingIgnored()) continue;
 						//skip if has perm
-						if(p.isSleepingIgnored() || p.hasPermission("sleep.ignore")) continue;
+						if(p.hasPermission("sleep.ignore")) continue;
 
 						new SendMessage(this.plugin, config, m, player, p).runTaskAsynchronously(this.plugin);
 					}

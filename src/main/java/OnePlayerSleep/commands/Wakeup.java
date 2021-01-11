@@ -31,6 +31,7 @@ public class Wakeup implements CommandExecutor {
 		Boolean doOtherWorld= config.config.getBoolean("doOtherWorlds");
 		Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
 		Boolean KickFromBed = this.config.config.getBoolean("kickFromBed");
+		Boolean useSleepingIgnored = config.config.getBoolean("useSleepingIgnored", true);
 		Boolean cantKickAPlayer = false;
 		Boolean hasSleepingPlayers = false;
 		Set<World> worlds = new HashSet<World>(this.plugin.sleepingPlayers.keySet());
@@ -59,7 +60,10 @@ public class Wakeup implements CommandExecutor {
 			if( isPlayer && !doOtherDim && !((Player)sender).getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
 			ArrayList<Player> sleepingPlayers = new ArrayList<Player>(this.plugin.sleepingPlayers.get(w));
 			for ( Player p : sleepingPlayers) {
-				if(p.isSleepingIgnored() || p.hasPermission("sleep.ignore")) continue;
+				if(useSleepingIgnored && p.isSleepingIgnored())
+					continue;
+				if(p.hasPermission("sleep.ignore"))
+					continue;
 				hasSleepingPlayers = true;
 				if(p.hasPermission("sleep.bypass") && !isPlayer) {
 					cantKickAPlayer = true;

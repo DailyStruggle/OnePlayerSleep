@@ -31,5 +31,10 @@ doOtherWorlds: false
 #   namely sharing messages in world with players in world_nether and world_the_end
 doOtherDimensions: false
 
+#option to utilize sleepingIgnored
+#   Essentials will typically setSleepingIgnored on /afk or /vanish
+#   this will cause the plugin to ignore such players automatically
+useSleepingIgnored: true
+
 #DO NOT TOUCH VERSION NUMBER
-version: 1.4
+version: 1.5
