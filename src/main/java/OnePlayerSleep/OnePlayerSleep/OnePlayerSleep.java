@@ -36,10 +36,10 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		this.config = new Config(this);
 		this.numPlayers = 0;
 		this.numSleepingPlayers = 0;
-		this.doSleep = new HashMap<World,BukkitTask>();
-		this.clearWeather = new HashMap<World,BukkitTask>();
-		this.wakeData = new HashMap<Player, Message>();
-		this.sleepingPlayers = new HashMap<World, ArrayList<Player>>();
+		this.doSleep = new HashMap<>();
+		this.clearWeather = new HashMap<>();
+		this.wakeData = new HashMap<>();
+		this.sleepingPlayers = new HashMap<>();
 
 		//make /sleep work
 		getCommand("sleep").setExecutor(new Sleep(this));
@@ -68,6 +68,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		}
 		
 		//register all the spigot OnePlayerSleep.events I need
+		getServer().getPluginManager().registerEvents(new onBedExplode(this, config), this);
 		getServer().getPluginManager().registerEvents(new onPlayerBedEnter(this, config), this);
 		getServer().getPluginManager().registerEvents(new onPlayerBedLeave(this, config), this);
 		getServer().getPluginManager().registerEvents(new onPlayerJoin(this, config), this);
@@ -91,7 +92,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 				if(p.isSleeping()){
 					this.numSleepingPlayers++;
 					if(!this.sleepingPlayers.containsKey(w)){
-						this.sleepingPlayers.put(w, new ArrayList<Player>());
+						this.sleepingPlayers.put(w, new ArrayList<>());
 					}
 					this.sleepingPlayers.get(w).add(p);
 				}

@@ -68,7 +68,7 @@ public class Config {
 		
 		checkConfigs();
 		
-		if( 	(this.messages.getDouble("version") < 1.5) ) {
+		if( 	(this.messages.getDouble("version") < 1.6) ) {
 			Bukkit.getConsoleSender().sendMessage("�b[OnePlayerSleep] old messages.yml detected. Getting a newer version");
 			this.renameFileInPluginDir("messages.yml","messages.old.yml");
 			

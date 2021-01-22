@@ -23,6 +23,8 @@
 
 onNoPlayersSleeping: "&eNo players sleeping!"
 
+badTimeMessage: "&eYou can't sleep during the day"
+
 cooldownMessage: "&eYou can't sleep again yet"
 
 badArgs: "&cinvalid sleep command arguments"
@@ -143,4 +145,4 @@ messages:
         chance: 0.067
 
 #DO NOT TOUCH VERSION NUMBER
-version: 1.5
+version: 1.6
