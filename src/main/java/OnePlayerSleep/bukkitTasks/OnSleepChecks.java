@@ -10,6 +10,7 @@ import OnePlayerSleep.tools.Config;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 public class OnSleepChecks extends BukkitRunnable{
@@ -36,6 +37,7 @@ public class OnSleepChecks extends BukkitRunnable{
 	@Override
 	public void run() {
 		//if player isn't sleeping anymore when the server gets here, pull out
+		Bukkit.getLogger().log(Level.INFO, this.bypassSleep.toString());
 		if( !(this.player.isSleeping())  && !this.bypassSleep) {
 			this.cancel();
 			return;
@@ -44,9 +46,11 @@ public class OnSleepChecks extends BukkitRunnable{
 		World myWorld = this.player.getWorld();
 
 		//add player to list of sleeping players
-		if(!this.plugin.sleepingPlayers.containsKey(myWorld)) this.plugin.sleepingPlayers.put(myWorld,new HashSet<Player>());
-		if(!this.plugin.sleepingPlayers.get(myWorld).contains(this.player)) this.plugin.sleepingPlayers.get(myWorld).add(this.player);
-		
+		this.plugin.sleepingPlayers.putIfAbsent(myWorld,new HashSet<Player>());
+		this.plugin.sleepingPlayers.get(myWorld).add(this.player);
+		Bukkit.getLogger().log(Level.INFO, ((Integer)this.plugin.sleepingPlayers.get(myWorld).size()).toString());
+
+
 		Boolean messageOtherWorlds = config.config.getBoolean("messageOtherWorlds");
 		Boolean messageOtherDimensions = config.config.getBoolean("messageOtherDimensions");
 
@@ -63,12 +67,16 @@ public class OnSleepChecks extends BukkitRunnable{
 			numPlayers += w.getPlayers().size();
 			if(numPlayers > 1) break;
 		}
-		
+
+		if(this.bypassSleep) {
+			return;
+		}
+
 		//only announce the first bed entry, and only when there's more than one player to see it
+		//skip if called by a test function
 		if(numSleepingPlayers < 2 && numPlayers > 1) {
 			//async message selection and delivery
-			//skip if called by a test function
-			if(!this.bypassSleep) new AnnounceSleep(this.plugin, this.config, this.player).runTaskAsynchronously(this.plugin);
+			new AnnounceSleep(this.plugin, this.config, this.player).runTaskAsynchronously(this.plugin);
 			
 			//start sleep task
 			if(plugin.doSleep.containsKey(this.player.getWorld())) plugin.doSleep.remove(this.player.getWorld());

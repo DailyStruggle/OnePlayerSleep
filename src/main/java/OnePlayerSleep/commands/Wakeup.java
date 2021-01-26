@@ -3,6 +3,7 @@ package OnePlayerSleep.commands;
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import OnePlayerSleep.bukkitTasks.AnnounceWakeup;
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 public class Wakeup implements CommandExecutor {
@@ -31,9 +33,9 @@ public class Wakeup implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!sender.hasPermission("sleep.wakeup")) return false;
 		Boolean isPlayer = (sender instanceof Player);
-		Boolean messageOtherWorlds= config.config.getBoolean("messageOtherWorlds");
-		Boolean messageOtherDimensions = config.config.getBoolean("messageOtherDimensions");
-		Boolean KickFromBed = this.config.config.getBoolean("kickFromBed");
+		Boolean messageOtherWorlds= config.config.getBoolean("messageOtherWorlds", false);
+		Boolean messageOtherDimensions = config.config.getBoolean("messageOtherDimensions", false);
+		Boolean KickFromBed = this.config.config.getBoolean("kickFromBed", true);
 		Boolean messageToSleepingIgnored = config.config.getBoolean("messageToSleepingIgnored", true);
 		Boolean cantKickAPlayer = false;
 		Boolean hasSleepingPlayers = false;
@@ -49,7 +51,6 @@ public class Wakeup implements CommandExecutor {
 			case 1: { //if 1 arg, look up message name
 				if(isPlayer) msg = config.getMessage(args[0], (Player)sender);
 				else msg = config.getMessage(args[0]);
-
 				break;
 			}
 			default: { //else bad args
@@ -58,18 +59,21 @@ public class Wakeup implements CommandExecutor {
 			}
 		}
 
+		String myWorldName = "";
+		if(isPlayer) myWorldName = dims.matcher(((Player)sender).getWorld().getName()).replaceAll("");
 		//for each relevant world with sleeping players, kick from bed
 		for(World w : worlds) {
-			if( isPlayer && !messageOtherWorlds && !((Player)sender).getWorld().getName().equals(dims.matcher(w.getName()).replaceAll("")) ) continue;
+			String theirWorld = dims.matcher(w.getName()).replaceAll("");
+			if( isPlayer && !messageOtherWorlds && !myWorldName.equals(theirWorld) ) continue;
 			if( isPlayer && !messageOtherDimensions && !((Player)sender).getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
-			ArrayList<Player> sleepingPlayers = new ArrayList<Player>(this.plugin.sleepingPlayers.get(w));
+			HashSet<Player> sleepingPlayers = this.plugin.sleepingPlayers.get(w);
 			for ( Player p : sleepingPlayers) {
 				if(!messageToSleepingIgnored && p.isSleepingIgnored())
 					continue;
 				if(p.hasPermission("sleep.ignore"))
 					continue;
 				hasSleepingPlayers = true;
-				if(p.hasPermission("sleep.bypass") && !isPlayer) {
+				if(p.hasPermission("sleep.bypass") || !isPlayer) {
 					cantKickAPlayer = true;
 				}
 				else if(KickFromBed) {
@@ -84,7 +88,7 @@ public class Wakeup implements CommandExecutor {
 				this.plugin.doSleep.get(w).cancel();
 			}
 		}
-		
+
 		if(!hasSleepingPlayers) {
 			String onNoPlayersSleeping = config.messages.getString("onNoPlayersSleeping");
 			if(isPlayer && this.config.hasPAPI()) onNoPlayersSleeping = PlaceholderAPI.setPlaceholders((Player)sender, onNoPlayersSleeping);
@@ -97,20 +101,13 @@ public class Wakeup implements CommandExecutor {
 			return true;
 		}
 
-		if(messageOtherWorlds || !isPlayer) {
-			new AnnounceWakeup(this.plugin,this.config,((Player)sender),msg).runTaskAsynchronously(this.plugin);
+		for (Map.Entry<World, Long> entry : plugin.numPlayers.entrySet()) {
+			World theirWorld = entry.getKey();
+			String theirWorldName = dims.matcher(theirWorld.getName()).replaceAll("");
+			if( isPlayer && !messageOtherWorlds && !myWorldName.equals(theirWorldName) ) continue;
+			if( isPlayer && !messageOtherDimensions && !((Player)sender).getWorld().getEnvironment().equals( theirWorld.getEnvironment() ) ) continue;
+			new AnnounceWakeup(this.plugin, this.config, ((Player) sender), msg, theirWorld).runTaskAsynchronously(this.plugin);
 		}
-		else {
-			for (Map.Entry<World, Long> entry : plugin.numPlayers.entrySet()) {
-				World theirWorld = entry.getKey();
-				if (isPlayer && !((Player) sender).getWorld().getName().equals(dims.matcher(theirWorld.getName()).replaceAll("")))
-					continue;
-				if (isPlayer && !messageOtherDimensions && !((Player) sender).getWorld().getEnvironment().equals(theirWorld.getEnvironment()))
-					continue;
-				new AnnounceWakeup(this.plugin, this.config, ((Player) sender), msg, theirWorld).runTaskAsynchronously(this.plugin);
-			}
-		}
-
 		return true;
 	}
 }
