@@ -13,16 +13,19 @@ import OnePlayerSleep.tools.Config;
 import OnePlayerSleep.tools.LocalPlaceholders;
 import OnePlayerSleep.types.Message;
 
+import java.util.regex.Pattern;
+
 public class Test implements CommandExecutor {
 	private OnePlayerSleep plugin;
-	
+	private static final Pattern dims = Pattern.compile("_nether|_the_end", Pattern.CASE_INSENSITIVE);
+
 	public Test(OnePlayerSleep plugin) {
 		this.plugin = plugin;
 	}
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		Boolean useSleepingIgnored = plugin.getPluginConfig().config.getBoolean("useSleepingIgnored", true);
+		Boolean messageToSleepingIgnored = plugin.getPluginConfig().config.getBoolean("messageToSleepingIgnored", true);
 		if(command.getName().equalsIgnoreCase("sleep test")) {
 			if(!(sender instanceof Player)){
 				sender.sendMessage("[sleep] only players can use this command!");
@@ -31,17 +34,13 @@ public class Test implements CommandExecutor {
 			Player player = (Player)sender;
 			Config config = this.plugin.getPluginConfig();
 
-			Boolean doOtherWorld= config.config.getBoolean("doOtherWorlds");
-			Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
-			Boolean perPlayer = config.config.getBoolean("randomPerPlayer");
-			Message resMsg = new Message("","","","","",0.0);
+			Boolean messageOtherWorlds= config.config.getBoolean("messageOtherWorlds");
+			Boolean messageOtherDimensions = config.config.getBoolean("messageOtherDimensions");
 			ConfigurationSection worlds = config.messages.getConfigurationSection("worlds");
-			String worldName = player.getWorld().getName().replace("_nether","").replace("the_end","");
-			if(!worlds.contains(worldName)) {
-				worlds.set(worldName, "&a" + worldName);
+			String myWorldName = dims.matcher(player.getWorld().getName()).replaceAll("");
+			if(!worlds.contains(myWorldName)) {
+				worlds.set(myWorldName, "&a" + myWorldName);
 			}
-			worldName = worlds.getString(worldName);
-			String dimStr = config.messages.getConfigurationSection("dimensions").getString(player.getWorld().getEnvironment().name());
 
 			new OnSleepChecks(this.plugin, config, player, true).runTaskAsynchronously(this.plugin);
 
@@ -71,23 +70,20 @@ public class Test implements CommandExecutor {
 
 			for( Message m : res) {
 				for (World w : plugin.getServer().getWorlds()) {
-					worldName = w.getName().replace("_nether","").replace("the_end","");
-					if(!worlds.contains(worldName)) {
-						worlds.set(worldName, "&a" + worldName);
+					String theirWorldName = dims.matcher(w.getName()).replaceAll("");
+					if(!worlds.contains(theirWorldName)) {
+						worlds.set(theirWorldName, "&a" + theirWorldName);
 					}
 
-					//skip if player's world isn't the same as receiver's world, disregarding the difference between dimension names
-					if( !doOtherWorld && !player.getWorld().getName().replace("_nether","").replace("the_end","").equals( worldName ) ) continue;
-
-					//skip if player is in another dimension
-					if( !doOtherDim && !player.getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
+					if( !messageOtherWorlds && !myWorldName.equals(theirWorldName) ) continue;
+					if( !messageOtherDimensions && !player.getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
 
 					for (Player p : w.getPlayers()) {
-						if(useSleepingIgnored && p.isSleepingIgnored()) continue;
+						if(messageToSleepingIgnored && p.isSleepingIgnored()) continue;
 						//skip if has perm
 						if(p.hasPermission("sleep.ignore")) continue;
 
-						new SendMessage(this.plugin, config, m, player, p).runTaskAsynchronously(this.plugin);
+						new SendMessage(this.plugin, config, player, p, m).runTaskAsynchronously(this.plugin);
 					}
 				}
 			}

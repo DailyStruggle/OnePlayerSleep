@@ -12,16 +12,6 @@ public class Message {
 	public String wakeup;
 	public String cantWakeup;
 	public Double chance;
-	
-//	public Message(String global, String hover, String wakeup, String cantWakeup, Double chance) {
-//		this.msg = new TextComponent(global);
-//		this.msg.setHoverEvent( new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder( hover ).create()));
-//		this.msg.setClickEvent( new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/sleepwakeup"));
-//		this.wakeup = wakeup;
-//		this.hoverText = hover;
-//		this.cantWakeup = cantWakeup;
-//		this.chance = chance;
-//	}
 
 	public Message(String name, String global, String hover, String wakeup, String cantWakeup, Double chance) {
 		this.msg = new TextComponent(global);

@@ -8,10 +8,12 @@ import org.bukkit.event.weather.WeatherChangeEvent;
 import OnePlayerSleep.tools.Config;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class onWeatherChange implements Listener {
+	private static final Pattern dims = Pattern.compile("_nether|_the_end", Pattern.CASE_INSENSITIVE);
 	private Config config;
-	
+
 	public onWeatherChange(Config config) {
 		this.config = config;
 	}
@@ -20,14 +22,16 @@ public class onWeatherChange implements Listener {
 	public void onWeatherChange(WeatherChangeEvent event) {
 		if(!this.config.config.getBoolean("doOtherWorlds")) return;
 		ArrayList<World> worlds = (ArrayList<World>) Bukkit.getWorlds();
-		int i = worlds.indexOf(event.getWorld());
+		World world = event.getWorld();
 		for (World w : worlds) {
 			if(w.equals(event.getWorld())) continue;
+			if(dims.matcher(w.getName()).find()) continue;
 			w.setStorm(event.toWeatherState());
-			//set a little longer than this world's weather duration so only one world causes the next weather update
-			w.setWeatherDuration(worlds.get(i).getWeatherDuration()+5);
-			w.setThundering(worlds.get(i).isThundering());
-			w.setThunderDuration(worlds.get(i).getThunderDuration()+5);
+
+			//set other weathers a little longer than this world's weather duration so only one world causes the next weather update
+			w.setWeatherDuration(world.getWeatherDuration()+5);
+			w.setThundering(world.isThundering());
+			w.setThunderDuration(world.getThunderDuration()+5);
 		}
 	}
 }

@@ -8,13 +8,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 import OnePlayerSleep.tools.Config;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 public class OnSleepChecks extends BukkitRunnable{
+	private static final Pattern dims = Pattern.compile("_nether|_the_end", Pattern.CASE_INSENSITIVE);
 	private OnePlayerSleep plugin;
 	private Config config;
 	private Player player;
-	private Boolean bypassSleep = false;
+	private Boolean bypassSleep = false; //flag for testing messages
 	
 	public OnSleepChecks(OnePlayerSleep plugin, Config config, Player player) {
 		this.plugin = plugin;
@@ -38,31 +41,30 @@ public class OnSleepChecks extends BukkitRunnable{
 			return;
 		}
 
-		Boolean useSleepingIgnored = config.config.getBoolean("useSleepingIgnored", true);
+		World myWorld = this.player.getWorld();
 
 		//add player to list of sleeping players
-		if(!this.plugin.sleepingPlayers.containsKey(this.player.getWorld())) this.plugin.sleepingPlayers.put(this.player.getWorld(),new ArrayList<Player>());
-		if(!this.plugin.sleepingPlayers.get(this.player.getWorld()).contains(this.player)) this.plugin.sleepingPlayers.get(this.player.getWorld()).add(this.player);
+		if(!this.plugin.sleepingPlayers.containsKey(myWorld)) this.plugin.sleepingPlayers.put(myWorld,new HashSet<Player>());
+		if(!this.plugin.sleepingPlayers.get(myWorld).contains(this.player)) this.plugin.sleepingPlayers.get(myWorld).add(this.player);
 		
-		Boolean doOtherWorld = config.config.getBoolean("doOtherWorlds");
-		Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
-		
+		Boolean messageOtherWorlds = config.config.getBoolean("messageOtherWorlds");
+		Boolean messageOtherDimensions = config.config.getBoolean("messageOtherDimensions");
+
+		String myWorldName = dims.matcher(this.player.getWorld().getName()).replaceAll("");
+
 		int numPlayers = 0;
 		int numSleepingPlayers = 0;
 		//check for valid players
 		for (World w : Bukkit.getWorlds()){
-			if( !doOtherWorld && !this.player.getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
-			if( !doOtherDim && !this.player.getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
-			if( this.plugin.sleepingPlayers.containsKey(w) )numSleepingPlayers = numSleepingPlayers + this.plugin.sleepingPlayers.get(w).size();
-			for (Player p : w.getPlayers()) {
-				if(useSleepingIgnored && p.isSleepingIgnored()) continue;
-				if(p.hasPermission("sleep.ignore")) continue;
-				numPlayers = numPlayers + 1;
-				if(numPlayers > 1) break;
-			}
+			String theirWorldName = dims.matcher(w.getName()).replaceAll("");
+			if( !messageOtherWorlds && !myWorldName.equals(theirWorldName) ) continue;
+			if( !messageOtherDimensions && !this.player.getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
+			if( this.plugin.sleepingPlayers.containsKey(w) ) numSleepingPlayers += this.plugin.sleepingPlayers.get(w).size();
+			numPlayers += w.getPlayers().size();
+			if(numPlayers > 1) break;
 		}
 		
-		//only announce the first bed entry, when there's more than one player to see it
+		//only announce the first bed entry, and only when there's more than one player to see it
 		if(numSleepingPlayers < 2 && numPlayers > 1) {
 			//async message selection and delivery
 			//skip if called by a test function
@@ -70,7 +72,8 @@ public class OnSleepChecks extends BukkitRunnable{
 			
 			//start sleep task
 			if(plugin.doSleep.containsKey(this.player.getWorld())) plugin.doSleep.remove(this.player.getWorld());
-			plugin.doSleep.put(this.player.getWorld(), new PassTime(this.plugin, this.config, this.player.getWorld()).runTaskLater(this.plugin, config.config.getInt("sleepDelay")));
+			plugin.doSleep.put(this.player.getWorld(), new PassTime(this.plugin, this.config, this.player.getWorld())
+					.runTaskLater(this.plugin, config.config.getInt("sleepDelay")));
 		}
 		
 		//set up clear weather task for later

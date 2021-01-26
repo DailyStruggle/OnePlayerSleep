@@ -18,20 +18,18 @@ public class onBedExplode implements Listener {
 
     public void onBedExplode(BlockExplodeEvent event) {
         Block block = event.getBlock();
+        if (!(block.getType().toString().toLowerCase().contains("bed") && block.getType() != Material.BEDROCK))
+            return;
+
         Boolean isNether = block.getWorld().getName().contains("_nether");
         Boolean isEnd = block.getWorld().getName().contains("_the_end");
-        if(     (isNether || isEnd)
-                && config.config.getBoolean("doOtherDimensions", false)) return;
-        if (!(block.getType().toString().toLowerCase().contains("bed") && block.getType() != Material.BEDROCK))
-        {
-            return;
+        if(isNether) {
+            if (!config.config.getBoolean("allowSleepInNether", false)) return;
+            event.setCancelled(true);
         }
-
-        event.setCancelled(true);
-
-        //brk
-
-
-        event.setCancelled(true);
+        if(isEnd) {
+            if (!config.config.getBoolean("allowSleepInEnd", false)) return;
+            event.setCancelled(true);
+        }
     }
 }

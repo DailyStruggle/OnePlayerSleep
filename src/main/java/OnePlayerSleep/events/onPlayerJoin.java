@@ -1,6 +1,7 @@
 package OnePlayerSleep.events;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
+import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -17,11 +18,15 @@ public class onPlayerJoin implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
-        if(config.config.getBoolean("useSleepingIgnored", true)
-                && event.getPlayer().isSleepingIgnored())
-            return;
+        Boolean messageFromSleepingIgnored = config.config.getBoolean("messageFromSleepingIgnored", true);
+        if(messageFromSleepingIgnored && event.getPlayer().isSleepingIgnored()) return;
         if(event.getPlayer().hasPermission("sleep.ignore"))
             return;
-        this.plugin.numPlayers++;
+
+        World myWorld = event.getPlayer().getWorld();
+        if(!this.plugin.numPlayers.containsKey(myWorld))
+            this.plugin.numPlayers.put(myWorld,Long.valueOf(1));
+
+        this.plugin.numPlayers.put( event.getPlayer().getWorld() , this.plugin.numPlayers.get(event.getPlayer().getWorld())+1 );
     }
 }

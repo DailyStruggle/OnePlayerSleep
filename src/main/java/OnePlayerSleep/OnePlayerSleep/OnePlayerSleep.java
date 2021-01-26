@@ -15,9 +15,7 @@ import OnePlayerSleep.tools.Metrics;
 import OnePlayerSleep.tools.PAPI_expansion;
 import OnePlayerSleep.types.Message;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public final class OnePlayerSleep extends JavaPlugin implements Listener {
 	private Config config;
@@ -25,36 +23,33 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 	public Map<World,BukkitTask> doSleep;
 	public Map<World,BukkitTask> clearWeather;
 	public Map<Player, Message> wakeData; //list of players receiving wakeup option
-	public Map<World, ArrayList<Player>> sleepingPlayers; //list of sleeping players for each world
-
-	public Integer numPlayers;
-	public Integer numSleepingPlayers;
-
+	public Map<World, HashSet<Player>> sleepingPlayers; //list of sleeping players for each world
+	public Map<World,Long> numPlayers;
 
 	@Override
 	public void onEnable() {
 		this.config = new Config(this);
-		this.numPlayers = 0;
-		this.numSleepingPlayers = 0;
+		this.numPlayers = new HashMap<>();
 		this.doSleep = new HashMap<>();
 		this.clearWeather = new HashMap<>();
 		this.wakeData = new HashMap<>();
 		this.sleepingPlayers = new HashMap<>();
 
 		//make /sleep work
-		getCommand("sleep").setExecutor(new Sleep(this));
-		
+		Objects.requireNonNull(getCommand("sleep")).setExecutor(new Sleep(this));
+
 		//let players tab for available subcommands
-		getCommand("sleep").setTabCompleter(new TabComplete(this.config));
-		
+		Objects.requireNonNull(getCommand("sleep")).setTabCompleter(new TabComplete(this.config));
+
 		//set executors so i can look them up from /sleep
-		getCommand("sleep help").setExecutor(new Help());
-		getCommand("sleep reload").setExecutor(new Reload(this, this.config));
-		getCommand("sleep test").setExecutor(new Test(this));
-		getCommand("sleep wakeup").setExecutor(new Wakeup(this, this.config));
-		
+		Objects.requireNonNull(getCommand("sleep help")).setExecutor(new Help());
+		Objects.requireNonNull(getCommand("sleep reload")).setExecutor(new Reload(this, this.config));
+		Objects.requireNonNull(getCommand("sleep test")).setExecutor(new Test(this));
+		Objects.requireNonNull(getCommand("sleep wakeup")).setExecutor(new Wakeup(this, this.config));
+
 		//other way to call wakeup, so sleep.wakeup doesn't depend on sleep.see
-		getCommand("sleepwakeup").setExecutor(new Wakeup(this, this.config));
+		Objects.requireNonNull(getCommand("sleepwakeup")).setExecutor(new Wakeup(this, this.config));
+
 
 		//load config files and check if they're up to date
 		// 	also check for hooks
@@ -83,16 +78,16 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		int pluginId = 7096; // <-- Replace with the id of your plugin!
 		new Metrics(this, pluginId);
 
-		Boolean useSleepingIgnored = this.config.config.getBoolean("useSleepingIgnored", true);
+		//fix player counts on reload
+		boolean messageFromSleepingIgnored = this.config.config.getBoolean("messageFromSleepingIgnored", true);
 		for (org.bukkit.World w : Bukkit.getWorlds()) {
 			for (Player p : w.getPlayers()){
-				if(useSleepingIgnored && p.isSleepingIgnored()) continue;
 				if(p.hasPermission("sleep.ignore")) continue;
-				this.numPlayers++;
+				this.numPlayers.put(w, this.numPlayers.get(w)+1);
+				if(messageFromSleepingIgnored && p.isSleepingIgnored()) continue;
 				if(p.isSleeping()){
-					this.numSleepingPlayers++;
 					if(!this.sleepingPlayers.containsKey(w)){
-						this.sleepingPlayers.put(w, new ArrayList<>());
+						this.sleepingPlayers.put(w, new HashSet<>());
 					}
 					this.sleepingPlayers.get(w).add(p);
 				}

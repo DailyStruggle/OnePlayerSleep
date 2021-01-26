@@ -17,23 +17,21 @@ public class SendMessage extends BukkitRunnable{
 	private Message message;
 	private Player sourcePlayer;
 	private Player targetPlayer;
-	boolean doRandom;
-	
+
 	public SendMessage(OnePlayerSleep plugin, Config config, Player sourcePlayer, Player targetPlayer) {
 		this.plugin = plugin;
 		this.config = config;
 		this.sourcePlayer = sourcePlayer;
 		this.targetPlayer = targetPlayer;
-		this.doRandom = true;
+		this.message = null;
 	}
 	
-	public SendMessage(OnePlayerSleep plugin, Config config, Message message, Player sourcePlayer, Player targetPlayer) {
+	public SendMessage(OnePlayerSleep plugin, Config config, Player sourcePlayer, Player targetPlayer, Message message) {
 		this.plugin = plugin;
 		this.config = config;
-		this.message = message;
 		this.sourcePlayer = sourcePlayer;
 		this.targetPlayer = targetPlayer;
-		this.doRandom = false;
+		this.message = message;
 	}
 	
 	@Override
@@ -43,7 +41,7 @@ public class SendMessage extends BukkitRunnable{
 		}
 		String global = this.message.msg.getText();
 		String hover = this.message.hoverText;
-		if(this.doRandom) {
+		if(this.message == null) {
 			this.message = this.config.pickRandomMessage();
 			global = LocalPlaceholders.fillPlaceHolders(
 					this.message.msg.getText(),

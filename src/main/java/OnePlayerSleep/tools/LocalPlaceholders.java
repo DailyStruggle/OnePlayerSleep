@@ -4,25 +4,28 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import java.util.Map;
+import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class LocalPlaceholders {
-	public static String fillPlaceHolders(String in, Player player, Config config) {
+	private static final Pattern dims = Pattern.compile("_nether|_the_end", Pattern.CASE_INSENSITIVE);
+	public static String fillPlaceHolders(String res, Player player, Config config) {
+		if(res.isEmpty()) return res;
 		ConfigurationSection worlds = config.messages.getConfigurationSection("worlds");
-		String worldName = player.getWorld().getName().replace("_nether","").replace("the_end","");
-		if(!worlds.contains(worldName)) {
+		String worldName = dims.matcher(player.getWorld().getName()).replaceAll("");
+		if(!Objects.requireNonNull(worlds).contains(worldName)) {
 			worlds.set(worldName, "&a" + worldName);
 		}
-		worldName = worlds.getString(worldName);
+		String finalWorldName = worlds.getString(worldName);
 
-		String dimStr = config.messages.getConfigurationSection("dimensions").getString(player.getWorld().getEnvironment().name());
+		String dimStr = Objects.requireNonNull(config.messages.getConfigurationSection("dimensions")).getString(player.getWorld().getEnvironment().name());
 
-		if(in.isEmpty()) return in;
-		String res = in;
 		res = res.replace("[username]", player.getName());
 		res = res.replace("[displayname]", player.getDisplayName());
 		if(worldName != null) res = res.replace("[world]", worldName.replace("_nether","").replace("_the_end",""));
 		if(dimStr!=null) res = res.replace("[dimension]", dimStr);
+
+		//bukkit color codes
 		res = ChatColor.translateAlternateColorCodes('&',res);
 		return res;
 	}

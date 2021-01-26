@@ -9,8 +9,11 @@ import OnePlayerSleep.tools.Config;
 import OnePlayerSleep.tools.LocalPlaceholders;
 import OnePlayerSleep.types.Message;
 
+import java.util.regex.Pattern;
+
 //set up message threads for all relevant players
 public class AnnounceSleep extends BukkitRunnable{
+	private static final Pattern dims = Pattern.compile("_nether|_the_end", Pattern.CASE_INSENSITIVE);
 	private OnePlayerSleep plugin;
 	private Config config;
 	private Player player;
@@ -23,10 +26,10 @@ public class AnnounceSleep extends BukkitRunnable{
 	
 	@Override
 	public void run() {
-		Boolean doOtherWorld= config.config.getBoolean("doOtherWorlds");
-		Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
+		Boolean doOtherWorld= config.config.getBoolean("messageOtherWorlds");
+		Boolean doOtherDim = config.config.getBoolean("messageOtherDimensions");
 		Boolean perPlayer = config.config.getBoolean("randomPerPlayer");
-		Boolean useSleepingIgnored = config.config.getBoolean("useSleepingIgnored", true);
+		Boolean messageToSleepingIgnored = config.config.getBoolean("messageToSleepingIgnored", true);
 		Message resMsg = new Message( "", "","","","",0.0);
 		ConfigurationSection worlds = this.config.messages.getConfigurationSection("worlds");
 
@@ -54,7 +57,7 @@ public class AnnounceSleep extends BukkitRunnable{
 			if( !doOtherDim && !player.getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
 			
 			for (Player p : w.getPlayers()) {
-				if(useSleepingIgnored && p.isSleepingIgnored()) continue;
+				if(!messageToSleepingIgnored && p.isSleepingIgnored()) continue;
 
 				//skip if has perm
 				if(p.hasPermission("sleep.ignore")) continue;
@@ -63,7 +66,7 @@ public class AnnounceSleep extends BukkitRunnable{
 					new SendMessage(this.plugin, this.config, this.player, p).runTaskAsynchronously(this.plugin);
 				}
 				else {
-					new SendMessage(this.plugin, this.config, resMsg, this.player, p).runTaskAsynchronously(this.plugin);
+					new SendMessage(this.plugin, this.config, this.player, p,  resMsg).runTaskAsynchronously(this.plugin);
 				}
 			}
 		}

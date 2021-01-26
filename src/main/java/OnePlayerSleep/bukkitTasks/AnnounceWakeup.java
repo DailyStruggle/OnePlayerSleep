@@ -2,11 +2,15 @@ package OnePlayerSleep.bukkitTasks;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import OnePlayerSleep.tools.Config;
 import OnePlayerSleep.tools.LocalPlaceholders;
 import OnePlayerSleep.types.Message;
+
+import java.util.regex.Pattern;
 
 //set up message threads for all relevant players
 public class AnnounceWakeup extends BukkitRunnable{
@@ -14,25 +18,47 @@ public class AnnounceWakeup extends BukkitRunnable{
 	private Config config;
 	private Player player;
 	private Message msg;
-	
+	private World world;
+
 	public AnnounceWakeup(OnePlayerSleep plugin, Config config, Player player, Message msg) {
 		this.plugin = plugin;
 		this.config = config;
 		this.player = player;
 		this.msg = msg;
+		this.world = null;
+	}
+
+	public AnnounceWakeup(OnePlayerSleep plugin, Config config, Player player, Message msg, World world) {
+		this.plugin = plugin;
+		this.config = config;
+		this.player = player;
+		this.msg = msg;
+		this.world = world;
 	}
 	
 	@Override
 	public void run() {
-		Boolean doOtherWorld = config.config.getBoolean("doOtherWorlds");
-		Boolean doOtherDim = config.config.getBoolean("doOtherDimensions");
-		for (Player p : plugin.getServer().getOnlinePlayers()) {
+		Boolean messageOtherDimensions = config.config.getBoolean("messageOtherDimensions");
+		Boolean messageOtherWorlds = config.config.getBoolean("messageOtherWorlds");
+		Boolean messageToSleepingIgnored = config.config.getBoolean("messageToSleepingIgnored");
+		World myWorld = this.player.getWorld();
+
+		//if no world defined, generate task for each world
+		if(this.world == null) {
+			for (World w : Bukkit.getWorlds()) {
+				if( !messageOtherDimensions && !myWorld.getEnvironment().equals( w.getEnvironment() ) ) continue;
+				if( !messageOtherWorlds && !myWorld.getEnvironment().equals(w.getEnvironment())) continue;
+				new AnnounceWakeup(this.plugin,this.config,this.player,msg, w).runTaskAsynchronously(this.plugin);
+			}
+			return;
+		}
+
+		//if we've gotten this far, format and ship it
+		for (Player p : this.world.getPlayers()) {
+			if(!messageToSleepingIgnored && p.isSleepingIgnored()) continue;
 			if(p.hasPermission("sleep.ignore")) continue;
-			if( !doOtherWorld && !this.player.getWorld().getName().replace("_nether","").replace("the_end","").equals( p.getWorld().getName().replace("_nether","").replace("the_end","") ) ) continue;
-			if( !doOtherDim && !this.player.getWorld().getEnvironment().equals( p.getWorld().getEnvironment() ) ) continue;
-			
 			String wakeupMsg = LocalPlaceholders.fillPlaceHolders(
-					this.msg.wakeup, 
+					this.msg.wakeup,
 					p,
 					this.config);
 			if(this.config.hasPAPI()) wakeupMsg = PlaceholderAPI.setPlaceholders(p, wakeupMsg);
