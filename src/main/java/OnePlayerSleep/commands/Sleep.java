@@ -30,8 +30,7 @@ public class Sleep implements CommandExecutor {
 				}
 				default: {
 					String cmd = command.toString();
-					for(int i = 0; i<args.length; i++)
-						cmd = cmd + args[i].toString();
+					for(int i = 0; i<args.length; i++) cmd = cmd + args[i];
 					if(subCommands.containsKey(args[0])) {
 						if(!sender.hasPermission(subCommands.get(args[0]))) return false;
 						String[] new_args = new String[args.length-1];

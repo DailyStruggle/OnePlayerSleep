@@ -3,6 +3,7 @@ package OnePlayerSleep.tools;
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -130,24 +131,29 @@ public class Config {
 
 	public Message getMessage(String name) {
 		Message res;
-		String msg = Objects.requireNonNull(Objects.requireNonNull(this.messages.getConfigurationSection("messages")).getConfigurationSection(name)).getString("global","[player] &bis sleeping");
-		String hover_msg = Objects.requireNonNull(Objects.requireNonNull(this.messages.getConfigurationSection("messages")).getConfigurationSection(name)).getString("hover","&eWake up!");
-		String response = Objects.requireNonNull(Objects.requireNonNull(this.messages.getConfigurationSection("messages")).getConfigurationSection(name)).getString("wakeup","[player] says &cWake up!");
-		String cantWakeup = Objects.requireNonNull(Objects.requireNonNull(this.messages.getConfigurationSection("messages")).getConfigurationSection(name)).getString("cantWakeup","&csomeone's a deep sleeper");
-		Double chance = Objects.requireNonNull(Objects.requireNonNull(this.messages.getConfigurationSection("messages")).getConfigurationSection(name)).getDouble("chance");
-		res = new Message(name, msg, hover_msg, response, cantWakeup, chance);
-
+		ConfigurationSection cfg = this.messages.getConfigurationSection("messages").getConfigurationSection(name);
+		if(cfg != null) {
+			String msg = cfg.getString("global", "[player] &bis sleeping");
+			String hover_msg = cfg.getString("hover", "&eWake up!");
+			String response = cfg.getString("wakeup", "[player] says &cWake up!");
+			String cantWakeup = cfg.getString("cantWakeup", "&csomeone's a deep sleeper");
+			Double chance = cfg.getDouble("chance");
+			res = new Message(name, msg, hover_msg, response, cantWakeup, chance);
+		} else res = null;
 		return res;
 	}
+
 	public Message getMessage(String name, Player player) {
 		Message res;
-		String msg = LocalPlaceholders.fillPlaceHolders(Objects.requireNonNull(Objects.requireNonNull(this.messages.getConfigurationSection("messages")).getConfigurationSection(name)).getString("global","[player] &bis sleeping"), player, this);
-		String hover_msg = LocalPlaceholders.fillPlaceHolders(Objects.requireNonNull(Objects.requireNonNull(this.messages.getConfigurationSection("messages")).getConfigurationSection(name)).getString("hover","&eWake up!"), player, this);
-		String response = LocalPlaceholders.fillPlaceHolders(Objects.requireNonNull(Objects.requireNonNull(this.messages.getConfigurationSection("messages")).getConfigurationSection(name)).getString("wakeup","[player] says &cWake up!"), player, this);
-		String cantWakeup = LocalPlaceholders.fillPlaceHolders(Objects.requireNonNull(Objects.requireNonNull(this.messages.getConfigurationSection("messages")).getConfigurationSection(name)).getString("cantWakeup","&csomeone's a deep sleeper"), player, this);
-		Double chance = Objects.requireNonNull(Objects.requireNonNull(this.messages.getConfigurationSection("messages")).getConfigurationSection(name)).getDouble("chance");
-		res = new Message(name, msg, hover_msg, response, cantWakeup, chance);
-
+		ConfigurationSection cfg = this.messages.getConfigurationSection("messages").getConfigurationSection(name);
+		if(cfg != null) {
+			String msg = LocalPlaceholders.fillPlaceHolders(cfg.getString("global", "[player] &bis sleeping"), player, this);
+			String hover_msg = LocalPlaceholders.fillPlaceHolders(cfg.getString("hover", "&eWake up!"), player, this);
+			String response = LocalPlaceholders.fillPlaceHolders(cfg.getString("wakeup", "[player] says &cWake up!"), player, this);
+			String cantWakeup = LocalPlaceholders.fillPlaceHolders(cfg.getString("cantWakeup", "&csomeone's a deep sleeper"), player, this);
+			Double chance = cfg.getDouble("chance");
+			res = new Message(name, msg, hover_msg, response, cantWakeup, chance);
+		} else res = null;
 		return res;
 	}
 	

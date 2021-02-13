@@ -16,7 +16,6 @@ public class LocalPlaceholders {
 		if(!Objects.requireNonNull(worlds).contains(worldName)) {
 			worlds.set(worldName, "&a" + worldName);
 		}
-		String finalWorldName = worlds.getString(worldName);
 
 		String dimStr = Objects.requireNonNull(config.messages.getConfigurationSection("dimensions")).getString(player.getWorld().getEnvironment().name());
 

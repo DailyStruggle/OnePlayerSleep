@@ -82,6 +82,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		//fix player counts on reload
 		boolean messageFromSleepingIgnored = this.config.config.getBoolean("messageFromSleepingIgnored", true);
 		for (org.bukkit.World w : Bukkit.getWorlds()) {
+			this.numPlayers.put(w,Long.valueOf(0));
 			for (Player p : w.getPlayers()){
 				if(p.hasPermission("sleep.ignore")) continue;
 				this.numPlayers.put(w, this.numPlayers.get(w)+1);
@@ -93,6 +94,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 					this.sleepingPlayers.get(w).add(p);
 				}
 			}
+			if(numPlayers.get(w) == 0) numPlayers.remove(w);
 		}
 	}
 	

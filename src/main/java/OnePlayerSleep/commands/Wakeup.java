@@ -44,8 +44,8 @@ public class Wakeup implements CommandExecutor {
 
 		switch(args.length) {
 			case 0: { //if no args, use last message given to player
-				if( isPlayer ) msg = this.plugin.wakeData.get(((Player)sender));
-				else msg = config.pickRandomMessage();
+				if(isPlayer) msg = this.plugin.wakeData.get(sender);
+				else msg = null;
 				break;
 			}
 			case 1: { //if 1 arg, look up message name
@@ -58,6 +58,7 @@ public class Wakeup implements CommandExecutor {
 				return true;
 			}
 		}
+		if(msg == null) msg = config.pickRandomMessage();
 
 		String myWorldName = "";
 		if(isPlayer) myWorldName = dims.matcher(((Player)sender).getWorld().getName()).replaceAll("");
@@ -97,7 +98,11 @@ public class Wakeup implements CommandExecutor {
 		}
 		
 		if(isPlayer && cantKickAPlayer) {
-			sender.sendMessage(PlaceholderAPI.setPlaceholders((Player)sender, msg.cantWakeup));
+			String send;
+			if(config.hasPAPI())
+				send = PlaceholderAPI.setPlaceholders((Player)sender, msg.cantWakeup);
+			else send = msg.cantWakeup;
+			sender.sendMessage(send);
 			return true;
 		}
 
