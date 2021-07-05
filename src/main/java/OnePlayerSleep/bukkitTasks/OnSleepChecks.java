@@ -37,7 +37,6 @@ public class OnSleepChecks extends BukkitRunnable{
 	@Override
 	public void run() {
 		//if player isn't sleeping anymore when the server gets here, pull out
-		Bukkit.getLogger().log(Level.INFO, this.bypassSleep.toString());
 		if( !(this.player.isSleeping())  && !this.bypassSleep) {
 			this.cancel();
 			return;
@@ -48,7 +47,6 @@ public class OnSleepChecks extends BukkitRunnable{
 		//add player to list of sleeping players
 		this.plugin.sleepingPlayers.putIfAbsent(myWorld,new HashSet<Player>());
 		this.plugin.sleepingPlayers.get(myWorld).add(this.player);
-		Bukkit.getLogger().log(Level.INFO, ((Integer)this.plugin.sleepingPlayers.get(myWorld).size()).toString());
 
 
 		Boolean messageOtherWorlds = config.config.getBoolean("messageOtherWorlds");
