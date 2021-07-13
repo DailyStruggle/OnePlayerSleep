@@ -24,11 +24,11 @@ public class onBedExplode implements Listener {
         Boolean isNether = block.getWorld().getName().contains("_nether");
         Boolean isEnd = block.getWorld().getName().contains("_the_end");
         if(isNether) {
-            if (!config.config.getBoolean("allowSleepInNether", false)) return;
+            if (!config.config.getBoolean("cancelBedExplodeInNether", false)) return;
             event.setCancelled(true);
         }
         if(isEnd) {
-            if (!config.config.getBoolean("allowSleepInEnd", false)) return;
+            if (!config.config.getBoolean("cancelBedExplodeInEnd", false)) return;
             event.setCancelled(true);
         }
     }

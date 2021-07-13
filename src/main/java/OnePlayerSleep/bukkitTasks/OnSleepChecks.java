@@ -7,9 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import OnePlayerSleep.tools.Config;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
@@ -18,85 +16,75 @@ public class OnSleepChecks extends BukkitRunnable{
 	private OnePlayerSleep plugin;
 	private Config config;
 	private Player player;
+	private World world;
 	private Boolean bypassSleep = false; //flag for testing messages
 	
-	public OnSleepChecks(OnePlayerSleep plugin, Config config, Player player) {
+	public OnSleepChecks(OnePlayerSleep plugin, Config config, Player player, World world) {
 		this.plugin = plugin;
 		this.config = config;
 		this.player = player;
-
-	}
-
-	public OnSleepChecks(OnePlayerSleep plugin, Config config, Player player, Boolean bypassSleep) {
-		this.plugin = plugin;
-		this.config = config;
-		this.player = player;
-		this.bypassSleep = bypassSleep;
+		this.world = world;
 	}
 
 	@Override
 	public void run() {
 		//if player isn't sleeping anymore when the server gets here, pull out
-		Bukkit.getLogger().log(Level.INFO, this.bypassSleep.toString());
-		if( !(this.player.isSleeping())  && !this.bypassSleep) {
+		// also skip if called by a test function
+		if( 	bypassSleep
+				|| (this.player != null && !this.player.isSleeping()))
+		{
 			this.cancel();
 			return;
 		}
 
-		World myWorld = this.player.getWorld();
-
-		//add player to list of sleeping players
-		this.plugin.sleepingPlayers.putIfAbsent(myWorld,new HashSet<Player>());
-		this.plugin.sleepingPlayers.get(myWorld).add(this.player);
-		Bukkit.getLogger().log(Level.INFO, ((Integer)this.plugin.sleepingPlayers.get(myWorld).size()).toString());
-
-
-		Boolean messageOtherWorlds = config.config.getBoolean("messageOtherWorlds");
-		Boolean messageOtherDimensions = config.config.getBoolean("messageOtherDimensions");
-
-		String myWorldName = dims.matcher(this.player.getWorld().getName()).replaceAll("");
-
-		int numPlayers = 0;
-		int numSleepingPlayers = 0;
-		//check for valid players
-		for (World w : Bukkit.getWorlds()){
-			String theirWorldName = dims.matcher(w.getName()).replaceAll("");
-			if( !messageOtherWorlds && !myWorldName.equals(theirWorldName) ) continue;
-			if( !messageOtherDimensions && !this.player.getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
-			if( this.plugin.sleepingPlayers.containsKey(w) ) numSleepingPlayers += this.plugin.sleepingPlayers.get(w).size();
-			numPlayers += w.getPlayers().size();
-			if(numPlayers > 1) break;
+		//add player to list of sleeping players for the world
+		if(player != null)
+		{
+			this.plugin.sleepingPlayers.putIfAbsent(this.world, new HashSet<>());
+			this.plugin.sleepingPlayers.get(this.world).add(this.player);
 		}
 
-		if(this.bypassSleep) {
-			return;
+		List<String> syncWorlds = this.config.getSyncWorlds(this.world.getName());
+
+		//check for valid players
+		int numPlayers = 0;
+		int numSleepingPlayers = 0;
+		for (String worldName : syncWorlds){
+			World w = Bukkit.getWorld(worldName);
+			if(w == null)
+			{
+				Bukkit.getLogger().warning("OnePlayerSleep: could not find world '" + worldName + "'"
+						+ "\n        please check your messages.yml");
+			}
+
+			if( this.plugin.sleepingPlayers.containsKey(w) ) numSleepingPlayers += this.plugin.sleepingPlayers.get(w).size();
+			numPlayers += w.getPlayers().size();
 		}
 
 		//only announce the first bed entry, and only when there's more than one player to see it
-		//skip if called by a test function
-		if(numSleepingPlayers < 2 && numPlayers > 1) {
+		if(numSleepingPlayers < 2 && numPlayers >= this.config.getMinPlayers()) {
 			//async message selection and delivery
-			new AnnounceSleep(this.plugin, this.config, this.player).runTaskAsynchronously(this.plugin);
+			new AnnounceSleep(this.plugin, this.config, this.player.getName(), this.world).runTaskAsynchronously(this.plugin);
 			
 			//start sleep task
-			if(plugin.doSleep.containsKey(this.player.getWorld())) plugin.doSleep.remove(this.player.getWorld());
-			plugin.doSleep.put(this.player.getWorld(), new PassTime(this.plugin, this.config, this.player.getWorld())
+			if(plugin.doSleep.containsKey(this.world)) plugin.doSleep.remove(this.world);
+			plugin.doSleep.put(this.world, new PassTime(this.plugin, this.config, this.world)
 					.runTaskLater(this.plugin, config.config.getInt("sleepDelay")));
 		}
 		
 		//set up clear weather task for later
-		if(!plugin.clearWeather.containsKey(this.player.getWorld())) {
+		if(!plugin.clearWeather.containsKey(this.world)) {
 			//calculate how long to wait before clearing weather
-			Long dT = (this.config.config.getLong("stopTime") - this.player.getWorld().getTime()) / this.config.config.getLong("increment");
-			Long cap = (this.player.getWorld().getTime() - this.config.config.getLong("startTime")) / this.config.config.getLong("increment");
+			Long dT = (this.config.config.getLong("stopTime") - this.world.getTime()) / this.config.config.getLong("increment");
+			Long cap = (this.world.getTime() - this.config.config.getLong("startTime")) / this.config.config.getLong("increment");
 			
 			//calculate how long to clear weather for
 			Double randomFactor = new Random().nextDouble()*168000;
 			Long duration = 12000 + randomFactor.longValue();
 			
 			//start task
-			if(dT>1 && cap>=0) plugin.clearWeather.put(this.player.getWorld(), new ClearWeather(this.player.getWorld(),duration).runTaskLater(this.plugin, dT+this.config.config.getLong("sleepDelay")));
-			else plugin.clearWeather.put(this.player.getWorld(), new ClearWeather(this.player.getWorld(),duration).runTaskLater(this.plugin, 2*this.config.config.getLong("sleepDelay")));
+			if(dT>1 && cap>=0) plugin.clearWeather.put(this.world, new ClearWeather(this.world,duration).runTaskLater(this.plugin, dT+this.config.config.getLong("sleepDelay")));
+			else plugin.clearWeather.put(this.world, new ClearWeather(this.world,duration).runTaskLater(this.plugin, 2*this.config.config.getLong("sleepDelay")));
 		}
 	}
 

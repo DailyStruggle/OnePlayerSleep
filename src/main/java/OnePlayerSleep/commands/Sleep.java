@@ -1,50 +1,49 @@
 package OnePlayerSleep.commands;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
+import OnePlayerSleep.tools.Config;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Sleep implements CommandExecutor {
 	private OnePlayerSleep plugin;
-	private Map<String,String> subCommands = new HashMap<String,String>();
-	
-	public Sleep(OnePlayerSleep plugin) {
+	private Config config;
+	private Map<String,String> perms = new HashMap<String,String>();
+
+	public Sleep(OnePlayerSleep plugin, Config config) {
 		this.plugin = plugin;
-		subCommands.put("reload","sleep.reload");
-		subCommands.put("wakeup","sleep.wakeup");
-		subCommands.put("test","sleep.test");
-		subCommands.put("help","sleep.help");
+		this.config = config;
+
+		//load commands and required permission nodes into map
+		perms.put("reload","sleep.reload");
+		perms.put("wakeup","sleep.wakeup");
+		perms.put("test","sleep.test");
+		perms.put("help","sleep.help");
 	}
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(command.getName().equalsIgnoreCase("sleep")) {
-			switch(args.length) {
-				case 0: {
-					plugin.getCommand("sleep help").execute(sender, label, args);
-					break;
-				}
-				default: {
-					String cmd = command.toString();
-					for(int i = 0; i<args.length; i++) cmd = cmd + args[i];
-					if(subCommands.containsKey(args[0])) {
-						if(!sender.hasPermission(subCommands.get(args[0]))) return false;
-						String[] new_args = new String[args.length-1];
-						for(int i = 1; i<args.length; i++) new_args[i-1] = args[i];
-						plugin.getCommand("sleep " + args[0]).execute(sender, label, new_args);
-					}
-					else { 
-						sender.sendMessage(this.plugin.getPluginConfig().messages.getString("badArgs"));
-					}
-					return true; 
-				}
-			}
+		if(!command.getName().equalsIgnoreCase("sleep")) return true;
+		if(args.length == 0) {
+			plugin.getCommand("sleep help").execute(sender, label, args);
+			return true;
+		}
+
+		if(perms.containsKey(args[0])) {
+			if(!sender.hasPermission(perms.get(args[0]))) return false;
+			plugin.getCommand("sleep " + args[0]).execute(sender, label, Arrays.copyOfRange(args, 1, args.length));
+		}
+		else {
+			String msg = this.plugin.getPluginConfig().messages.getString("badArgs");
+			msg = ChatColor.translateAlternateColorCodes('&',msg);
+			sender.sendMessage(msg);
 		}
 		return true;
-		
 	}
 }

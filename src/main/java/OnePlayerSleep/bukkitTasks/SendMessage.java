@@ -2,10 +2,11 @@ package OnePlayerSleep.bukkitTasks;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import OnePlayerSleep.tools.Config;
-import OnePlayerSleep.tools.LocalPlaceholders;
 import OnePlayerSleep.types.Message;
 
 
@@ -15,21 +16,24 @@ public class SendMessage extends BukkitRunnable{
 	private OnePlayerSleep plugin;
 	private Config config;
 	private Message message;
-	private Player sourcePlayer;
+	private String sourcePlayerName;
 	private Player targetPlayer;
+	private World sourceWorld;
 
-	public SendMessage(OnePlayerSleep plugin, Config config, Player sourcePlayer, Player targetPlayer) {
+	public SendMessage(OnePlayerSleep plugin, Config config, World sourceWorld, String sourcePlayerName, Player targetPlayer) {
 		this.plugin = plugin;
 		this.config = config;
-		this.sourcePlayer = sourcePlayer;
+		this.sourceWorld = sourceWorld;
+		this.sourcePlayerName = sourcePlayerName;
 		this.targetPlayer = targetPlayer;
 		this.message = null;
 	}
 	
-	public SendMessage(OnePlayerSleep plugin, Config config, Player sourcePlayer, Player targetPlayer, Message message) {
+	public SendMessage(OnePlayerSleep plugin, Config config, World sourceWorld, String sourcePlayerName, Player targetPlayer, Message message) {
 		this.plugin = plugin;
 		this.config = config;
-		this.sourcePlayer = sourcePlayer;
+		this.sourceWorld = sourceWorld;
+		this.sourcePlayerName = sourcePlayerName;
 		this.targetPlayer = targetPlayer;
 		this.message = message;
 	}
@@ -39,28 +43,21 @@ public class SendMessage extends BukkitRunnable{
 		if(this.targetPlayer.hasPermission("sleep.ignore")) {
 			return;
 		}
+		Boolean isPlayer = (this.sourcePlayerName != this.config.getServerName());
+
 		String global = this.message.msg.getText();
 		String hover = this.message.hoverText;
-		if(this.message == null) {
-			this.message = this.config.pickRandomMessage();
-			global = LocalPlaceholders.fillPlaceHolders(
-					this.message.msg.getText(),
-					this.sourcePlayer,
-					this.config);
-			hover = LocalPlaceholders.fillPlaceHolders(
-					this.message.hoverText,
-					this.sourcePlayer,
-					this.config);
-		}
-		if(this.config.hasPAPI()) global = PlaceholderAPI.setPlaceholders(this.targetPlayer, global);
-		if(this.config.hasPAPI()) hover = PlaceholderAPI.setPlaceholders(this.sourcePlayer, hover);
-		String wakeup = LocalPlaceholders.fillPlaceHolders(
+		if(this.message == null) this.message = this.config.pickRandomMessage(this.sourceWorld, sourcePlayerName);
+
+		Boolean hasPAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
+		if(hasPAPI) global = PlaceholderAPI.setPlaceholders(this.targetPlayer, global);
+		if(hasPAPI && isPlayer) hover = PlaceholderAPI.setPlaceholders(Bukkit.getPlayer(this.sourcePlayerName), hover);
+		String wakeup = config.fillPlaceHolders(
 				this.message.wakeup,
-				this.targetPlayer,
-				this.config );
-		if(this.config.hasPAPI()) wakeup = PlaceholderAPI.setPlaceholders(this.targetPlayer, wakeup);
+				this.targetPlayer.getName());
+		if(hasPAPI) wakeup = PlaceholderAPI.setPlaceholders(this.targetPlayer, wakeup);
 		
-		this.message = new Message(this.message.name, global, hover, wakeup, this.message.cantWakeup, this.message.chance);
+		this.message = new Message(this.message.worldName, this.message.name, global, hover, wakeup, this.message.cantWakeup, this.message.chance);
 		this.targetPlayer.spigot().sendMessage(this.message.msg);
 		
 		if(this.plugin.wakeData.containsKey(targetPlayer)) {

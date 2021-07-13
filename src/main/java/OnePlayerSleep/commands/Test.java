@@ -1,8 +1,9 @@
 package OnePlayerSleep.commands;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
-import OnePlayerSleep.bukkitTasks.OnSleepChecks;
-import OnePlayerSleep.bukkitTasks.SendMessage;
+import OnePlayerSleep.bukkitTasks.AnnounceSleep;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -10,82 +11,123 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import OnePlayerSleep.tools.Config;
-import OnePlayerSleep.tools.LocalPlaceholders;
 import OnePlayerSleep.types.Message;
 
-import java.util.regex.Pattern;
+import java.util.List;
 
 public class Test implements CommandExecutor {
 	private OnePlayerSleep plugin;
-	private static final Pattern dims = Pattern.compile("_nether|_the_end", Pattern.CASE_INSENSITIVE);
+	private Config config;
 
-	public Test(OnePlayerSleep plugin) {
+	public Test(OnePlayerSleep plugin, Config config) {
 		this.plugin = plugin;
+		this.config = config;
 	}
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		Boolean messageToSleepingIgnored = plugin.getPluginConfig().config.getBoolean("messageToSleepingIgnored", true);
-		if(command.getName().equalsIgnoreCase("sleep test")) {
-			if(!(sender instanceof Player)){
-				sender.sendMessage("[sleep] only players can use this command!");
-				return true;
-			}
-			Player player = (Player)sender;
-			Config config = this.plugin.getPluginConfig();
+		if(!command.getName().equalsIgnoreCase("sleep test")) return true;
 
-			Boolean messageOtherWorlds= config.config.getBoolean("messageOtherWorlds");
-			Boolean messageOtherDimensions = config.config.getBoolean("messageOtherDimensions");
-			ConfigurationSection worlds = config.messages.getConfigurationSection("worlds");
-			String myWorldName = dims.matcher(player.getWorld().getName()).replaceAll("");
-			if(!worlds.contains(myWorldName)) {
-				worlds.set(myWorldName, "&a" + myWorldName);
-			}
+		Boolean isPlayer = sender instanceof Player;
+		String playerName = isPlayer
+				? sender.getName()
+				: this.config.getServerName();
+		String worldName = isPlayer
+				? ((Player)sender).getWorld().getName()
+				: this.config.getServerWorldName();
 
-			new OnSleepChecks(this.plugin, config, player, true).runTaskAsynchronously(this.plugin);
-
-			Message[] res;
-			switch(args.length) {
-				case 0: {
-					//if just /sleep test, pick a random message
-					res = new Message[1];
-					res[0] = this.plugin.getPluginConfig().pickRandomMessage();
-					String global = LocalPlaceholders.fillPlaceHolders(res[0].msg.getText(), player, config);
-					String hover = LocalPlaceholders.fillPlaceHolders(res[0].hoverText, player, config);
-					res[0] = new Message(res[0].name, global, hover, res[0].wakeup, res[0].cantWakeup, res[0].chance);
-					break;
+		Message[] res;
+		switch(args.length) {
+			case 0: //if just /sleep test, pick 1 random message from player's world
+			{
+				res = new Message[1];
+				World world = Bukkit.getWorld(worldName);
+				if(world != null) {
+					res[0] = this.plugin.getPluginConfig().pickRandomMessage(world, playerName);
 				}
-				default: {
-					//if trying to specify message
-					res = new Message[args.length];
-					for( int i = 0; i<args.length; i++) {
-						if(!config.messages.getConfigurationSection("messages").contains(args[i])) {
-							sender.sendMessage(config.messages.getString("badArgs"));
-							return true;
+				else {
+					sender.sendMessage(ChatColor.YELLOW + "world '" + worldName + "' was not found");
+				}
+				break;
+			}
+			case 1: //if world arg, pick 1 random message from the world's list
+			{
+				res = new Message[1];
+				World w = Bukkit.getWorld(args[0]);
+				if(w == null) {
+					sender.sendMessage( ChatColor.YELLOW + args[0] + " is not a valid world");
+					return true;
+				}
+				res[0] = this.plugin.getPluginConfig().pickRandomMessage(w, playerName);
+				break;
+			}
+			default: //if world arg and message args
+			{
+				World w = Bukkit.getWorld(args[0]);
+				if(w == null) {
+					sender.sendMessage( ChatColor.YELLOW + args[0] + " is not a valid world");
+					return true;
+				}
+				worldName = args[0];
+
+				res = new Message[args.length-1];
+				ConfigurationSection messagesSection = this.config.messages.getConfigurationSection("messages");
+				for( int i = 0; i<res.length; i++)
+				{
+					//detect delimiter exists and where
+					String listName;
+					Integer delimiterIdx = args[i+1].indexOf('.');
+					if(delimiterIdx > 0)
+					{
+						listName = args[i+1].substring(0, delimiterIdx);
+						String msgName = args[i+1].substring(delimiterIdx+1);
+
+						if(!messagesSection.contains(listName))
+						{
+							sender.sendMessage( ChatColor.YELLOW + listName + " is not a valid message list");
+							continue;
 						}
-						res[i] = config.getMessage(args[i], player);
+
+						if(!messagesSection.getConfigurationSection(listName).contains(msgName))
+						{
+							sender.sendMessage( ChatColor.YELLOW + msgName + " is not a valid message in " + listName);
+							continue;
+						}
+
+						res[i] = this.config.getMessage(listName, msgName, playerName);
 					}
+					else
+					{
+						listName = args[i+1];
+						if(!messagesSection.contains(listName))
+						{
+							sender.sendMessage( ChatColor.YELLOW + listName + " is not a valid message list");
+							continue;
+						}
+						res[i] = this.config.pickRandomMessage(listName,playerName);
+					}
+					res[i].setWorld(args[0]);
 				}
 			}
+		}
 
-			for( Message m : res) {
-				for (World w : plugin.getServer().getWorlds()) {
-					String theirWorldName = dims.matcher(w.getName()).replaceAll("");
-					if(!worlds.contains(theirWorldName)) {
-						worlds.set(theirWorldName, "&a" + theirWorldName);
-					}
+		for( Message message : res) {
+			if(message == null) continue;
+			World world = Bukkit.getWorld(message.worldName);
+			if(world == null) {
+				sender.sendMessage(ChatColor.YELLOW + "'" + message.worldName +"' is not a world");
+				continue;
+			}
 
-					if( !messageOtherWorlds && !myWorldName.equals(theirWorldName) ) continue;
-					if( !messageOtherDimensions && !player.getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
-
-					for (Player p : w.getPlayers()) {
-						if(messageToSleepingIgnored && p.isSleepingIgnored()) continue;
-						//skip if has perm
-						if(p.hasPermission("sleep.ignore")) continue;
-
-						new SendMessage(this.plugin, config, player, p, m).runTaskAsynchronously(this.plugin);
-					}
+			List<String> msgToWorldNames = this.config.getMsgToWorlds(worldName);
+			for(String msgToWorldName : msgToWorldNames) {
+				World msgToWorld = Bukkit.getWorld(msgToWorldName);
+				if(msgToWorld == null) {
+					sender.sendMessage(ChatColor.YELLOW + "'" + message.worldName +"' is not a world");
+					continue;
 				}
+
+				new AnnounceSleep(this.plugin,this.config,playerName,msgToWorld,message).runTaskAsynchronously(this.plugin);
 			}
 		}
 		return true;

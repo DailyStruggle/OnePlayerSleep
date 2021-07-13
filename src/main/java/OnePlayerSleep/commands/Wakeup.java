@@ -4,19 +4,21 @@ import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import OnePlayerSleep.bukkitTasks.AnnounceWakeup;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import OnePlayerSleep.tools.Config;
 import OnePlayerSleep.types.Message;
+import org.bukkit.event.player.PlayerBedLeaveEvent;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
+
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class Wakeup implements CommandExecutor {
@@ -32,87 +34,131 @@ public class Wakeup implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!sender.hasPermission("sleep.wakeup")) return false;
+
 		Boolean isPlayer = (sender instanceof Player);
-		Boolean messageOtherWorlds= config.config.getBoolean("messageOtherWorlds", false);
-		Boolean messageOtherDimensions = config.config.getBoolean("messageOtherDimensions", false);
+		String playerName = isPlayer
+				? sender.getName()
+				: this.config.getServerName();
+		String myWorldName = isPlayer
+				? ((Player)sender).getWorld().getName()
+				: config.getServerWorldName();
+
 		Boolean KickFromBed = this.config.config.getBoolean("kickFromBed", true);
 		Boolean messageToSleepingIgnored = config.config.getBoolean("messageToSleepingIgnored", true);
 		Boolean cantKickAPlayer = false;
 		Boolean hasSleepingPlayers = false;
-		Set<World> worlds = new HashSet<World>(this.plugin.sleepingPlayers.keySet());
-		Message msg;
 
+		String cmdWorldName;
+		Message msg;
 		switch(args.length) {
-			case 0: { //if no args, use last message given to player
+			case 0: { //no args, use last message given to player
 				if(isPlayer) msg = this.plugin.wakeData.get(sender);
-				else msg = null;
+				else msg = config.pickRandomMessage(Bukkit.getWorld(myWorldName), playerName);
+				cmdWorldName = (isPlayer) ?
+						((Player)sender).getWorld().getName() :
+						this.config.getServerWorldName();
 				break;
 			}
-			case 1: { //if 1 arg, look up message name
-				if(isPlayer) msg = config.getMessage(args[0], (Player)sender);
-				else msg = config.getMessage(args[0]);
+			case 1: { //only world name
+				cmdWorldName = args[0];
+				if(!config.worlds.contains(cmdWorldName)) {
+					sender.sendMessage(this.plugin.getPluginConfig().messages.getString("badArgs"));
+					return true;
+				}
+				msg = config.pickRandomMessage(Bukkit.getWorld(args[0]), playerName);
+				break;
+			}
+			case 2: { //world name + message name
+				cmdWorldName = args[0];
+				ConfigurationSection messagesSection = this.config.messages.getConfigurationSection("messages");
+				Integer delimiterIdx = args[1].indexOf('.');
+				if(delimiterIdx > 0) {
+					String listName = args[1].substring(0,delimiterIdx);
+					String msgName = args[1].substring(delimiterIdx+1);
+
+					if(!messagesSection.contains(listName))
+					{
+						sender.sendMessage( ChatColor.YELLOW + listName + " is not a valid message list");
+						return true;
+					}
+
+					if(!messagesSection.getConfigurationSection(listName).contains(msgName))
+					{
+						sender.sendMessage( ChatColor.YELLOW + msgName + " is not a valid message in " + listName);
+						return true;
+					}
+
+					msg = this.config.getMessage(listName, msgName, sender.getName());
+				}
+				else {
+					if(!messagesSection.contains(args[1]))
+					{
+						sender.sendMessage( ChatColor.YELLOW + args[1] + " is not a valid message list");
+						return true;
+					}
+					msg = this.config.pickRandomMessage(args[1], playerName);
+					msg.setWorld(cmdWorldName);
+				}
 				break;
 			}
 			default: { //else bad args
-				sender.sendMessage(this.plugin.getPluginConfig().messages.getString("badArgs"));
+				sender.sendMessage(ChatColor.YELLOW + "[sleep] did not expect more than 2 arguments");
 				return true;
 			}
 		}
-		if(msg == null) msg = config.pickRandomMessage();
+		if(msg == null) msg = config.pickRandomMessage(Bukkit.getWorld(myWorldName), playerName);
 
-		String myWorldName = "";
-		if(isPlayer) myWorldName = dims.matcher(((Player)sender).getWorld().getName()).replaceAll("");
-		//for each relevant world with sleeping players, kick from bed
-		for(World w : worlds) {
-			String theirWorld = dims.matcher(w.getName()).replaceAll("");
-			if( isPlayer && !messageOtherWorlds && !myWorldName.equals(theirWorld) ) continue;
-			if( isPlayer && !messageOtherDimensions && !((Player)sender).getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
-			HashSet<Player> sleepingPlayers = this.plugin.sleepingPlayers.get(w);
-			for ( Player p : sleepingPlayers) {
-				if(!messageToSleepingIgnored && p.isSleepingIgnored())
-					continue;
-				if(p.hasPermission("sleep.ignore"))
-					continue;
-				hasSleepingPlayers = true;
-				if(p.hasPermission("sleep.bypass") || !isPlayer) {
-					cantKickAPlayer = true;
-				}
-				else if(KickFromBed) {
-					if(this.plugin.sleepingPlayers.get(w).contains(p)) this.plugin.sleepingPlayers.get(w).remove(p);
-					if(this.plugin.sleepingPlayers.get(w).size() == 0) this.plugin.sleepingPlayers.remove(w);
-					Double health = p.getHealth();
-					p.damage(1);
-					p.setHealth(health);
-				}
-			}
-			if(!cantKickAPlayer && hasSleepingPlayers && this.plugin.doSleep.containsKey(w)) {
-				this.plugin.doSleep.get(w).cancel();
-			}
+		//check if there's anything to do
+		List<String> syncWorlds = config.getSyncWorlds(myWorldName);
+		Integer numSleeping = 0;
+		for(String worldName : syncWorlds) {
+			World world = Bukkit.getWorld(worldName);
+			if(	!this.plugin.sleepingPlayers.containsKey(world) ) continue;
+			numSleeping += this.plugin.sleepingPlayers.get(world).size();
 		}
 
-		if(!hasSleepingPlayers) {
+		if(numSleeping == 0) {
 			String onNoPlayersSleeping = config.messages.getString("onNoPlayersSleeping");
-			if(isPlayer && this.config.hasPAPI()) onNoPlayersSleeping = PlaceholderAPI.setPlaceholders((Player)sender, onNoPlayersSleeping);
+			if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null)
+				onNoPlayersSleeping = PlaceholderAPI.setPlaceholders((Player)sender, onNoPlayersSleeping);
 			sender.sendMessage(onNoPlayersSleeping);
 			return true;
 		}
+
+		for(String worldName : syncWorlds) {
+			World world = Bukkit.getWorld(worldName);
+			if(	!this.plugin.sleepingPlayers.containsKey(world) ) continue;
+			HashSet<Player> players = this.plugin.sleepingPlayers.get(world);
+			//attempt to wake each player
+			for(Player p : players) {
+				if(!p.isSleeping()) {
+					players.remove(p);
+					continue;
+				}
+				if(p.hasPermission("sleep.bypass")) {
+					cantKickAPlayer = true;
+					continue;
+				}
+				p.wakeup(true);
+			}
+		}
 		
-		if(isPlayer && cantKickAPlayer) {
+		//if failed to kick everyone
+		if(cantKickAPlayer) {
 			String send;
-			if(config.hasPAPI())
+			if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null)
 				send = PlaceholderAPI.setPlaceholders((Player)sender, msg.cantWakeup);
 			else send = msg.cantWakeup;
 			sender.sendMessage(send);
 			return true;
 		}
 
-		for (Map.Entry<World, Long> entry : plugin.numPlayers.entrySet()) {
-			World theirWorld = entry.getKey();
-			String theirWorldName = dims.matcher(theirWorld.getName()).replaceAll("");
-			if( isPlayer && !messageOtherWorlds && !myWorldName.equals(theirWorldName) ) continue;
-			if( isPlayer && !messageOtherDimensions && !((Player)sender).getWorld().getEnvironment().equals( theirWorld.getEnvironment() ) ) continue;
-			new AnnounceWakeup(this.plugin, this.config, ((Player) sender), msg, theirWorld).runTaskAsynchronously(this.plugin);
+		//send a wakeup message
+		for(String worldName : this.config.worlds.getConfigurationSection(cmdWorldName).getStringList("sendTo")) {
+			World world = Bukkit.getWorld(worldName);
+			new AnnounceWakeup(this.plugin, this.config, playerName, msg, world).runTaskAsynchronously(this.plugin);
 		}
+
 		return true;
 	}
 }

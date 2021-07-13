@@ -2,7 +2,6 @@ package OnePlayerSleep.events;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import OnePlayerSleep.bukkitTasks.OnSleepChecks;
-import OnePlayerSleep.tools.LocalPlaceholders;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -14,6 +13,9 @@ import OnePlayerSleep.tools.Config;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+Class for filtering bed entry and setting up an async task for filtering world behaviors
+ */
 public class onPlayerBedEnter implements Listener {
 	private final OnePlayerSleep plugin;
 	private final Config config;
@@ -29,38 +31,32 @@ public class onPlayerBedEnter implements Listener {
 		//skip if player needs to be ignored by the plugin
 		if(config.config.getBoolean("messageFromSleepingIgnored", false)
 				&& event.getPlayer().isSleepingIgnored()) return;
-
 		if(event.getPlayer().hasPermission("sleep.ignore")) return;
 
-		World myWorld = event.getPlayer().getWorld();
+		World myWorld = event.getBed().getWorld();
 
-		Boolean isNether = myWorld.getName().contains("_nether");
-		Boolean isEnd = myWorld.getName().contains("_the_end");
-
-		if(isNether) {
-			if (!config.config.getBoolean("allowSleepInNether", false)) return;
-			if (event.getBedEnterResult() == PlayerBedEnterEvent.BedEnterResult.NOT_POSSIBLE_HERE) {
-				event.setUseBed(Event.Result.ALLOW);
-			}
+		//check config to prevent explosion in a dimension, otherwise we can't do anything there
+		if(		myWorld.getEnvironment() == World.Environment.NETHER
+				&& !config.config.getBoolean("cancelBedExplodeInNether", false)		)
+		{
+			return;
 		}
 
-		if(isEnd) {
-			if (!config.config.getBoolean("allowSleepInEnd", false)) return;
-			if (event.getBedEnterResult() == PlayerBedEnterEvent.BedEnterResult.NOT_POSSIBLE_HERE) {
-				event.setUseBed(Event.Result.ALLOW);
-			}
+		if(myWorld.getEnvironment() == World.Environment.THE_END
+				&& !config.config.getBoolean("cancelBedExplodeInEnd", false)	)
+		{
+			return;
 		}
 
-		if(
-			(	   event.getPlayer().getWorld().getTime() < config.config.getInt("startTime")
-				|| event.getPlayer().getWorld().getTime() > config.config.getInt("stopTime"))
-			&& !event.getPlayer().getWorld().hasStorm()
-			) {
+		//check time
+		if(		(myWorld.getTime() < config.config.getInt("startTime")
+				|| myWorld.getTime() > config.config.getInt("stopTime"))
+				&& !myWorld.hasStorm()		)
+		{
 			String msg = config.messages.getString("badTimeMessage");
-			msg = LocalPlaceholders.fillPlaceHolders(
+			msg = this.config.fillPlaceHolders(
 					msg,
-					event.getPlayer(),
-					this.config);
+					event.getPlayer().getName());
 			event.getPlayer().sendMessage(msg);
 			event.setCancelled(true);
 			return;
@@ -72,20 +68,19 @@ public class onPlayerBedEnter implements Listener {
 				currentTime < this.lastTme.get(event.getPlayer()) + config.config.getLong("sleepCooldown")) {
 			event.setCancelled(true);
 			String msg = config.messages.getString("cooldownMessage");
-			msg = LocalPlaceholders.fillPlaceHolders(
+			msg = this.config.fillPlaceHolders(
 					msg,
-					event.getPlayer(),
-					this.config);
+					event.getPlayer().getName());
 			event.getPlayer().sendMessage(msg);
 			event.setCancelled(true);
 			return;
 		}
 
-		if(this.lastTme.containsKey(event.getPlayer()))
-			this.lastTme.remove(event.getPlayer());
+		event.setUseBed(Event.Result.ALLOW);
+
 		this.lastTme.put(event.getPlayer(), currentTime);
 		
 		//do other relevant checks asynchronously
-		new OnSleepChecks(this.plugin, this.config, event.getPlayer()).runTaskAsynchronously(plugin);
+		new OnSleepChecks(this.plugin, this.config, event.getPlayer(), myWorld).runTaskAsynchronously(plugin);
 	}
 }

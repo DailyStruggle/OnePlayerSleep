@@ -23,7 +23,7 @@ public class Reload implements CommandExecutor {
 			String str = ChatColor.BLUE + "[OnePlayerSleep] reloading.";
 			Bukkit.getConsoleSender().sendMessage(str);
 			if(sender instanceof Player) {
-				if(this.plugin.getPluginConfig().hasPAPI()) str = PlaceholderAPI.setPlaceholders((Player)sender, str);
+				if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) str = PlaceholderAPI.setPlaceholders((Player)sender, str);
 				sender.sendMessage(str);
 			}
 			
@@ -33,7 +33,7 @@ public class Reload implements CommandExecutor {
 			str = ChatColor.BLUE + "[OnePlayerSleep] successfully reloaded.";
 			Bukkit.getConsoleSender().sendMessage(str);
 			if(sender instanceof Player) {
-				if(this.plugin.getPluginConfig().hasPAPI()) str = PlaceholderAPI.setPlaceholders((Player)sender, str);
+				if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) str = PlaceholderAPI.setPlaceholders((Player)sender, str);
 				sender.sendMessage(str);
 			}
 			

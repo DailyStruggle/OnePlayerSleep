@@ -1,7 +1,7 @@
 name: OnePlayerSleep
 main: OnePlayerSleep.OnePlayerSleep.OnePlayerSleep
-version: 2.0.2
-api-version: 1.13
+version: 3.0
+api-version: 1.17
 author: leaf26
 website: https://github.com/DailyStruggle
 
@@ -32,11 +32,6 @@ commands:
         permission: sleep.wakeup
         usage: |
             /sleep wakeup
-    sleepwakeup:
-        description: kick from bed
-        permission: sleep.wakeup
-        usage: |
-            /sleepwakeup
 
 permissions:
     sleep.*:
@@ -48,14 +43,15 @@ permissions:
             sleep.wakeup: true
             sleep.bypass: true
             sleep.test: true
+            sleep.withoutBed: true
     sleep.see:
         description: can see the sleep help menu
         default: true
-    sleep.reload: 
+    sleep.reload:
         description: can reload sleep options
         default: op
     sleep.wakeup:
-        description: can kick from bed
+        description: can kick others from bed
         default: true
     sleep.bypass:
         description: cannot kick this player from bed
@@ -66,4 +62,3 @@ permissions:
     sleep.ignore:
         description: ignore player entirely
         default: false
-    

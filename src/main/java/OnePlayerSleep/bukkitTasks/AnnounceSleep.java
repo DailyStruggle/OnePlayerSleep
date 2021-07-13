@@ -1,14 +1,15 @@
 package OnePlayerSleep.bukkitTasks;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import OnePlayerSleep.tools.Config;
-import OnePlayerSleep.tools.LocalPlaceholders;
 import OnePlayerSleep.types.Message;
 
+import java.util.List;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 //set up message threads for all relevant players
@@ -16,46 +17,39 @@ public class AnnounceSleep extends BukkitRunnable{
 	private static final Pattern dims = Pattern.compile("_nether|_the_end", Pattern.CASE_INSENSITIVE);
 	private OnePlayerSleep plugin;
 	private Config config;
-	private Player player;
-	
-	public AnnounceSleep(OnePlayerSleep plugin, Config config, Player player) {
+	private String playerName;
+	private World world;
+	private Message message;
+
+	public AnnounceSleep(OnePlayerSleep plugin, Config config, String playerName, World world) {
 		this.plugin = plugin;
 		this.config = config;
-		this.player = player;
+		this.playerName = playerName;
+		this.world = world;
+		this.message = null;
+	}
+
+	public AnnounceSleep(OnePlayerSleep plugin, Config config, String playerName, World world, Message message) {
+		this.plugin = plugin;
+		this.config = config;
+		this.playerName = playerName;
+		this.world = world;
+		this.message = message;
 	}
 	
 	@Override
 	public void run() {
-		Boolean doOtherWorld= config.config.getBoolean("messageOtherWorlds");
-		Boolean doOtherDim = config.config.getBoolean("messageOtherDimensions");
 		Boolean perPlayer = config.config.getBoolean("randomPerPlayer");
 		Boolean messageToSleepingIgnored = config.config.getBoolean("messageToSleepingIgnored", true);
-		Message resMsg = new Message( "", "","","","",0.0);
-		ConfigurationSection worlds = this.config.messages.getConfigurationSection("worlds");
+		List<String> worldNames = this.config.getMsgToWorlds(this.world.getName());
 
-		if(!perPlayer) {
-			resMsg = this.config.pickRandomMessage();
-			
-			String global = LocalPlaceholders.fillPlaceHolders(
-					resMsg.msg.getText(),
-					this.player,
-					this.config);
-			
-			String hover = LocalPlaceholders.fillPlaceHolders(
-					resMsg.hoverText,
-					this.player,
-					this.config);
-			
-			resMsg = new Message(resMsg.name, global, hover, resMsg.wakeup, resMsg.cantWakeup, resMsg.chance);
+		if(this.message == null) {
+			this.message = this.config.pickRandomMessage(this.world, playerName);
 		}
-		
-		for (World w : plugin.getServer().getWorlds()) {
-			//skip if player's world isn't the same as receiver's world, disregarding the difference between dimension names
-			if( !doOtherWorld && !player.getWorld().getName().replace("_nether","").replace("the_end","").equals( w.getName().replace("_nether","").replace("the_end","") ) ) continue;
-			
-			//skip if player is in another dimension
-			if( !doOtherDim && !player.getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
-			
+
+		for (String worldName : worldNames) {
+			World w = Bukkit.getWorld(worldName);
+
 			for (Player p : w.getPlayers()) {
 				if(!messageToSleepingIgnored && p.isSleepingIgnored()) continue;
 
@@ -63,12 +57,15 @@ public class AnnounceSleep extends BukkitRunnable{
 				if(p.hasPermission("sleep.ignore")) continue;
 				
 				if(perPlayer) {
-					new SendMessage(this.plugin, this.config, this.player, p).runTaskAsynchronously(this.plugin);
+					new SendMessage(this.plugin, this.config, this.world, this.playerName, p).runTaskAsynchronously(this.plugin);
 				}
 				else {
-					new SendMessage(this.plugin, this.config, this.player, p,  resMsg).runTaskAsynchronously(this.plugin);
+					new SendMessage(this.plugin, this.config, this.world, this.playerName, p,  this.message).runTaskAsynchronously(this.plugin);
 				}
 			}
+		}
+		if(this.config.logMessages() || this.playerName == this.config.getServerName()) {
+			Bukkit.getLogger().log(Level.INFO, this.message.msg.getText());
 		}
 	}
 }

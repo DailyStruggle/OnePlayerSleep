@@ -9,11 +9,11 @@ startTime: 12010
 stopTime: 23992
 
 #amount of server time to increment by, per server tick
-# lowering this will slow the night passing
+# lowering this will slow the night passing, increasing will speed it up
 increment: 150
 
-#amount of server ticks between increments, usually 20 per second
-# lower makes a smoother transition but more work
+#number of server ticks between increments, usually 20 ticks per second
+# lower makes a smoother transition but more processing
 # min - 1
 timeBetweenIncrements: 2
 
@@ -30,26 +30,11 @@ randomPerPlayer: false
 #whether to reset the TIME_SINCE_REST statistic for every player on sleep task
 resetPhantomStatistics: true
 
-#option to send sleep message to other worlds
-# e.g. some Skyblock setups have a world per island
-messageOtherWorlds: false
+#whether to write players' sleep messages to console
+logMessages: true
 
-#option to sync time and weather across all worlds in the server
-syncWorldTime: false
-
-#option to show messages to players in dimensional variants with the same world name
-# basically whether "world_nether" gets sleep messages from "world" and vice versa
-messageOtherDimensions: false
-syncDimensionTime: false
-
-#option to explicitly disable bed explosions in _nether and/or _the_end
-allowSleepInNether: false
-allowSleepInEnd: false
-
-#plugins like EssentialsX will typically setSleepingIgnored on /afk or /vanish
-# whether to send messages from/to sleepingIgnored players
-messageFromSleepingIgnored: false
-messageToSleepingIgnored: true
+#how many players online and awake before sleep messages are used
+minPlayers: 2
 
 #DO NOT TOUCH VERSION NUMBER
-version: 1.6
+version: 2.0

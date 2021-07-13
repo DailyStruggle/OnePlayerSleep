@@ -7,62 +7,44 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import OnePlayerSleep.tools.Config;
-import OnePlayerSleep.tools.LocalPlaceholders;
 import OnePlayerSleep.types.Message;
 
-import java.util.regex.Pattern;
+import java.util.List;
 
 //set up message threads for all relevant players
 public class AnnounceWakeup extends BukkitRunnable{
 	private OnePlayerSleep plugin;
 	private Config config;
-	private Player player;
+	private String playerName;
 	private Message msg;
 	private World world;
 
-	public AnnounceWakeup(OnePlayerSleep plugin, Config config, Player player, Message msg) {
+	public AnnounceWakeup(OnePlayerSleep plugin, Config config, String playerName, Message msg, World world) {
 		this.plugin = plugin;
 		this.config = config;
-		this.player = player;
-		this.msg = msg;
-		this.world = null;
-	}
-
-	public AnnounceWakeup(OnePlayerSleep plugin, Config config, Player player, Message msg, World world) {
-		this.plugin = plugin;
-		this.config = config;
-		this.player = player;
+		this.playerName = playerName;
 		this.msg = msg;
 		this.world = world;
 	}
 	
 	@Override
 	public void run() {
-		Boolean messageOtherDimensions = config.config.getBoolean("messageOtherDimensions");
-		Boolean messageOtherWorlds = config.config.getBoolean("messageOtherWorlds");
 		Boolean messageToSleepingIgnored = config.config.getBoolean("messageToSleepingIgnored");
-		World myWorld = this.player.getWorld();
 
-		//if no world defined, generate task for each world
-		if(this.world == null) {
-			for (World w : Bukkit.getWorlds()) {
-				if( !messageOtherDimensions && !myWorld.getEnvironment().equals( w.getEnvironment() ) ) continue;
-				if( !messageOtherWorlds && !myWorld.getEnvironment().equals(w.getEnvironment())) continue;
-				new AnnounceWakeup(this.plugin,this.config,this.player,msg, w).runTaskAsynchronously(this.plugin);
+		//format and ship it
+		List<String> worldNames = this.config.worlds.getConfigurationSection(this.world.getName()).getStringList("sendTo");
+		for (String worldName : worldNames) {
+
+			for(Player p : Bukkit.getWorld(worldName).getPlayers()) {
+				if (!messageToSleepingIgnored && p.isSleepingIgnored()) continue;
+				if (p.hasPermission("sleep.ignore")) continue;
+				String wakeupMsg = config.fillPlaceHolders(
+						this.msg.wakeup,
+						p.getName());
+				if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null)
+					wakeupMsg = PlaceholderAPI.setPlaceholders(p, wakeupMsg);
+				p.sendMessage(wakeupMsg);
 			}
-			return;
-		}
-
-		//if we've gotten this far, format and ship it
-		for (Player p : this.world.getPlayers()) {
-			if(!messageToSleepingIgnored && p.isSleepingIgnored()) continue;
-			if(p.hasPermission("sleep.ignore")) continue;
-			String wakeupMsg = LocalPlaceholders.fillPlaceHolders(
-					this.msg.wakeup,
-					p,
-					this.config);
-			if(this.config.hasPAPI()) wakeupMsg = PlaceholderAPI.setPlaceholders(p, wakeupMsg);
-			p.sendMessage(wakeupMsg);
 		}
 	}
 }

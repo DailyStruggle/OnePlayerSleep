@@ -1,0 +1,18 @@
+#autofilled per-world settings
+#world name according to bukkit
+default:
+    #world name placeholder
+    name: "default"
+    #what set of messages to use for this world
+    msgGroup: "default"
+    #which worlds to send sleep messages
+    # environment names such as "NORMAL", "NETHER", "THE_END" will send to all worlds with that environment
+    # "ALL" will send to all worlds.
+    sendTo:
+      - "world"
+    #which worlds to send time and weather updates, with same placeholders as above
+    # at least 2 players total to trigger sleep message
+    timeSync:
+      - "world"
+
+version: 1.0

@@ -22,7 +22,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 
 	public Map<World,BukkitTask> doSleep;
 	public Map<World,BukkitTask> clearWeather;
-	public Map<Player, Message> wakeData; //list of players receiving wakeup option
+	public Map<Player, Message> wakeData; //list of players receiving messages
 	public Map<World, HashSet<Player>> sleepingPlayers; //list of sleeping players for each world
 	public Map<World,Long> numPlayers;
 
@@ -36,7 +36,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		this.sleepingPlayers = new HashMap<>();
 
 		//make /sleep work
-		Objects.requireNonNull(getCommand("sleep")).setExecutor(new Sleep(this));
+		Objects.requireNonNull(getCommand("sleep")).setExecutor(new Sleep(this, this.config));
 
 		//let players tab for available subcommands
 		Objects.requireNonNull(getCommand("sleep")).setTabCompleter(new TabComplete(this.config));
@@ -44,12 +44,8 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		//set executors so i can look them up from /sleep
 		Objects.requireNonNull(getCommand("sleep help")).setExecutor(new Help());
 		Objects.requireNonNull(getCommand("sleep reload")).setExecutor(new Reload(this, this.config));
-		Objects.requireNonNull(getCommand("sleep test")).setExecutor(new Test(this));
+		Objects.requireNonNull(getCommand("sleep test")).setExecutor(new Test(this, this.config));
 		Objects.requireNonNull(getCommand("sleep wakeup")).setExecutor(new Wakeup(this, this.config));
-
-		//other way to call wakeup, so sleep.wakeup doesn't depend on sleep.see
-		Objects.requireNonNull(getCommand("sleepwakeup")).setExecutor(new Wakeup(this, this.config));
-
 
 		//load config files and check if they're up to date
 		// 	also check for hooks
@@ -72,7 +68,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new onWeatherChange(config), this);
 		getServer().getPluginManager().registerEvents(this, this);
 		
-		if(this.config.hasPAPI()) {
+		if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
 			new PAPI_expansion(this).register();
 		}
 
