@@ -409,10 +409,10 @@ public class Config {
 				: playerName;
 		World world = (isPlayer)
 				? Bukkit.getPlayer(playerName).getWorld()
-				: Bukkit.getWorld( messages.getConfigurationSection("server").getString("world"));
+				: Bukkit.getWorld( this.getServerWorldName() );
 
 		String worldName = dims.matcher(world.getName()).replaceAll("");
-		String dimName = messages.getConfigurationSection("dimensions").getString(world.getEnvironment().name());
+		String dimName = this.getDimensionPlaceholder(world.getEnvironment());
 
 		res = res.replace("[username]", playerName);
 		res = res.replace("[displayname]", playerDisplayName);
