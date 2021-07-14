@@ -43,10 +43,7 @@ public class Wakeup implements CommandExecutor {
 				? ((Player)sender).getWorld().getName()
 				: config.getServerWorldName();
 
-		Boolean KickFromBed = this.config.config.getBoolean("kickFromBed", true);
-		Boolean messageToSleepingIgnored = config.config.getBoolean("messageToSleepingIgnored", true);
 		Boolean cantKickAPlayer = false;
-		Boolean hasSleepingPlayers = false;
 
 		String cmdWorldName;
 		Message msg;
@@ -106,7 +103,14 @@ public class Wakeup implements CommandExecutor {
 				return true;
 			}
 		}
+
 		if(msg == null) msg = config.pickRandomMessage(Bukkit.getWorld(myWorldName), playerName);
+
+		//check if user should have a say in this
+		if((!config.getMsgToWorlds(myWorldName).contains(cmdWorldName))&&(!sender.hasPermission("sleep.global"))) {
+			sender.sendMessage(ChatColor.YELLOW + "You don't have permission to wake " + cmdWorldName + "from" + Bukkit.getWorld(myWorldName) );
+			return true;
+		}
 
 		//check if there's anything to do
 		List<String> syncWorlds = config.getSyncWorlds(myWorldName);
