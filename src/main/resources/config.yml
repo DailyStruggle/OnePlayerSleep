@@ -33,8 +33,13 @@ resetPhantomStatistics: true
 #whether to write players' sleep messages to console
 logMessages: true
 
+#plugins like EssentialsX will typically setSleepingIgnored on /afk or /vanish
+# whether to send messages from/to sleepingIgnored players
+messageFromSleepingIgnored: false
+messageToSleepingIgnored: true
+
 #how many players online and awake before sleep messages are used
 minPlayers: 2
 
 #DO NOT TOUCH VERSION NUMBER
-version: 2.0
+version: 2.1

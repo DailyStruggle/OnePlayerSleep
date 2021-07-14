@@ -49,8 +49,8 @@ public class Config {
 		}
 		this.config = YamlConfiguration.loadConfiguration(f);
 
-		if( 	(this.config.getDouble("version") < 2.0) ) {
-			Bukkit.getConsoleSender().sendMessage("�b[OnePlayerSleep] old config.yml detected. Updating");
+		if( 	(this.config.getDouble("version") < 2.1) ) {
+			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[OnePlayerSleep] old config.yml detected. Updating");
 
 			updateConfig();
 

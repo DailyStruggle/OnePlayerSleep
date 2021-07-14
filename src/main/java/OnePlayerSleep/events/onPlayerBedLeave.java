@@ -31,8 +31,6 @@ public class onPlayerBedLeave implements Listener {
 		Boolean messageFromSleepingIgnored = config.config.getBoolean("messageFromSleepingIgnored", true);
 		if(messageFromSleepingIgnored && event.getPlayer().isSleepingIgnored()) return;
 		if(event.getPlayer().hasPermission("sleep.ignore")) return;
-		Boolean messageOtherWorlds = config.config.getBoolean("messageOtherWorlds", false);
-		Boolean messageOtherDimensions = config.config.getBoolean("messageOtherDimensions", false);
 
 		//remove player from sleep lookup table
 		World myWorld = event.getPlayer().getWorld();
@@ -44,28 +42,22 @@ public class onPlayerBedLeave implements Listener {
 		}
 
 		Long numSleepingPlayers = Long.valueOf(0);
-		for (Map.Entry<World, HashSet<Player>> entry : this.plugin.sleepingPlayers.entrySet()) {
-			World key = entry.getKey();
-			String theirWorldName = dims.matcher(key.getName()).replaceAll("");
-			if( !messageOtherWorlds && !myWorldName.equals(theirWorldName)) continue;
-			if( !messageOtherDimensions && !event.getPlayer().getWorld().getEnvironment().equals( key.getEnvironment() ) ) continue;
-			numSleepingPlayers = numSleepingPlayers + this.plugin.sleepingPlayers.get(key).size();
+		for(String theirWorldName : this.config.getSyncWorlds(event.getBed().getWorld().getName()))
+		{
+			if(this.plugin.sleepingPlayers.containsKey(Bukkit.getWorld(theirWorldName)))
+				numSleepingPlayers += this.plugin.sleepingPlayers.get(Bukkit.getWorld(theirWorldName)).size();
 		}
+
 		if(numSleepingPlayers == 0) {
-			for (World w : Bukkit.getWorlds()) {
-				String theirWorldName = dims.matcher(w.getName()).replaceAll("");
-				if( !messageOtherWorlds && !myWorldName.equals(theirWorldName)) continue;
-				if( !messageOtherDimensions && !event.getPlayer().getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
-				if( this.plugin.doSleep.containsKey(w)) {
-					this.plugin.doSleep.get(w).cancel();
+			for(String worldName : this.config.getSyncWorlds(myWorldName)) {
+				if( this.plugin.doSleep.containsKey(Bukkit.getWorld(worldName))) {
+					this.plugin.doSleep.get(Bukkit.getWorld(worldName)).cancel();
 				}
 			}
 		}
 		else if( event.getPlayer().getWorld().getTime() >= 23460) {
-			for (World w : Bukkit.getWorlds()) {
-				String theirWorldName = dims.matcher(w.getName()).replaceAll("");
-				if( !messageOtherWorlds && !myWorldName.equals(theirWorldName)) continue;
-				if( !messageOtherDimensions && !event.getPlayer().getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
+			for(String worldName : this.config.getSyncWorlds(myWorldName)) {
+				World w = Bukkit.getWorld(worldName);
 				if(w.getTime()!= myWorld.getTime()) w.setTime(myWorld.getTime());
 				this.plugin.doSleep.get(w).cancel();
 				this.plugin.clearWeather.get(w).cancel();

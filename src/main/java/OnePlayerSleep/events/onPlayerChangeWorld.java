@@ -25,8 +25,6 @@ public class onPlayerChangeWorld implements Listener {
 
     @EventHandler
     public void onPlayerChangeWorld(PlayerChangedWorldEvent event){
-        Boolean messageOtherWorlds = config.config.getBoolean("messageOtherWorlds");
-        Boolean messageOtherDimensions = config.config.getBoolean("messageOtherDimensions");
         Boolean messageFromSleepingIgnored = config.config.getBoolean("messageFromSleepingIgnored", true);
         if(messageFromSleepingIgnored && event.getPlayer().isSleepingIgnored()) return;
         if(event.getPlayer().hasPermission("sleep.ignore"))
@@ -39,21 +37,15 @@ public class onPlayerChangeWorld implements Listener {
             this.plugin.sleepingPlayers.get(me.getWorld()).remove(me);
             String myWorldName = dims.matcher(event.getPlayer().getWorld().getName()).replaceAll("");
 
-            for(Map.Entry<World, HashSet<Player>> entry : this.plugin.sleepingPlayers.entrySet())
+            for(String theirWorldName : this.config.getSyncWorlds(event.getFrom().getName()))
             {
-                String theirWorldName = dims.matcher(entry.getKey().getName()).replaceAll("");
-                if( !messageOtherWorlds && !myWorldName.equals(theirWorldName) ) continue;
-                if( !messageOtherDimensions && !me.getWorld().getEnvironment().equals( entry.getKey().getEnvironment() ) ) continue;
-                numSleepingPlayers += entry.getValue().size();
+                numSleepingPlayers += this.plugin.sleepingPlayers.get(Bukkit.getWorld(theirWorldName)).size();
             }
 
             if(numSleepingPlayers == 0) {
-                for (World w : Bukkit.getWorlds()) {
-                    String theirWorldName = dims.matcher(w.getName()).replaceAll("");
-                    if( !messageOtherWorlds && !myWorldName.equals(theirWorldName) ) continue;
-                    if( !messageOtherDimensions && !event.getPlayer().getWorld().getEnvironment().equals( w.getEnvironment() ) ) continue;
-                    if( this.plugin.doSleep.containsKey(w)) {
-                        this.plugin.doSleep.get(w).cancel();
+                for (String worldName : this.config.getSyncWorlds(myWorldName)) {
+                    if( this.plugin.doSleep.containsKey(Bukkit.getWorld(worldName))) {
+                        this.plugin.doSleep.get(Bukkit.getWorld(worldName)).cancel();
                     }
                 }
             }
