@@ -36,14 +36,8 @@ public class onPlayerBedEnter implements Listener {
 		World myWorld = event.getBed().getWorld();
 
 		//check config to prevent explosion in a dimension, otherwise we can't do anything there
-		if(		myWorld.getEnvironment() == World.Environment.NETHER
-				&& !config.config.getBoolean("cancelBedExplodeInNether", false)		)
-		{
-			return;
-		}
-
-		if(myWorld.getEnvironment() == World.Environment.THE_END
-				&& !config.config.getBoolean("cancelBedExplodeInEnd", false)	)
+		if(		(myWorld.getEnvironment() == World.Environment.NETHER || myWorld.getEnvironment() == World.Environment.THE_END)
+				&& !this.config.worlds.getConfigurationSection(event.getBed().getWorld().getName()).getBoolean("cancelBedExplode",false)		)
 		{
 			return;
 		}

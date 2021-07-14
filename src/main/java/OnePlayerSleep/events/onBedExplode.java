@@ -21,15 +21,7 @@ public class onBedExplode implements Listener {
         if (!(block.getType().toString().toLowerCase().contains("bed") && block.getType() != Material.BEDROCK))
             return;
 
-        Boolean isNether = block.getWorld().getName().contains("_nether");
-        Boolean isEnd = block.getWorld().getName().contains("_the_end");
-        if(isNether) {
-            if (!config.config.getBoolean("cancelBedExplodeInNether", false)) return;
+        if(this.config.worlds.getConfigurationSection(event.getBlock().getWorld().getName()).getBoolean("cancelBedExplode",false))
             event.setCancelled(true);
-        }
-        if(isEnd) {
-            if (!config.config.getBoolean("cancelBedExplodeInEnd", false)) return;
-            event.setCancelled(true);
-        }
     }
 }

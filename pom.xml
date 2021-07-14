@@ -5,7 +5,7 @@
 
     <groupId>net.leafcraft</groupId>
     <artifactId>OnePlayerSleep</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

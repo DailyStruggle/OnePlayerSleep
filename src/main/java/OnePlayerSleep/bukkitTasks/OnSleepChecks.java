@@ -53,7 +53,7 @@ public class OnSleepChecks extends BukkitRunnable{
 			World w = Bukkit.getWorld(worldName);
 			if(w == null)
 			{
-				Bukkit.getLogger().warning("OnePlayerSleep: could not find world '" + worldName + "'"
+				Bukkit.getLogger().log(Level.WARNING, "[sleep] could not find world '" + worldName + "'"
 						+ "\n        please check your messages.yml");
 			}
 
