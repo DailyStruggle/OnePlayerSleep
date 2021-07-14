@@ -1,12 +1,10 @@
 package OnePlayerSleep.types;
 
-import OnePlayerSleep.tools.Config;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class Message {
 	public TextComponent msg;
@@ -25,7 +23,7 @@ public class Message {
 		this.chance = chance;
 
 		this.msg = new TextComponent(global);
-		this.msg.setHoverEvent( new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(hoverText)));
+		this.msg.setHoverEvent( new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverText).create()));
 		this.msg.setClickEvent( new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/sleep wakeup " + worldName + " " + name));
 	}
 

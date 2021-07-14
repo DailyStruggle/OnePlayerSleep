@@ -12,25 +12,25 @@ import OnePlayerSleep.tools.Config;
 
 public class Reload implements CommandExecutor {
 	private OnePlayerSleep plugin;
+	private Config config;
 	
 	public Reload(OnePlayerSleep plugin, Config config) {
-		this.plugin = plugin;
+		this.plugin = plugin;this.config = config;
 	}
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(sender.hasPermission("sleep.reload"))
 		{
-			String str = ChatColor.BLUE + "[OnePlayerSleep] reloading.";
+			String str = this.config.getLog("reloading");
 			Bukkit.getConsoleSender().sendMessage(str);
 			if(sender instanceof Player) {
 				if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) str = PlaceholderAPI.setPlaceholders((Player)sender, str);
 				sender.sendMessage(str);
 			}
 			
-			Config config = plugin.getPluginConfig();
-			config.refreshConfigs();
+			this.config.refreshConfigs();
 			
-			str = ChatColor.BLUE + "[OnePlayerSleep] successfully reloaded.";
+			str = this.config.getLog("reloaded");
 			Bukkit.getConsoleSender().sendMessage(str);
 			if(sender instanceof Player) {
 				if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) str = PlaceholderAPI.setPlaceholders((Player)sender, str);

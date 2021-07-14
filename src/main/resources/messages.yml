@@ -21,12 +21,6 @@
 #
 #   %vault_prefix% (requires vault)
 
-onNoPlayersSleeping: "&eNo players sleeping!"
-
-badTimeMessage: "&eYou can't sleep during the day"
-
-cooldownMessage: "&eYou can't sleep again yet"
-
 badArgs: "&cinvalid sleep command arguments"
 
 #dimension placeholders

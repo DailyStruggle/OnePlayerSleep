@@ -2,6 +2,7 @@ package OnePlayerSleep.bukkitTasks;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -53,8 +54,7 @@ public class OnSleepChecks extends BukkitRunnable{
 			World w = Bukkit.getWorld(worldName);
 			if(w == null)
 			{
-				Bukkit.getLogger().log(Level.WARNING, "[sleep] could not find world '" + worldName + "'"
-						+ "\n        please check your messages.yml");
+				Bukkit.getLogger().log(Level.WARNING, this.config.getLog("invalidWorld",worldName));
 			}
 
 			if( this.plugin.sleepingPlayers.containsKey(w) ) numSleepingPlayers += this.plugin.sleepingPlayers.get(w).size();

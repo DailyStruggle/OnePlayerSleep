@@ -23,6 +23,7 @@ public class Config {
 	public FileConfiguration config;
 	public FileConfiguration messages;
 	public FileConfiguration worlds;
+	public FileConfiguration lang;
 	public String version;
 
 	private static final Pattern dims = Pattern.compile("_nether|_the_end", Pattern.CASE_INSENSITIVE);
@@ -41,8 +42,24 @@ public class Config {
 	
 	
 	public void refreshConfigs() {
+		//load lang.yml file first
+		File f = new File(this.plugin.getDataFolder(), "lang.yml");
+		if(!f.exists())
+		{
+			plugin.saveResource("lang.yml", false);
+		}
+		this.lang = YamlConfiguration.loadConfiguration(f);
+
+		if( 	(this.lang.getDouble("version") < 1.0) ) {
+			Bukkit.getLogger().log(Level.WARNING, this.getLog("oldFile", "lang.yml"));
+			updateLang();
+
+			f = new File(this.plugin.getDataFolder(), "lang.yml");
+			this.lang = YamlConfiguration.loadConfiguration(f);;
+		}
+
 		//load config.yml file
-		File f = new File(this.plugin.getDataFolder(), "config.yml");
+		f = new File(this.plugin.getDataFolder(), "config.yml");
 		if(!f.exists())
 		{
 			plugin.saveResource("config.yml", false);
@@ -50,7 +67,7 @@ public class Config {
 		this.config = YamlConfiguration.loadConfiguration(f);
 
 		if( 	(this.config.getDouble("version") < 2.1) ) {
-			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[OnePlayerSleep] old config.yml detected. Updating");
+			Bukkit.getLogger().log(Level.WARNING, this.getLog("oldFile", "config.yml"));
 
 			updateConfig();
 
@@ -67,7 +84,7 @@ public class Config {
 		this.messages = YamlConfiguration.loadConfiguration(f);
 
 		if( 	(this.messages.getDouble("version") < 2.0) ) {
-			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[OnePlayerSleep] old messages.yml detected. Getting a newer version");
+			Bukkit.getLogger().log(Level.WARNING, this.getLog("oldFile", "messages.yml"));
 			this.renameFileInPluginDir("messages.yml","messages.old.yml");
 			
 			this.plugin.saveResource("messages.yml", false);
@@ -85,7 +102,7 @@ public class Config {
 		this.worlds = YamlConfiguration.loadConfiguration(f);
 
 		if( 	(this.worlds.getDouble("version") < 1.0) ) {
-			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[OnePlayerSleep] old worlds.yml detected. Getting a newer version");
+			Bukkit.getLogger().log(Level.WARNING, this.getLog("oldFile", "worlds.yml"));
 			this.renameFileInPluginDir("worlds.yml","worlds.old.yml");
 
 			this.plugin.saveResource("worlds.yml", false);
@@ -159,7 +176,6 @@ public class Config {
 					//was not an environment, do nothing
 				}
 				sendToNew.add(p);
-
 			}
 			for(String p : timeSync) {
 				if(p.equals("ALL")) {
@@ -182,11 +198,6 @@ public class Config {
 
 			this.getMsgToWorlds(worldName);
 		}
-
-
-
-		String msg = ChatColor.translateAlternateColorCodes('&', this.messages.getString("onNoPlayersSleeping"));
-		this.messages.set("onNoPlayersSleeping", msg);
 	}
 
 	public Message pickRandomMessage(World world, String playerName) {
@@ -226,7 +237,7 @@ public class Config {
 			i = (iter_high - iter_low)/2 + iter_low;
 		}
 		if(j>=1000) {
-			Bukkit.getLogger().log(Level.SEVERE, "[sleep] Failed to find a message within 1000 iterations. Using first message");
+			Bukkit.getLogger().log(Level.SEVERE, this.getLog("msgLookupFail"));
 			i = 0;
 		}
 		Message res = messageArray.get(listName).get(i);
@@ -259,6 +270,53 @@ public class Config {
 	}
 	
 	//update config files based on version number
+	private void updateLang() {
+		this.renameFileInPluginDir("lang.yml","lang.old.yml");
+		plugin.saveResource("lang.yml", false);
+		Map<String, Object> oldValues = this.config.getValues(false);
+		// Read default config to keep comments
+		ArrayList<String> linesInDefaultConfig = new ArrayList<>();
+		try {
+			Scanner scanner = new Scanner(
+					new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "lang.yml"));
+			while (scanner.hasNextLine()) {
+				linesInDefaultConfig.add(scanner.nextLine() + "");
+			}
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		ArrayList<String> newLines = new ArrayList<>();
+		for (String line : linesInDefaultConfig) {
+			String newline = line;
+			if (line.startsWith("version:")) {
+				newline = "version: 1.0";
+			} else {
+				for (String node : oldValues.keySet()) {
+					if (line.startsWith(node + ":")) {
+						String quotes = "";
+						newline = node + ": " + quotes + oldValues.get(node).toString() + quotes;
+						break;
+					}
+				}
+			}
+			newLines.add(newline);
+		}
+
+		FileWriter fw;
+		String[] linesArray = newLines.toArray(new String[linesInDefaultConfig.size()]);
+		try {
+			fw = new FileWriter(plugin.getDataFolder().getAbsolutePath() + File.separator + "lang.yml");
+			for (String s : linesArray) {
+				fw.write(s + "\n");
+			}
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void updateConfig() {
 		this.renameFileInPluginDir("config.yml","config.old.yml");
 		plugin.saveResource("config.yml", false);
@@ -459,5 +517,23 @@ public class Config {
 
 	public Integer getMinPlayers() {
 		return this.config.getInt("minPlayers", 2);
+	}
+
+	public String getLog(String key) {
+		String msg = this.lang.getString(key);
+		msg = ChatColor.translateAlternateColorCodes('&',msg);
+		return msg;
+	}
+
+	public String getLog(String key, String placeholder) {
+		String msg = this.getLog(key);
+
+		String replace = "[placeholder]";
+		switch(key) {
+			case "oldFile": replace = "[filename]"; break;
+			case "invalidWorld": replace = "[worldName]"; break;
+		}
+
+		return msg.replaceAll(replace, placeholder);
 	}
 }

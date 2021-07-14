@@ -1,0 +1,26 @@
+#player responses
+
+#on wakeup command, no players are asleep
+onNoPlayersSleeping: "&eNo players sleeping!"
+
+badTimeMessage: "&eYou can't sleep during the day"
+
+cooldownMessage: "&eYou can't sleep again yet"
+
+#log messages
+# a configuration file 'version' is lower than the latest
+# placeholder: [filename] - name of file, including file extension
+oldFile: "&b[sleep] old [filename] detected. Updating"
+
+# an invalid world in worlds.yml
+# placeholder: [worldName] - name of world attempted
+invalidWorld: "[sleep] could not find world '[worldName]'. Please check your worlds.yml"
+
+# error in random message selection
+msgPickFail: "[sleep] Failed to pick a message. Using first message"
+
+# plugin reload text
+reloading: "&a[sleep] reloading..."
+reloaded: "&a[sleep] successfully reloaded."
+
+version: 1.0
