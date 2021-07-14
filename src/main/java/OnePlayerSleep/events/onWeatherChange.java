@@ -20,7 +20,9 @@ public class onWeatherChange implements Listener {
 	@EventHandler
 	public void onWeatherChange(WeatherChangeEvent event) {
 		for(String worldName : this.config.getSyncWorlds(event.getWorld().getName())) {
+			if(worldName.equals(event.getWorld().getName())) continue;
 			World w = Bukkit.getWorld(worldName);
+			if(w.getWeatherDuration() > event.getWorld().getWeatherDuration() - 10) continue; //prevent recursive events
 			w.setStorm(event.toWeatherState());
 
 			//set other weathers a little longer than this world's weather duration so only one world causes the next weather update

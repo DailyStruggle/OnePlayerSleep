@@ -1,6 +1,6 @@
 name: OnePlayerSleep
 main: OnePlayerSleep.OnePlayerSleep.OnePlayerSleep
-version: 3.0
+version: 3.0.4
 api-version: 1.13
 author: leaf26
 website: https://github.com/DailyStruggle
@@ -62,3 +62,6 @@ permissions:
     sleep.ignore:
         description: ignore player entirely
         default: false
+    sleep.global:
+        description: can wakeup other worlds
+        default: op

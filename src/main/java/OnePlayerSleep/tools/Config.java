@@ -124,7 +124,8 @@ public class Config {
 			this.messageArray.putIfAbsent(messageListName,messageArray);
 			this.chanceRanges.putIfAbsent(messageListName,chanceRanges);
 			this.totalChance.putIfAbsent(messageListName,totalChance);
-			this.messageNames.putIfAbsent(messageListName,messageNames.stream().toList());
+			this.messageNames.putIfAbsent(messageListName, new ArrayList<>(messageNames));
+
 		}
 
 		//table of worlds ordered by dimension for quick lookup

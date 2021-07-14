@@ -31,6 +31,9 @@ public class TabComplete implements TabCompleter {
 		if(!sender.hasPermission("sleep.see")) return null;
 
 		List<String> res = null;
+		String myWorldName = (sender instanceof Player) ?
+				((Player)sender).getWorld().getName() :
+				this.config.getServerWorldName();
 
 		switch(args.length){
 			case 1: { //sleep subcommands
@@ -48,10 +51,14 @@ public class TabComplete implements TabCompleter {
 				if( 	(args[0].equalsIgnoreCase("test")  && sender.hasPermission("sleep.test") ) ||
 						(args[0].equalsIgnoreCase("wakeup")  && sender.hasPermission("sleep.wakeup") ) ) {
 					res = new ArrayList<>();
-					List<String> worldNames = new ArrayList<>();
-					for (World w : Bukkit.getWorlds()) {
-						worldNames.add(w.getName());
+					List<String> worldNames;
+					if(sender.hasPermission("sleep.global")) {
+						worldNames = new ArrayList<>();
+						for (World w : Bukkit.getWorlds()) {
+							worldNames.add(w.getName());
+						}
 					}
+					else worldNames = this.config.getMsgToWorlds(myWorldName);
 					StringUtil.copyPartialMatches(args[args.length - 1], worldNames, res);
 				}
 				break;
@@ -60,9 +67,6 @@ public class TabComplete implements TabCompleter {
 				if( 	(args[0].equalsIgnoreCase("test")  && sender.hasPermission("sleep.test") ) ||
 						(args[0].equalsIgnoreCase("wakeup")  && sender.hasPermission("sleep.wakeup") ) ) {
 					res = new ArrayList<>();
-					String worldName = null;
-					if(sender instanceof Player) worldName = ((Player)sender).getWorld().getName();
-
 					List<String> names = new ArrayList<>();
 
 					Integer delimiterIdx = args[args.length-1].indexOf('.');
@@ -77,7 +81,7 @@ public class TabComplete implements TabCompleter {
 					}
 					else
 					{
-						names.addAll(this.config.messages.getConfigurationSection("messages").getKeys(false).stream().toList());
+						names = new ArrayList<>(this.config.messages.getConfigurationSection("messages").getKeys(false));
 					}
 
 					StringUtil.copyPartialMatches(args[args.length - 1], names, res);
