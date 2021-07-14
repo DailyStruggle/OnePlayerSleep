@@ -67,7 +67,7 @@ public class Config {
 		this.messages = YamlConfiguration.loadConfiguration(f);
 
 		if( 	(this.messages.getDouble("version") < 2.0) ) {
-			Bukkit.getConsoleSender().sendMessage("�b[OnePlayerSleep] old messages.yml detected. Getting a newer version");
+			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[OnePlayerSleep] old messages.yml detected. Getting a newer version");
 			this.renameFileInPluginDir("messages.yml","messages.old.yml");
 			
 			this.plugin.saveResource("messages.yml", false);
@@ -85,7 +85,7 @@ public class Config {
 		this.worlds = YamlConfiguration.loadConfiguration(f);
 
 		if( 	(this.worlds.getDouble("version") < 1.0) ) {
-			Bukkit.getConsoleSender().sendMessage("�b[OnePlayerSleep] old worlds.yml detected. Getting a newer version");
+			Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[OnePlayerSleep] old worlds.yml detected. Getting a newer version");
 			this.renameFileInPluginDir("worlds.yml","worlds.old.yml");
 
 			this.plugin.saveResource("worlds.yml", false);
@@ -143,31 +143,47 @@ public class Config {
 			if(worldName.equals("default") || worldName.equals("version")) continue;
 			List<String> sendTo = this.worlds.getConfigurationSection(worldName).getStringList("sendTo");
 			List<String> timeSync = this.worlds.getConfigurationSection(worldName).getStringList("timeSync");
+			List<String> sendToNew = new ArrayList<>();
+			List<String> timeSyncNew = new ArrayList<>();
 			for(String p : sendTo) {
-				if(this.worlds.getKeys(false).contains(p)) continue;
 				if(p.equals("ALL")) {
-					sendTo.addAll(Bukkit.getWorlds().stream().map(world -> world.getName()).collect(Collectors.toList()));
+					sendToNew.addAll(Bukkit.getWorlds().stream().map(world -> world.getName()).collect(Collectors.toList()));
 					continue;
 				}
-				World.Environment env = World.Environment.valueOf(p);
-				if(env != null) {
-					sendTo.addAll(dimWorldList.get(env));
+				try{
+					World.Environment env = World.Environment.valueOf(p);
+					sendToNew.addAll(dimWorldList.get(env));
+					continue;
 				}
+				catch (IllegalArgumentException ex) {
+					//was not an environment, do nothing
+				}
+				sendToNew.add(p);
+
 			}
 			for(String p : timeSync) {
-				if(this.worlds.getKeys(false).contains(p)) continue;
 				if(p.equals("ALL")) {
-					timeSync.addAll(Bukkit.getWorlds().stream().map(world -> world.getName()).collect(Collectors.toList()));
+					timeSyncNew.addAll(Bukkit.getWorlds().stream().map(world -> world.getName()).collect(Collectors.toList()));
 					continue;
 				}
-				World.Environment env = World.Environment.valueOf(p);
-				if(env != null) {
-					timeSync.addAll(dimWorldList.get(env));
+				try{
+					World.Environment env = World.Environment.valueOf(p);
+					timeSyncNew.addAll(dimWorldList.get(env));
+					continue;
 				}
+				catch (IllegalArgumentException ex) {
+					//was not an environment, do nothing
+				}
+				timeSyncNew.add(p);
 			}
-			this.worlds.getConfigurationSection(worldName).set("sendTo", sendTo);
-			this.worlds.getConfigurationSection(worldName).set("sendTo", timeSync);
+
+			this.worlds.getConfigurationSection(worldName).set("sendTo", sendToNew);
+			this.worlds.getConfigurationSection(worldName).set("timeSync", timeSyncNew);
+
+			this.getMsgToWorlds(worldName);
 		}
+
+
 
 		String msg = ChatColor.translateAlternateColorCodes('&', this.messages.getString("onNoPlayersSleeping"));
 		this.messages.set("onNoPlayersSleeping", msg);
@@ -385,14 +401,14 @@ public class Config {
 
 	public List<String> getMsgToWorlds(String worldName) {
 		if(worldName == null || worldName.isEmpty()) {
-			worldName = this.messages.getConfigurationSection("server").getString("world");
+			worldName = this.getServerWorldName();
 		}
 		return worlds.getConfigurationSection(worldName).getStringList("sendTo");
 	}
 
 	public List<String> getSyncWorlds(String worldName) {
 		if(worldName == null || worldName.isEmpty()) {
-			worldName = this.messages.getConfigurationSection("server").getString("world");
+			worldName = this.getServerWorldName();
 		}
 		return worlds.getConfigurationSection(worldName).getStringList("timeSync");
 	}

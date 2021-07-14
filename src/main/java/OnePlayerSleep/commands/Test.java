@@ -14,6 +14,7 @@ import OnePlayerSleep.tools.Config;
 import OnePlayerSleep.types.Message;
 
 import java.util.List;
+import java.util.logging.Level;
 
 public class Test implements CommandExecutor {
 	private OnePlayerSleep plugin;
