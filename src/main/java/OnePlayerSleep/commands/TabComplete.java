@@ -10,6 +10,7 @@ import org.bukkit.util.StringUtil;
 import OnePlayerSleep.tools.Config;
 
 import java.util.*;
+import java.util.logging.Level;
 
 public class TabComplete implements TabCompleter {
 	private Map<String,String> subCommands = new HashMap<String,String>();
@@ -64,24 +65,26 @@ public class TabComplete implements TabCompleter {
 				break;
 			}
 			default: { //subsequent args are list.message
+				Set<String> listNames = this.config.getMessageListNames();
 				if( 	(args[0].equalsIgnoreCase("test")  && sender.hasPermission("sleep.test") ) ||
 						(args[0].equalsIgnoreCase("wakeup")  && sender.hasPermission("sleep.wakeup") ) ) {
 					res = new ArrayList<>();
-					List<String> names = new ArrayList<>();
+					List<String> names;
 
 					Integer delimiterIdx = args[args.length-1].indexOf('.');
 					if(delimiterIdx > 0) {
-						String listName = args[args.length-1].substring(0,delimiterIdx);
-						if(!this.config.messages.getConfigurationSection("messages").contains(listName)) return res;
-						names.addAll(this.config.getMessageNames(listName));
+						String cmdListName = args[args.length-1].substring(0,delimiterIdx);
+
+						if(!listNames.contains(cmdListName)) return res;
+						names = new ArrayList<>(this.config.getMessageNames(cmdListName));
 						for(int i = 0; i < names.size(); i++)
 						{
-							names.set(i,listName + "." + names.get(i));
+							names.set(i, cmdListName + "." + names.get(i));
 						}
 					}
 					else
 					{
-						names = new ArrayList<>(this.config.messages.getConfigurationSection("messages").getKeys(false));
+						names = new ArrayList<>(this.config.getMessageListNames());
 					}
 
 					StringUtil.copyPartialMatches(args[args.length - 1], names, res);

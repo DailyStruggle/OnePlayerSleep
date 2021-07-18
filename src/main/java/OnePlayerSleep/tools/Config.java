@@ -94,8 +94,6 @@ public class Config {
 			this.plugin.saveResource("messages.yml", false);
 			this.messages = YamlConfiguration.loadConfiguration(f);
 		}
-		this.messages.set("onNoPlayersSleeping", ChatColor.translateAlternateColorCodes('&', Objects.requireNonNull(this.messages.getString("onNoPlayersSleeping"))));
-		this.messages.set("cooldownMessage", ChatColor.translateAlternateColorCodes('&', Objects.requireNonNull(this.messages.getString("cooldownMessage"))));
 
 		//load worlds.yml file
 		f = new File(this.plugin.getDataFolder(), "worlds.yml");
@@ -434,7 +432,7 @@ public class Config {
 		if(!this.messages.getConfigurationSection("messages").contains(listName)) {
 			Bukkit.getLogger().log(Level.WARNING, getLog("invalidList",listName));
 		}
-		res.addAll(this.messages.getConfigurationSection(listName).getKeys(false));
+		res.addAll(this.messages.getConfigurationSection("messages").getConfigurationSection(listName).getKeys(false));
 		return res;
 	}
 
@@ -537,7 +535,7 @@ public class Config {
 			Bukkit.getLogger().log(Level.WARNING, getLog("invalidWorld",worldName));
 			return 23992;
 		}
-		return this.worlds.getConfigurationSection(worldName).getInt("startTime", 23992);
+		return this.worlds.getConfigurationSection(worldName).getInt("stopTime", 23992);
 	}
 
 	public Boolean getCancelBedExplode(String worldName) {

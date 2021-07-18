@@ -2,6 +2,7 @@ package OnePlayerSleep.events;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import OnePlayerSleep.bukkitTasks.OnSleepChecks;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -12,6 +13,7 @@ import OnePlayerSleep.tools.Config;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 /*
 Class for filtering bed entry and setting up an async task for filtering world behaviors

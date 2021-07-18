@@ -34,12 +34,14 @@ public class PassTime extends BukkitRunnable{
 	public void run() {
 		//while in the given timespan, set time
 		List<String> worldNames = this.config.getSyncWorlds(this.world.getName());
+		Integer timeBetweenIncrements = (Integer) config.getConfigValue("increment",150);
 		if (this.world.getTime() < this.config.getStopTime(this.world.getName())
 				&& this.world.getTime() >= this.config.getStartTime(this.world.getName())) {
-			Long newTime = this.world.getTime() + (Long) config.getConfigValue("increment",150);
+			Long newTime = this.world.getTime() + timeBetweenIncrements;
 			this.plugin.doSleep.remove(this.world);
-			this.plugin.doSleep.put(this.world, new PassTime(this.plugin, this.config, this.world, true)
-					.runTaskLater(this.plugin, (Long)this.config.getConfigValue("timeBetweenIncrements", 150)));
+			this.plugin.doSleep.put(this.world,
+					new PassTime(this.plugin, this.config, this.world, true)
+							.runTaskLater(this.plugin, timeBetweenIncrements));
 
 			//update all synced worlds
 			for(String worldName : worldNames) {
@@ -54,7 +56,7 @@ public class PassTime extends BukkitRunnable{
 		for(String worldName : worldNames) {
 			World targetWorld = Bukkit.getWorld(worldName);
 			if (didNightPass) this.plugin.clearWeather.put(targetWorld, new ClearWeather(targetWorld).runTask(this.plugin));
-			else this.plugin.clearWeather.put(this.world, new ClearWeather(targetWorld).runTaskLater(this.plugin, (Long)this.config.getConfigValue("sleepDelay",60)));
+			else this.plugin.clearWeather.put(this.world, new ClearWeather(targetWorld).runTaskLater(this.plugin, (Integer)this.config.getConfigValue("sleepDelay",60)));
 		}
 
 		this.cancel();

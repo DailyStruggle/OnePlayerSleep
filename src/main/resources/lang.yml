@@ -27,8 +27,8 @@ invalidMsg: "&e[sleep] could not find message '[msg]'"
 msgPickFail: "&e[sleep] Failed to pick a message. Using first message"
 
 # plugin reload text
-reloading: "&a[sleep] reloading..."
-reloaded: "&a[sleep] successfully reloaded."
+reloading: "&b[sleep] reloading..."
+reloaded: "&b[sleep] successfully reloaded."
 
 # plugin doesn't have the command the user requested
 # placeholder: [arg] - the argument attempted

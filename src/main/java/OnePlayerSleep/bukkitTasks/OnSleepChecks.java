@@ -62,7 +62,7 @@ public class OnSleepChecks extends BukkitRunnable{
 		}
 
 		//only announce the first bed entry, and only when there's more than one player to see it
-		Long sleepDelay = (Long)this.config.getConfigValue("sleepDelay", 60);
+		Integer sleepDelay = (Integer)this.config.getConfigValue("sleepDelay", 60);
 		if(numSleepingPlayers < 2 && numPlayers >= this.config.getMinPlayers()) {
 			//async message selection and delivery
 			new AnnounceSleep(this.plugin, this.config, this.player.getName(), this.world).runTaskAsynchronously(this.plugin);
@@ -76,8 +76,8 @@ public class OnSleepChecks extends BukkitRunnable{
 		//set up clear weather task for later
 		if(!plugin.clearWeather.containsKey(this.world)) {
 			//calculate how long to wait before clearing weather
-			Long dT = (this.config.getStopTime(this.world.getName()) - this.world.getTime()) / (Long) this.config.getConfigValue("increment", 150);
-			Long cap = (this.world.getTime() - this.config.getStartTime(this.world.getName())) / (Long) this.config.getConfigValue("increment", 150);
+			Long dT = (this.config.getStopTime(this.world.getName()) - this.world.getTime()) / (Integer) this.config.getConfigValue("increment", 150);
+			Long cap = (this.world.getTime() - this.config.getStartTime(this.world.getName())) / (Integer) this.config.getConfigValue("increment", 150);
 			
 			//calculate how long to clear weather for
 			Double randomFactor = new Random().nextDouble()*168000;

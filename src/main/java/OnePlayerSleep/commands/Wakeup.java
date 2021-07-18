@@ -75,7 +75,7 @@ public class Wakeup implements CommandExecutor {
 						return true;
 					}
 
-					msg = this.config.getMessage(listName, msgName, sender.getName());
+					msg = this.config.getMessage(listName, msgName, playerName);
 					if(msg == null)
 					{
 						sender.sendMessage(this.config.getLog("invalidMsg", msgName));
