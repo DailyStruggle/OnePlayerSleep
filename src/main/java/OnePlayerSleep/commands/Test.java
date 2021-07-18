@@ -14,6 +14,7 @@ import OnePlayerSleep.tools.Config;
 import OnePlayerSleep.types.Message;
 
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 public class Test implements CommandExecutor {
@@ -47,7 +48,7 @@ public class Test implements CommandExecutor {
 					res[0] = this.plugin.getPluginConfig().pickRandomMessage(world, playerName);
 				}
 				else {
-					sender.sendMessage(ChatColor.YELLOW + "world '" + worldName + "' was not found");
+					sender.sendMessage(this.config.getLog("invalidWorld", worldName));
 				}
 				break;
 			}
@@ -56,7 +57,7 @@ public class Test implements CommandExecutor {
 				res = new Message[1];
 				World w = Bukkit.getWorld(args[0]);
 				if(w == null) {
-					sender.sendMessage( ChatColor.YELLOW + args[0] + " is not a valid world");
+					sender.sendMessage(this.config.getLog("invalidWorld", worldName));
 					return true;
 				}
 				res[0] = this.plugin.getPluginConfig().pickRandomMessage(w, playerName);
@@ -66,13 +67,13 @@ public class Test implements CommandExecutor {
 			{
 				World w = Bukkit.getWorld(args[0]);
 				if(w == null) {
-					sender.sendMessage( ChatColor.YELLOW + args[0] + " is not a valid world");
+					sender.sendMessage(this.config.getLog("invalidWorld", worldName));
 					return true;
 				}
 				worldName = args[0];
 
 				res = new Message[args.length-1];
-				ConfigurationSection messagesSection = this.config.messages.getConfigurationSection("messages");
+				Set<String> messageListNames = this.config.getMessageListNames();
 				for( int i = 0; i<res.length; i++)
 				{
 					//detect delimiter exists and where
@@ -83,15 +84,16 @@ public class Test implements CommandExecutor {
 						listName = args[i+1].substring(0, delimiterIdx);
 						String msgName = args[i+1].substring(delimiterIdx+1);
 
-						if(!messagesSection.contains(listName))
+						if(!messageListNames.contains(listName))
 						{
-							sender.sendMessage( ChatColor.YELLOW + listName + " is not a valid message list");
+							sender.sendMessage(this.config.getLog("invalidList", listName));
 							continue;
 						}
 
-						if(!messagesSection.getConfigurationSection(listName).contains(msgName))
+						Message msg = this.config.getMessage(listName,msgName,playerName);
+						if(msg==null)
 						{
-							sender.sendMessage( ChatColor.YELLOW + msgName + " is not a valid message in " + listName);
+							sender.sendMessage(this.config.getLog("invalidMsg", msgName));
 							continue;
 						}
 
@@ -100,9 +102,9 @@ public class Test implements CommandExecutor {
 					else
 					{
 						listName = args[i+1];
-						if(!messagesSection.contains(listName))
+						if(!messageListNames.contains(listName))
 						{
-							sender.sendMessage( ChatColor.YELLOW + listName + " is not a valid message list");
+							sender.sendMessage(this.config.getLog("invalidList", listName));
 							continue;
 						}
 						res[i] = this.config.pickRandomMessage(listName,playerName);
@@ -116,7 +118,7 @@ public class Test implements CommandExecutor {
 			if(message == null) continue;
 			World world = Bukkit.getWorld(message.worldName);
 			if(world == null) {
-				sender.sendMessage(ChatColor.YELLOW + "'" + message.worldName +"' is not a world");
+				sender.sendMessage(this.config.getLog("invalidWorld", message.worldName));
 				continue;
 			}
 
@@ -124,7 +126,7 @@ public class Test implements CommandExecutor {
 			for(String msgToWorldName : msgToWorldNames) {
 				World msgToWorld = Bukkit.getWorld(msgToWorldName);
 				if(msgToWorld == null) {
-					sender.sendMessage(ChatColor.YELLOW + "'" + message.worldName +"' is not a world");
+					sender.sendMessage(this.config.getLog("invalidWorld", message.worldName));
 					continue;
 				}
 

@@ -1,4 +1,4 @@
-#player responses
+#logs and command responses
 
 #on wakeup command, no players are asleep
 onNoPlayersSleeping: "&eNo players sleeping!"
@@ -7,20 +7,45 @@ badTimeMessage: "&eYou can't sleep during the day"
 
 cooldownMessage: "&eYou can't sleep again yet"
 
-#log messages
 # a configuration file 'version' is lower than the latest
 # placeholder: [filename] - name of file, including file extension
 oldFile: "&b[sleep] old [filename] detected. Updating"
 
-# an invalid world in worlds.yml
+# an invalid world lookup somewhere or on command
 # placeholder: [worldName] - name of world attempted
-invalidWorld: "[sleep] could not find world '[worldName]'. Please check your worlds.yml"
+invalidWorld: "&e[sleep] could not find world '[worldName]'"
+
+# an invalid message list
+# placeholder: [list] - name of list attempted
+invalidList: "&e[sleep] could not find message '[list]'"
+
+# an invalid message name
+# placeholder: [msg] - name of message attempted
+invalidMsg: "&e[sleep] could not find message '[msg]'"
 
 # error in random message selection
-msgPickFail: "[sleep] Failed to pick a message. Using first message"
+msgPickFail: "&e[sleep] Failed to pick a message. Using first message"
 
 # plugin reload text
 reloading: "&a[sleep] reloading..."
 reloaded: "&a[sleep] successfully reloaded."
+
+# plugin doesn't have the command the user requested
+# placeholder: [arg] - the argument attempted
+badArg: "&cinvalid sleep command argument [arg]"
+
+# user doesn't have permission for the command requested
+# placeholder: [arg] - the argument attempted
+noPerms: "&eI'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error."
+
+# user tried to wake a world that doesn't send messages to their location, without perms
+# placeholder: [worldName] - the world attempted in the command
+noGlobalPerms: "&eYou don't have permission to wake [worldName] from your location"
+
+#command descriptions
+help: "&b/sleep help - see this"
+wakeup: "&b/sleep wakeup - wake sleeping players"
+reload: "&b/sleep reload - reload config files"
+test: "&b/sleep test - test sleep messages"
 
 version: 1.0

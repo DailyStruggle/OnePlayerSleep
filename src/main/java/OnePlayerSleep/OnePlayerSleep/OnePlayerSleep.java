@@ -42,7 +42,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		Objects.requireNonNull(getCommand("sleep")).setTabCompleter(new TabComplete(this.config));
 
 		//set executors so i can look them up from /sleep
-		Objects.requireNonNull(getCommand("sleep help")).setExecutor(new Help());
+		Objects.requireNonNull(getCommand("sleep help")).setExecutor(new Help(this, this.config));
 		Objects.requireNonNull(getCommand("sleep reload")).setExecutor(new Reload(this, this.config));
 		Objects.requireNonNull(getCommand("sleep test")).setExecutor(new Test(this, this.config));
 		Objects.requireNonNull(getCommand("sleep wakeup")).setExecutor(new Wakeup(this, this.config));
@@ -76,7 +76,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		new Metrics(this, pluginId);
 
 		//fix player counts on reload
-		boolean messageFromSleepingIgnored = this.config.config.getBoolean("messageFromSleepingIgnored", true);
+		boolean messageFromSleepingIgnored = (Boolean) this.config.getConfigValue("messageFromSleepingIgnored", true);
 		for (org.bukkit.World w : Bukkit.getWorlds()) {
 			this.numPlayers.put(w,Long.valueOf(0));
 			for (Player p : w.getPlayers()){

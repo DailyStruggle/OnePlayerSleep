@@ -29,7 +29,7 @@ public class onPlayerBedEnter implements Listener {
 	@EventHandler
 	public void onPlayerBedEnter(PlayerBedEnterEvent event) {
 		//skip if player needs to be ignored by the plugin
-		if(config.config.getBoolean("messageFromSleepingIgnored", false)
+		if((Boolean)config.getConfigValue("messageFromSleepingIgnored", false)
 				&& event.getPlayer().isSleepingIgnored()) return;
 		if(event.getPlayer().hasPermission("sleep.ignore")) return;
 
@@ -37,17 +37,17 @@ public class onPlayerBedEnter implements Listener {
 
 		//check config to prevent explosion in a dimension, otherwise we can't do anything there
 		if(		(myWorld.getEnvironment() == World.Environment.NETHER || myWorld.getEnvironment() == World.Environment.THE_END)
-				&& !this.config.worlds.getConfigurationSection(event.getBed().getWorld().getName()).getBoolean("cancelBedExplode",false)		)
+				&& !this.config.getCancelBedExplode(myWorld.getName())		)
 		{
 			return;
 		}
 
 		//check time
-		if(		(myWorld.getTime() < config.config.getInt("startTime")
-				|| myWorld.getTime() > config.config.getInt("stopTime"))
+		if(		(myWorld.getTime() < this.config.getStartTime(myWorld.getName())
+				|| myWorld.getTime() > this.config.getStopTime(myWorld.getName()))
 				&& !myWorld.hasStorm()		)
 		{
-			String msg = config.messages.getString("badTimeMessage");
+			String msg = config.getLog("badTimeMessage");
 			msg = this.config.fillPlaceHolders(
 					msg,
 					event.getPlayer().getName());
@@ -59,9 +59,9 @@ public class onPlayerBedEnter implements Listener {
 		//cooldown logic
 		Long currentTime = System.currentTimeMillis();
 		if(		this.lastTme.containsKey(event.getPlayer()) &&
-				currentTime < this.lastTme.get(event.getPlayer()) + config.config.getLong("sleepCooldown")) {
+				currentTime < this.lastTme.get(event.getPlayer()) + (Integer)config.getConfigValue("sleepCooldown",2000)) {
 			event.setCancelled(true);
-			String msg = config.messages.getString("cooldownMessage");
+			String msg = config.getLog("cooldownMessage");
 			msg = this.config.fillPlaceHolders(
 					msg,
 					event.getPlayer().getName());
@@ -70,10 +70,10 @@ public class onPlayerBedEnter implements Listener {
 			return;
 		}
 
-		event.setUseBed(Event.Result.ALLOW);
-
 		this.lastTme.put(event.getPlayer(), currentTime);
-		
+
+		if(event.getBedEnterResult().equals(PlayerBedEnterEvent.BedEnterResult.NOT_POSSIBLE_HERE)) event.setUseBed(Event.Result.ALLOW);
+
 		//do other relevant checks asynchronously
 		new OnSleepChecks(this.plugin, this.config, event.getPlayer(), myWorld).runTaskAsynchronously(plugin);
 	}

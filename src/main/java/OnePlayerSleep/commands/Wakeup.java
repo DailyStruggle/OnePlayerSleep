@@ -58,39 +58,34 @@ public class Wakeup implements CommandExecutor {
 			}
 			case 1: { //only world name
 				cmdWorldName = args[0];
-				if(!config.worlds.contains(cmdWorldName)) {
-					sender.sendMessage(this.plugin.getPluginConfig().messages.getString("badArgs"));
-					return true;
-				}
 				msg = config.pickRandomMessage(Bukkit.getWorld(args[0]), playerName);
 				break;
 			}
-			case 2: { //world name + message name
+			default: { //world name + message name
 				cmdWorldName = args[0];
-				ConfigurationSection messagesSection = this.config.messages.getConfigurationSection("messages");
+				Set<String> listNames = this.config.getMessageListNames();
 				Integer delimiterIdx = args[1].indexOf('.');
 				if(delimiterIdx > 0) {
 					String listName = args[1].substring(0,delimiterIdx);
 					String msgName = args[1].substring(delimiterIdx+1);
 
-					if(!messagesSection.contains(listName))
+					if(!listNames.contains(listName))
 					{
-						sender.sendMessage( ChatColor.YELLOW + listName + " is not a valid message list");
-						return true;
-					}
-
-					if(!messagesSection.getConfigurationSection(listName).contains(msgName))
-					{
-						sender.sendMessage( ChatColor.YELLOW + msgName + " is not a valid message in " + listName);
+						sender.sendMessage(this.config.getLog("invalidList", listName));
 						return true;
 					}
 
 					msg = this.config.getMessage(listName, msgName, sender.getName());
+					if(msg == null)
+					{
+						sender.sendMessage(this.config.getLog("invalidMsg", msgName));
+						return true;
+					}
 				}
 				else {
-					if(!messagesSection.contains(args[1]))
+					if(!listNames.contains(args[1]))
 					{
-						sender.sendMessage( ChatColor.YELLOW + args[1] + " is not a valid message list");
+						sender.sendMessage(this.config.getLog("invalidList", args[1]));
 						return true;
 					}
 					msg = this.config.pickRandomMessage(args[1], playerName);
@@ -98,17 +93,13 @@ public class Wakeup implements CommandExecutor {
 				}
 				break;
 			}
-			default: { //else bad args
-				sender.sendMessage(ChatColor.YELLOW + "[sleep] did not expect more than 2 arguments");
-				return true;
-			}
 		}
 
 		if(msg == null) msg = config.pickRandomMessage(Bukkit.getWorld(myWorldName), playerName);
 
 		//check if user should have a say in this
 		if((!config.getMsgToWorlds(myWorldName).contains(cmdWorldName))&&(!sender.hasPermission("sleep.global"))) {
-			sender.sendMessage(ChatColor.YELLOW + "You don't have permission to wake " + cmdWorldName + "from" + Bukkit.getWorld(myWorldName) );
+			sender.sendMessage(this.config.getLog("noGlobalPerms", cmdWorldName));
 			return true;
 		}
 
@@ -122,7 +113,7 @@ public class Wakeup implements CommandExecutor {
 		}
 
 		if(numSleeping == 0) {
-			String onNoPlayersSleeping = config.messages.getString("onNoPlayersSleeping");
+			String onNoPlayersSleeping = config.getLog("onNoPlayersSleeping");
 			if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null)
 				onNoPlayersSleeping = PlaceholderAPI.setPlaceholders((Player)sender, onNoPlayersSleeping);
 			sender.sendMessage(onNoPlayersSleeping);
@@ -158,7 +149,7 @@ public class Wakeup implements CommandExecutor {
 		}
 
 		//send a wakeup message
-		for(String worldName : this.config.worlds.getConfigurationSection(cmdWorldName).getStringList("sendTo")) {
+		for(String worldName : this.config.getMsgToWorlds(myWorldName)) {
 			World world = Bukkit.getWorld(worldName);
 			new AnnounceWakeup(this.plugin, this.config, playerName, msg, world).runTaskAsynchronously(this.plugin);
 		}

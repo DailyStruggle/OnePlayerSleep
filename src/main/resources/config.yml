@@ -1,12 +1,6 @@
 #time, in ticks, to delay the task of passing of night
-# if night is not passed, weather is cleared after 2x this amount
+# weather clear is scheduled to run after 2x this amount
 sleepDelay: 60
-
-#server times to start allowing passing night and to stop the sleep tasks
-# effective min for overworld - 12010
-# effective max for overworld - 23992
-startTime: 12010
-stopTime: 23992
 
 #amount of server time to increment by, per server tick
 # lowering this will slow the night passing, increasing will speed it up

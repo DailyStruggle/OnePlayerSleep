@@ -14,5 +14,10 @@ default:
     # at least 2 players total to trigger sleep message
     timeSync:
       - "world"
+    #range of time when sleep is allowed
+    # effective min for overworld - 12010
+    # effective max for overworld - 23992
+    startTime: 12010
+    stopTime: 23992
 
-version: 1.0
+version: 1.1

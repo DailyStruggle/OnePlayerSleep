@@ -1,6 +1,7 @@
 package OnePlayerSleep.bukkitTasks;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -39,15 +40,14 @@ public class AnnounceSleep extends BukkitRunnable{
 	
 	@Override
 	public void run() {
-		Boolean perPlayer = config.config.getBoolean("randomPerPlayer");
-		Boolean messageToSleepingIgnored = config.config.getBoolean("messageToSleepingIgnored", true);
-		List<String> worldNames = this.config.getMsgToWorlds(this.world.getName());
+		Boolean perPlayer = (Boolean) config.getConfigValue("randomPerPlayer", false);
+		Boolean messageToSleepingIgnored = (Boolean) config.getConfigValue("messageToSleepingIgnored", true);
 
 		if(this.message == null) {
 			this.message = this.config.pickRandomMessage(this.world, playerName);
 		}
 
-		for (String worldName : worldNames) {
+		for (String worldName : this.config.getMsgToWorlds(this.world.getName())) {
 			World w = Bukkit.getWorld(worldName);
 
 			for (Player p : w.getPlayers()) {

@@ -1,6 +1,7 @@
 package OnePlayerSleep.tools;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -20,19 +21,22 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Config {
-	public FileConfiguration config;
-	public FileConfiguration messages;
-	public FileConfiguration worlds;
-	public FileConfiguration lang;
+	private final OnePlayerSleep plugin;
+	private FileConfiguration config;
+	private FileConfiguration messages;
+	private FileConfiguration worlds;
+	private FileConfiguration lang;
 	public String version;
 
 	private static final Pattern dims = Pattern.compile("_nether|_the_end", Pattern.CASE_INSENSITIVE);
 
-	private Map<String,List<String>> messageNames = new HashMap<>();
-	private Map<String,ArrayList<Double>> chanceRanges = new HashMap<>();
-	private Map<String,ArrayList<Message>> messageArray = new HashMap<>();
+	//key: message list name
+	//value: lookup table for values
+	private Map<String,NavigableMap<Double,Message>> messageLookup = new HashMap<>();
+
+	//key: message list name
+	//value: maximum random value to work with
 	private Map<String,Double> totalChance = new HashMap<>();
-	private final OnePlayerSleep plugin;
 
 	public Config(OnePlayerSleep plugin) {
 		this.plugin = plugin;
@@ -101,7 +105,7 @@ public class Config {
 		}
 		this.worlds = YamlConfiguration.loadConfiguration(f);
 
-		if( 	(this.worlds.getDouble("version") < 1.0) ) {
+		if( 	(this.worlds.getDouble("version") < 1.1) ) {
 			Bukkit.getLogger().log(Level.WARNING, this.getLog("oldFile", "worlds.yml"));
 			this.renameFileInPluginDir("worlds.yml","worlds.old.yml");
 
@@ -118,12 +122,8 @@ public class Config {
 		for(String messageListName : messageListNames) {
 			Set<String> messageNames = this.messages.getConfigurationSection("messages").getConfigurationSection(messageListName).getKeys(false);
 
-
 			Double totalChance = 0.0;
-			ArrayList<Message> messageArray = new ArrayList<>();
-			ArrayList<Double> chanceRanges = new ArrayList<>();
-			chanceRanges.add(0, 0.0);
-			int i = 0;
+			NavigableMap<Double,Message> messageLookup = new TreeMap<>();
 			for ( String messageName : messageNames) {
 				ConfigurationSection message = this.messages.getConfigurationSection("messages")
 						.getConfigurationSection(messageListName).getConfigurationSection(messageName);
@@ -132,17 +132,11 @@ public class Config {
 				String response 	= ChatColor.translateAlternateColorCodes('&', message.getString("wakeup", "[player] says &cWake up!"));
 				String cantWakeup 	= ChatColor.translateAlternateColorCodes('&', message.getString("cantWakeup", "&csomeone's a deep sleeper"));
 				Double chance = message.getDouble("chance");
-				messageArray.add(new Message(new String(), message.getName(), msg, hover_msg, response, cantWakeup, chance) );
+				messageLookup.put(totalChance, new Message(new String(), message.getName(), msg, hover_msg, response, cantWakeup, chance));
 				totalChance += chance;
-				chanceRanges.add(chanceRanges.get(i) + chance);
-				messageNames.add(message.getName());
-				i++;
 			}
-			this.messageArray.putIfAbsent(messageListName,messageArray);
-			this.chanceRanges.putIfAbsent(messageListName,chanceRanges);
+			this.messageLookup.putIfAbsent(messageListName,messageLookup);
 			this.totalChance.putIfAbsent(messageListName,totalChance);
-			this.messageNames.putIfAbsent(messageListName, new ArrayList<>(messageNames));
-
 		}
 
 		//table of worlds ordered by dimension for quick lookup
@@ -152,7 +146,12 @@ public class Config {
 		}
 		for(String worldName : this.worlds.getKeys(false)) {
 			if(worldName.equals("default") || worldName.equals("version")) continue;
-			dimWorldList.get(Bukkit.getWorld(worldName).getEnvironment()).add(worldName);
+			World w = Bukkit.getWorld(worldName);
+			if(w == null) {
+				Bukkit.getLogger().log(Level.WARNING, this.getLog("invalidWorld", worldName));
+				continue;
+			}
+			dimWorldList.get(w.getEnvironment()).add(worldName);
 		}
 
 		//reconfigure placeholders as world names
@@ -214,42 +213,18 @@ public class Config {
 	public Message pickRandomMessage(String listName, String playerName) {
 		if(!this.messages.getConfigurationSection("messages").contains(listName))
 			return null;
-		ArrayList<Double> chanceRanges = this.chanceRanges.get(listName);
-		int numMessages = this.messageArray.get(listName).size();
-		if(numMessages == 1) return messageArray.get(listName).get(0);
 
-		//pick a random float
-		Random r = new Random();
-		Double randomValue = (this.totalChance.get(listName)) * r.nextDouble();
+		Random r2 = new Random();
+		Double randomValue2 = (this.totalChance.get(listName)) * r2.nextDouble();
+		Message res = this.messageLookup.get(listName).floorEntry(randomValue2).getValue();
 
-		//lookup iterator by binary search of ranges
-		int iter_low = 0;
-		int iter_high = chanceRanges.size();
+		String msg = fillPlaceHolders(res.msg.getText(), playerName);
+		String hover_msg = fillPlaceHolders(res.hoverText, playerName);
+		String wakeup = fillPlaceHolders(res.wakeup, playerName);
+		String cantWakeup = fillPlaceHolders(res.cantWakeup, playerName);
+		Double chance = res.chance;
+		res = new Message(new String(), (listName+"."+res.name), msg, hover_msg, wakeup, cantWakeup, chance);
 
-		int i = iter_high/2;
-		int j;
-		for(j = 0; j < 1000; j++) { //cap at 1k in case of infinite loop
-			double range_low = chanceRanges.get(i);
-			double range_high = chanceRanges.get(i+1);
-			if(randomValue <= range_low) iter_high = i;
-			else if(randomValue > range_high) iter_low = i;
-			else break;
-			i = (iter_high - iter_low)/2 + iter_low;
-		}
-		if(j>=1000) {
-			Bukkit.getLogger().log(Level.SEVERE, this.getLog("msgLookupFail"));
-			i = 0;
-		}
-		Message res = messageArray.get(listName).get(i);
-		ConfigurationSection cfg = this.messages.getConfigurationSection("messages").getConfigurationSection(listName).getConfigurationSection(res.name);
-		if(cfg != null) {
-			String msg = fillPlaceHolders(cfg.getString("global", "[player] &bis sleeping"), playerName);
-			String hover_msg = fillPlaceHolders(cfg.getString("hover", "&eWake up!"), playerName);
-			String response = fillPlaceHolders(cfg.getString("wakeup", "[player] says &cWake up!"), playerName);
-			String cantWakeup = fillPlaceHolders(cfg.getString("cantWakeup", "&csomeone's a deep sleeper"), playerName);
-			Double chance = cfg.getDouble("chance");
-			res = new Message(new String(), (listName+"."+res.name), msg, hover_msg, response, cantWakeup, chance);
-		} else res = null;
 		return res;
 	}
 
@@ -406,7 +381,10 @@ public class Config {
 							linesInWorlds.add("        - \"" + sync + "\"");
 						}
 
-						if(Bukkit.getWorld(worldName).getEnvironment() != World.Environment.NORMAL)
+						linesInWorlds.add("    startTime: 12010");
+						linesInWorlds.add("    stopTime: 23992");
+
+						if(w.getEnvironment() != World.Environment.NORMAL)
 						{
 							linesInWorlds.add("    cancelBedExplode: false");
 						}
@@ -453,7 +431,10 @@ public class Config {
 		if(listName == null || listName.isEmpty()) {
 			listName = this.worlds.getConfigurationSection("world").getString("msgGroup");
 		}
-		res.addAll( messageNames.get( listName ) );
+		if(!this.messages.getConfigurationSection("messages").contains(listName)) {
+			Bukkit.getLogger().log(Level.WARNING, getLog("invalidList",listName));
+		}
+		res.addAll(this.messages.getConfigurationSection(listName).getKeys(false));
 		return res;
 	}
 
@@ -528,12 +509,50 @@ public class Config {
 	public String getLog(String key, String placeholder) {
 		String msg = this.getLog(key);
 
-		String replace = "[placeholder]";
+		String replace;
 		switch(key) {
 			case "oldFile": replace = "[filename]"; break;
+			case "noGlobalPerms":
 			case "invalidWorld": replace = "[worldName]"; break;
+			case "invalidList": replace = "[list]"; break;
+			case "invalidMsg": replace = "[msg]"; break;
+			case "noPerms":
+			case "badArg": replace = "[arg]"; break;
+			default: replace = "[placeholder]";
 		}
 
 		return msg.replaceAll(replace, placeholder);
+	}
+
+	public Integer getStartTime (String worldName) {
+		if(!this.worlds.contains(worldName)) {
+			Bukkit.getLogger().log(Level.WARNING, getLog("invalidWorld",worldName));
+			return 12010;
+		}
+		return this.worlds.getConfigurationSection(worldName).getInt("startTime", 12010);
+	}
+
+	public Integer getStopTime (String worldName) {
+		if(!this.worlds.contains(worldName)) {
+			Bukkit.getLogger().log(Level.WARNING, getLog("invalidWorld",worldName));
+			return 23992;
+		}
+		return this.worlds.getConfigurationSection(worldName).getInt("startTime", 23992);
+	}
+
+	public Boolean getCancelBedExplode(String worldName) {
+		if(!this.worlds.contains(worldName)) {
+			Bukkit.getLogger().log(Level.WARNING, getLog("invalidWorld",worldName));
+			return false;
+		}
+		return this.worlds.getConfigurationSection(worldName).getBoolean("cancelBedExplode", false);
+	}
+
+	public Object getConfigValue(String name, Object def) {
+		return this.config.get(name,def);
+	}
+
+	public Set<String> getMessageListNames() {
+		return this.messages.getConfigurationSection("messages").getKeys(false);
 	}
 }

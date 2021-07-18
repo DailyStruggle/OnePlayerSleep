@@ -62,6 +62,7 @@ public class OnSleepChecks extends BukkitRunnable{
 		}
 
 		//only announce the first bed entry, and only when there's more than one player to see it
+		Long sleepDelay = (Long)this.config.getConfigValue("sleepDelay", 60);
 		if(numSleepingPlayers < 2 && numPlayers >= this.config.getMinPlayers()) {
 			//async message selection and delivery
 			new AnnounceSleep(this.plugin, this.config, this.player.getName(), this.world).runTaskAsynchronously(this.plugin);
@@ -69,23 +70,22 @@ public class OnSleepChecks extends BukkitRunnable{
 			//start sleep task
 			if(plugin.doSleep.containsKey(this.world)) plugin.doSleep.remove(this.world);
 			plugin.doSleep.put(this.world, new PassTime(this.plugin, this.config, this.world)
-					.runTaskLater(this.plugin, config.config.getInt("sleepDelay")));
+					.runTaskLater(this.plugin, sleepDelay));
 		}
 		
 		//set up clear weather task for later
 		if(!plugin.clearWeather.containsKey(this.world)) {
 			//calculate how long to wait before clearing weather
-			Long dT = (this.config.config.getLong("stopTime") - this.world.getTime()) / this.config.config.getLong("increment");
-			Long cap = (this.world.getTime() - this.config.config.getLong("startTime")) / this.config.config.getLong("increment");
+			Long dT = (this.config.getStopTime(this.world.getName()) - this.world.getTime()) / (Long) this.config.getConfigValue("increment", 150);
+			Long cap = (this.world.getTime() - this.config.getStartTime(this.world.getName())) / (Long) this.config.getConfigValue("increment", 150);
 			
 			//calculate how long to clear weather for
 			Double randomFactor = new Random().nextDouble()*168000;
 			Long duration = 12000 + randomFactor.longValue();
 			
 			//start task
-			if(dT>1 && cap>=0) plugin.clearWeather.put(this.world, new ClearWeather(this.world,duration).runTaskLater(this.plugin, dT+this.config.config.getLong("sleepDelay")));
-			else plugin.clearWeather.put(this.world, new ClearWeather(this.world,duration).runTaskLater(this.plugin, 2*this.config.config.getLong("sleepDelay")));
+			if(dT>1 && cap>=0) this.plugin.clearWeather.put(this.world, new ClearWeather(this.world,duration).runTaskLater(this.plugin, dT+sleepDelay));
+			else this.plugin.clearWeather.put(this.world, new ClearWeather(this.world,duration).runTaskLater(this.plugin, 2*sleepDelay));
 		}
 	}
-
 }

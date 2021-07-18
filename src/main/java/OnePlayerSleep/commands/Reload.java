@@ -15,7 +15,8 @@ public class Reload implements CommandExecutor {
 	private Config config;
 	
 	public Reload(OnePlayerSleep plugin, Config config) {
-		this.plugin = plugin;this.config = config;
+		this.plugin = plugin;
+		this.config = config;
 	}
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

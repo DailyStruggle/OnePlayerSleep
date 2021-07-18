@@ -1,10 +1,12 @@
 package OnePlayerSleep.bukkitTasks;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
 import OnePlayerSleep.tools.Config;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class PassTime extends BukkitRunnable{
@@ -30,34 +32,31 @@ public class PassTime extends BukkitRunnable{
 
 	@Override
 	public void run() {
-		String myWorldName = dims.matcher(this.world.getName()).replaceAll("");
-		Boolean syncDimensionTime = this.config.config.getBoolean("syncDimensionTime", false);
-		Boolean syncWorldTime = this.config.config.getBoolean("syncWorldTime", false);
-		if (this.world.getTime() < config.config.getInt("stopTime")
-				&& this.world.getTime() >= config.config.getInt("startTime")) {
-			this.world.setTime(this.world.getTime() + config.config.getInt("increment"));
+		//while in the given timespan, set time
+		List<String> worldNames = this.config.getSyncWorlds(this.world.getName());
+		if (this.world.getTime() < this.config.getStopTime(this.world.getName())
+				&& this.world.getTime() >= this.config.getStartTime(this.world.getName())) {
+			Long newTime = this.world.getTime() + (Long) config.getConfigValue("increment",150);
 			this.plugin.doSleep.remove(this.world);
 			this.plugin.doSleep.put(this.world, new PassTime(this.plugin, this.config, this.world, true)
-					.runTaskLater(this.plugin, this.config.config.getLong("timeBetweenIncrements", 4)));
-			if (syncWorldTime || syncDimensionTime) {
-				for (World w : this.plugin.numPlayers.keySet()) {
-					String theirWorldName = dims.matcher(w.getName()).replaceAll("");
-					if (!syncWorldTime && !myWorldName.equals(theirWorldName)) continue;
-					if (!syncDimensionTime && !this.world.getEnvironment().equals(w.getEnvironment())) continue;
-					w.setTime(world.getTime());
-				}
+					.runTaskLater(this.plugin, (Long)this.config.getConfigValue("timeBetweenIncrements", 150)));
+
+			//update all synced worlds
+			for(String worldName : worldNames) {
+				World targetWorld = Bukkit.getWorld(worldName);
+				targetWorld.setTime(newTime);
 			}
 			return;
 		}
 
-		for (World w : this.plugin.numPlayers.keySet()) {
-			String theirWorldName = dims.matcher(w.getName()).replaceAll("");
-			if (!syncWorldTime && !myWorldName.equals(theirWorldName)) continue;
-			if (!syncDimensionTime && !this.world.getEnvironment().equals(w.getEnvironment())) continue;
-			this.plugin.doSleep.remove(w);
-			if (didNightPass) this.plugin.doSleep.put(w, new ClearWeather(w).runTask(this.plugin));
-			else this.plugin.doSleep.put(w, new ClearWeather(w).runTaskLater(this.plugin, this.config.config.getLong("sleepDelay")));
+		//else clear weather and stop
+		this.plugin.doSleep.remove(this.world);
+		for(String worldName : worldNames) {
+			World targetWorld = Bukkit.getWorld(worldName);
+			if (didNightPass) this.plugin.clearWeather.put(targetWorld, new ClearWeather(targetWorld).runTask(this.plugin));
+			else this.plugin.clearWeather.put(this.world, new ClearWeather(targetWorld).runTaskLater(this.plugin, (Long)this.config.getConfigValue("sleepDelay",60)));
 		}
+
 		this.cancel();
 		this.plugin.doSleep.remove(this.world);
 	}

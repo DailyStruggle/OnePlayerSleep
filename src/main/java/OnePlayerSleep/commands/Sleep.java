@@ -36,11 +36,13 @@ public class Sleep implements CommandExecutor {
 		}
 
 		if(perms.containsKey(args[0])) {
-			if(!sender.hasPermission(perms.get(args[0]))) return false;
-			plugin.getCommand("sleep " + args[0]).execute(sender, label, Arrays.copyOfRange(args, 1, args.length));
+			if(!sender.hasPermission(perms.get(args[0]))) {
+				sender.sendMessage(this.config.getLog("noPerms"));
+			}
+			else plugin.getCommand("sleep " + args[0]).execute(sender, label, Arrays.copyOfRange(args, 1, args.length));
 		}
 		else {
-			String msg = this.plugin.getPluginConfig().messages.getString("badArgs");
+			String msg = this.config.getLog("badArg", args[0]);
 			msg = ChatColor.translateAlternateColorCodes('&',msg);
 			sender.sendMessage(msg);
 		}

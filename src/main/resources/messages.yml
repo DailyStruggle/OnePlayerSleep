@@ -21,8 +21,6 @@
 #
 #   %vault_prefix% (requires vault)
 
-badArgs: "&cinvalid sleep command arguments"
-
 #dimension placeholders
 dimensions:
     NORMAL: "&f[&aoverworld&f]"

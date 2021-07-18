@@ -28,7 +28,7 @@ public class onPlayerBedLeave implements Listener {
 	
 	@EventHandler
 	public void onPlayerBedLeave (PlayerBedLeaveEvent event) {
-		Boolean messageFromSleepingIgnored = config.config.getBoolean("messageFromSleepingIgnored", true);
+		Boolean messageFromSleepingIgnored = (Boolean) config.getConfigValue("messageFromSleepingIgnored", true);
 		if(messageFromSleepingIgnored && event.getPlayer().isSleepingIgnored()) return;
 		if(event.getPlayer().hasPermission("sleep.ignore")) return;
 
@@ -63,7 +63,7 @@ public class onPlayerBedLeave implements Listener {
 				this.plugin.clearWeather.get(w).cancel();
 				this.plugin.clearWeather.remove(w);
 				this.plugin.clearWeather.put(w, new ClearWeather(w).runTask(this.plugin));
-				if(this.config.config.getBoolean("resetAllStatistics")) {
+				if((Boolean)this.config.getConfigValue("resetAllStatistics", true)) {
 					for (Player p : w.getPlayers()) {
 						if(p.hasPermission("sleep.ignore")) continue;
 						p.setStatistic(Statistic.TIME_SINCE_REST, 0);

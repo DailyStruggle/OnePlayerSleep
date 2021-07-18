@@ -29,11 +29,10 @@ public class AnnounceWakeup extends BukkitRunnable{
 	
 	@Override
 	public void run() {
-		Boolean messageToSleepingIgnored = config.config.getBoolean("messageToSleepingIgnored");
+		Boolean messageToSleepingIgnored = (Boolean) config.getConfigValue("messageToSleepingIgnored",true);
 
 		//format and ship it
-		List<String> worldNames = this.config.worlds.getConfigurationSection(this.world.getName()).getStringList("sendTo");
-		for (String worldName : worldNames) {
+		for (String worldName : this.config.getMsgToWorlds(this.world.getName())) {
 
 			for(Player p : Bukkit.getWorld(worldName).getPlayers()) {
 				if (!messageToSleepingIgnored && p.isSleepingIgnored()) continue;
