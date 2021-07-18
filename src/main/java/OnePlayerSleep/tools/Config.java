@@ -87,7 +87,7 @@ public class Config {
 		}
 		this.messages = YamlConfiguration.loadConfiguration(f);
 
-		if( 	(this.messages.getDouble("version") < 2.0) ) {
+		if( 	(this.messages.getDouble("version") < 2.1) ) {
 			Bukkit.getLogger().log(Level.WARNING, this.getLog("oldFile", "messages.yml"));
 			this.renameFileInPluginDir("messages.yml","messages.old.yml");
 			
