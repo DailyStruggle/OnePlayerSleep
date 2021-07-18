@@ -108,7 +108,7 @@ public class Config {
 			this.renameFileInPluginDir("worlds.yml","worlds.old.yml");
 
 			this.plugin.saveResource("worlds.yml", false);
-			this.messages = YamlConfiguration.loadConfiguration(f);
+			this.worlds = YamlConfiguration.loadConfiguration(f);
 		}
 
 		//update world list and save
@@ -487,7 +487,7 @@ public class Config {
 	}
 
 	public String getServerWorldName() {
-		return this.messages.getConfigurationSection("server").getString("world");
+		return this.messages.getConfigurationSection("server").getString("world", "world");
 	}
 
 	public Boolean logMessages() {

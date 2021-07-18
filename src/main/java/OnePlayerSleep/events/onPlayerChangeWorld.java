@@ -26,7 +26,7 @@ public class onPlayerChangeWorld implements Listener {
     @EventHandler
     public void onPlayerChangeWorld(PlayerChangedWorldEvent event){
         Boolean messageFromSleepingIgnored = (Boolean) config.getConfigValue("messageFromSleepingIgnored", true);
-        if(messageFromSleepingIgnored && event.getPlayer().isSleepingIgnored()) return;
+        if(!messageFromSleepingIgnored && event.getPlayer().isSleepingIgnored()) return;
         if(event.getPlayer().hasPermission("sleep.ignore"))
             return;
 

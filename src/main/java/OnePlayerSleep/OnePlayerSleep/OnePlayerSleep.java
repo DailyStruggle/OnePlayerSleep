@@ -82,7 +82,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 			for (Player p : w.getPlayers()){
 				if(p.hasPermission("sleep.ignore")) continue;
 				this.numPlayers.put(w, this.numPlayers.get(w)+1);
-				if(messageFromSleepingIgnored && p.isSleepingIgnored()) continue;
+				if(!messageFromSleepingIgnored && p.isSleepingIgnored()) continue;
 				if(p.isSleeping()){
 					if(!this.sleepingPlayers.containsKey(w)){
 						this.sleepingPlayers.put(w, new HashSet<>());

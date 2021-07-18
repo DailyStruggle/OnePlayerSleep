@@ -29,7 +29,7 @@ public class onPlayerBedLeave implements Listener {
 	@EventHandler
 	public void onPlayerBedLeave (PlayerBedLeaveEvent event) {
 		Boolean messageFromSleepingIgnored = (Boolean) config.getConfigValue("messageFromSleepingIgnored", true);
-		if(messageFromSleepingIgnored && event.getPlayer().isSleepingIgnored()) return;
+		if(!messageFromSleepingIgnored && event.getPlayer().isSleepingIgnored()) return;
 		if(event.getPlayer().hasPermission("sleep.ignore")) return;
 
 		//remove player from sleep lookup table
