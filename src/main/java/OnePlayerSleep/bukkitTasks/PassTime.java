@@ -34,10 +34,11 @@ public class PassTime extends BukkitRunnable{
 	public void run() {
 		//while in the given timespan, set time
 		List<String> worldNames = this.config.getSyncWorlds(this.world.getName());
-		Integer timeBetweenIncrements = (Integer) config.getConfigValue("increment",150);
+		Integer timeBetweenIncrements = (Integer) config.getConfigValue("timeBetweenIncrements",2);
+		Integer incrementAmount = (Integer) config.getConfigValue("increment",150);
 		if (this.world.getTime() < this.config.getStopTime(this.world.getName())
 				&& this.world.getTime() >= this.config.getStartTime(this.world.getName())) {
-			Long newTime = this.world.getTime() + timeBetweenIncrements;
+			Long newTime = this.world.getTime() + incrementAmount;
 			this.plugin.doSleep.remove(this.world);
 			this.plugin.doSleep.put(this.world,
 					new PassTime(this.plugin, this.config, this.world, true)
