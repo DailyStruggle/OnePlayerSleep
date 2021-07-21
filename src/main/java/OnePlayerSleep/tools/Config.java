@@ -53,7 +53,7 @@ public class Config {
 		}
 		this.lang = YamlConfiguration.loadConfiguration(f);
 
-		if( 	(this.lang.getDouble("version") < 1.1) ) {
+		if( 	(this.lang.getDouble("version") < 1.0) ) {
 			Bukkit.getLogger().log(Level.WARNING, this.getLog("oldFile", "lang.yml"));
 			updateLang();
 
@@ -205,7 +205,7 @@ public class Config {
 		for (String line : linesInDefaultConfig) {
 			String newline = line;
 			if (line.startsWith("version:")) {
-				newline = "version: 1.1";
+				newline = "version: 1.0";
 			} else {
 				for (String node : oldValues.keySet()) {
 					if (line.startsWith(node + ":")) {
@@ -512,8 +512,7 @@ public class Config {
 		switch(key) {
 			case "oldFile": replace = "[filename]"; break;
 			case "noGlobalPerms":
-			case "invalidWorld":
-			case "newWorld": replace = "[worldName]"; break;
+			case "invalidWorld": replace = "[worldName]"; break;
 			case "invalidList": replace = "[list]"; break;
 			case "invalidMsg": replace = "[msg]"; break;
 			case "noPerms":
@@ -552,15 +551,6 @@ public class Config {
 			return false;
 		}
 		else if( !worldKnown ) {
-			Bukkit.getLogger().log(Level.WARNING, this.getLog("newWorld", worldName));
-			this.worlds.set(worldName,this.worlds.getConfigurationSection("default"));
-			ConfigurationSection worldCfg = this.worlds.getConfigurationSection("default");
-			worldCfg.set("name", worldName);
-			worldCfg.set("sendTo", worldCfg.getStringList("sendTo").add(worldName));
-			worldCfg.set("timeSync", worldCfg.getStringList("timeSync").add(worldName));
-			if(!(Bukkit.getWorld(worldName).getEnvironment().equals(World.Environment.NORMAL)))
-				worldCfg.set("cancelBedExplode", false);
-			this.worlds.set(worldName, worldCfg);
 			this.fillWorldsFile(); //not optimal but it works
 		}
 		return true;

@@ -35,6 +35,7 @@ public class onPlayerBedLeave implements Listener {
 		//remove player from sleep lookup table
 		World myWorld = event.getPlayer().getWorld();
 		String myWorldName = myWorld.getName();
+		this.config.checkWorldExists(myWorldName);
 		if(		this.plugin.sleepingPlayers.containsKey(myWorld) &&
 				this.plugin.sleepingPlayers.get(myWorld).contains(event.getPlayer())){
 			this.plugin.sleepingPlayers.get(myWorld).remove(event.getPlayer());
@@ -44,6 +45,7 @@ public class onPlayerBedLeave implements Listener {
 		Long numSleepingPlayers = Long.valueOf(0);
 		for(String theirWorldName : this.config.getSyncWorlds(event.getBed().getWorld().getName()))
 		{
+			this.config.checkWorldExists(theirWorldName);
 			if(this.plugin.sleepingPlayers.containsKey(Bukkit.getWorld(theirWorldName)))
 				numSleepingPlayers += this.plugin.sleepingPlayers.get(Bukkit.getWorld(theirWorldName)).size();
 		}

@@ -9,8 +9,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 
-import java.util.HashSet;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class onPlayerChangeWorld implements Listener {
