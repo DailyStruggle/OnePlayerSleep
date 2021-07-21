@@ -104,6 +104,13 @@ public class Test implements CommandExecutor {
 
 		for( Message message : res) {
 			if(message == null) continue;
+			if(!isPlayer) {
+				World w = Bukkit.getWorld(worldName);
+				message.setWorld(worldName);
+				message.msg.setText(this.config.fillPlaceHolders(message.msg.getText(),w));
+				message.hoverText = this.config.fillPlaceHolders(message.hoverText,w);
+			}
+
 			List<String> msgToWorldNames = this.config.getMsgToWorlds(worldName);
 			for(String msgToWorldName : msgToWorldNames) {
 				new AnnounceSleep(this.plugin,this.config,playerName,Bukkit.getWorld(msgToWorldName),message).runTaskAsynchronously(this.plugin);

@@ -93,6 +93,8 @@ public class Config {
 
 		//load up message map for quick selection later
 		Set<String> messageListNames = this.messages.getConfigurationSection("messages").getKeys(false);
+		this.messageLookup = new HashMap<>();
+		this.totalChance = new HashMap<>();
 		for(String messageListName : messageListNames) {
 			Set<String> messageNames = this.messages.getConfigurationSection("messages").getConfigurationSection(messageListName).getKeys(false);
 
@@ -106,7 +108,7 @@ public class Config {
 				String response 	= ChatColor.translateAlternateColorCodes('&', message.getString("wakeup", "[player] says &cWake up!"));
 				String cantWakeup 	= ChatColor.translateAlternateColorCodes('&', message.getString("cantWakeup", "&csomeone's a deep sleeper"));
 				Double chance = message.getDouble("chance");
-				messageLookup.put(totalChance, new Message(new String(), message.getName(), msg, hover_msg, response, cantWakeup, chance));
+				messageLookup.put(totalChance, new Message(new String(), messageListName+"."+message.getName(), msg, hover_msg, response, cantWakeup, chance));
 				totalChance += chance;
 			}
 			this.messageLookup.putIfAbsent(messageListName,messageLookup);
@@ -122,7 +124,7 @@ public class Config {
 		}
 		this.worlds = YamlConfiguration.loadConfiguration(f);
 
-		if( 	(this.worlds.getDouble("version") < 1.1) ) {
+		if( 	(this.worlds.getDouble("version") < 1.2) ) {
 			Bukkit.getLogger().log(Level.WARNING, this.getLog("oldFile", "worlds.yml"));
 			this.renameFileInPluginDir("worlds.yml","worlds.old.yml");
 
@@ -150,9 +152,9 @@ public class Config {
 			return null;
 		}
 
-		Random r2 = new Random();
-		Double randomValue2 = (this.totalChance.get(listName)) * r2.nextDouble();
-		Message res = this.messageLookup.get(listName).floorEntry(randomValue2).getValue();
+		Random r = new Random();
+		Double randomValue = (this.totalChance.get(listName)) * r.nextDouble();
+		Message res = this.messageLookup.get(listName).floorEntry(randomValue).getValue();
 
 		String msg = fillPlaceHolders(res.msg.getText(), playerName);
 		String hover_msg = fillPlaceHolders(res.hoverText, playerName);
@@ -174,7 +176,7 @@ public class Config {
 			String response = fillPlaceHolders(cfg.getString("wakeup", "[player] says &cWake up!"), playerName);
 			String cantWakeup = fillPlaceHolders(cfg.getString("cantWakeup", "&csomeone's a deep sleeper"), playerName);
 			Double chance = cfg.getDouble("chance");
-			res = new Message(new String(), messageName, msg, hover_msg, response, cantWakeup, chance);
+			res = new Message(new String(), listName+"."+messageName, msg, hover_msg, response, cantWakeup, chance);
 		} else res = null;
 
 		return res;
@@ -304,7 +306,7 @@ public class Config {
 						if(linesInWorlds.get(linesInWorlds.size()-1).length() < 4)
 							linesInWorlds.set(linesInWorlds.size()-1,"    " + worldName + ":");
 						else linesInWorlds.add(worldName + ":");
-						linesInWorlds.add("    placeholder: \"" + worldName + "\"");
+						linesInWorlds.add("    name: \"[" + worldName + "]\"");
 						linesInWorlds.add("    msgGroup: \"" + defaultMessageGroup + "\"");
 						linesInWorlds.add("    sendTo:");
 						linesInWorlds.add("        - \"" + worldName + "\"");
@@ -445,8 +447,19 @@ public class Config {
 		return worlds.getConfigurationSection(worldName).getStringList("timeSync");
 	}
 
+	public String fillPlaceHolders(String res, World world) {
+		if(res == null || res.isEmpty()) return res;
+
+		String worldName = this.getWorldPlaceholder(world.getName());
+		String dimName = this.getDimensionPlaceholder(world.getEnvironment());
+		res = res.replace("[world]", worldName);
+		res = res.replace("[dimension]", dimName);
+
+		return res;
+	}
+
 	public String fillPlaceHolders(String res, String playerName) {
-		if(res.isEmpty()) return res;
+		if(res == null || res.isEmpty()) return res;
 
 		Boolean isPlayer = !playerName.equals(this.getServerName());
 

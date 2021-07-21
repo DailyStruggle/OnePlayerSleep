@@ -1,8 +1,8 @@
 #default placeholders:
 #[username] - player doing the thing, using username
 #[displayname] - player doing the thing, using displayname
-#[world] - world the player is in, minus the dimension substring
-#[dimension] - dimension the player is in
+#[world] - world the player is in, using 'name' in worlds.yml
+#[dimension] - dimension the player is in, using dimension placeholders
 
 #useful PAPI placeholders:
 #   %player_name% 
