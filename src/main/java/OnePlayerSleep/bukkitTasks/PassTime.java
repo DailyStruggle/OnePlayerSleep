@@ -7,10 +7,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import OnePlayerSleep.tools.Config;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class PassTime extends BukkitRunnable{
-	private static final Pattern dims = Pattern.compile("_nether|_the_end", Pattern.CASE_INSENSITIVE);
 	private OnePlayerSleep plugin;
 	private Config config;
 	private World world;

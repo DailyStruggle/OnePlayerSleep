@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Config {
@@ -26,8 +25,6 @@ public class Config {
 	private FileConfiguration worlds;
 	private FileConfiguration lang;
 	public String version;
-
-	private static final Pattern dims = Pattern.compile("_nether|_the_end", Pattern.CASE_INSENSITIVE);
 
 	//key: message list name
 	//value: lookup table for values

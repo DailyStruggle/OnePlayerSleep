@@ -4,22 +4,17 @@ import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import OnePlayerSleep.bukkitTasks.AnnounceWakeup;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import OnePlayerSleep.tools.Config;
 import OnePlayerSleep.types.Message;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class Wakeup implements CommandExecutor {
-	private static final Pattern dims = Pattern.compile("_nether|_the_end", Pattern.CASE_INSENSITIVE);
 	OnePlayerSleep plugin;
 	Config config;
 	

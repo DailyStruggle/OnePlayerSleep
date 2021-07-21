@@ -11,13 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import OnePlayerSleep.tools.Config;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-
 public class onPlayerBedLeave implements Listener {
-	private static final Pattern dims = Pattern.compile("_nether|_the_end", Pattern.CASE_INSENSITIVE);
 	private OnePlayerSleep plugin;
 	private Config config;
 	

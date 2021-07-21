@@ -1,7 +1,6 @@
 package OnePlayerSleep.bukkitTasks;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -9,13 +8,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import OnePlayerSleep.tools.Config;
 import OnePlayerSleep.types.Message;
 
-import java.util.List;
 import java.util.logging.Level;
-import java.util.regex.Pattern;
 
 //set up message threads for all relevant players
 public class AnnounceSleep extends BukkitRunnable{
-	private static final Pattern dims = Pattern.compile("_nether|_the_end", Pattern.CASE_INSENSITIVE);
 	private OnePlayerSleep plugin;
 	private Config config;
 	private String playerName;

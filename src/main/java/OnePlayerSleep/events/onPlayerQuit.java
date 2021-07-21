@@ -2,20 +2,13 @@ package OnePlayerSleep.events;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import OnePlayerSleep.tools.Config;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 public class onPlayerQuit implements Listener {
-    private static final Pattern dims = Pattern.compile("_nether|_the_end", Pattern.CASE_INSENSITIVE);
     private OnePlayerSleep plugin;
     private Config config;
 

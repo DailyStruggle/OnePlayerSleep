@@ -2,7 +2,6 @@ package OnePlayerSleep.bukkitTasks;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -10,10 +9,8 @@ import OnePlayerSleep.tools.Config;
 
 import java.util.*;
 import java.util.logging.Level;
-import java.util.regex.Pattern;
 
 public class OnSleepChecks extends BukkitRunnable{
-	private static final Pattern dims = Pattern.compile("_nether|_the_end", Pattern.CASE_INSENSITIVE);
 	private OnePlayerSleep plugin;
 	private Config config;
 	private Player player;

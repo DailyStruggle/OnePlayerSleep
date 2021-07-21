@@ -7,9 +7,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import OnePlayerSleep.tools.Config;
 
-import java.util.ArrayList;
-import java.util.regex.Pattern;
-
 public class onWeatherChange implements Listener {
 	private Config config;
 
