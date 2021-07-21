@@ -35,6 +35,7 @@ public class TabComplete implements TabCompleter {
 		String myWorldName = (sender instanceof Player) ?
 				((Player)sender).getWorld().getName() :
 				this.config.getServerWorldName();
+		this.config.checkWorldExists(myWorldName);
 
 		switch(args.length){
 			case 1: { //sleep subcommands

@@ -37,41 +37,29 @@ public class Test implements CommandExecutor {
 		String worldName = isPlayer
 				? ((Player)sender).getWorld().getName()
 				: this.config.getServerWorldName();
+		if(args.length > 0) worldName = args[0];
+		if(!this.config.checkWorldExists(worldName)) {
+			if(isPlayer) sender.sendMessage(this.config.getLog("invalidWorld", worldName));
+			return true;
+		}
+
 
 		Message[] res;
 		switch(args.length) {
 			case 0: //if just /sleep test, pick 1 random message from player's world
 			{
 				res = new Message[1];
-				World world = Bukkit.getWorld(worldName);
-				if(world != null) {
-					res[0] = this.plugin.getPluginConfig().pickRandomMessage(world, playerName);
-				}
-				else {
-					sender.sendMessage(this.config.getLog("invalidWorld", worldName));
-				}
+				res[0] = this.plugin.getPluginConfig().pickRandomMessage(Bukkit.getWorld(worldName), playerName);
 				break;
 			}
 			case 1: //if world arg, pick 1 random message from the world's list
 			{
 				res = new Message[1];
-				World w = Bukkit.getWorld(args[0]);
-				if(w == null) {
-					sender.sendMessage(this.config.getLog("invalidWorld", worldName));
-					return true;
-				}
-				res[0] = this.plugin.getPluginConfig().pickRandomMessage(w, playerName);
+				res[0] = this.plugin.getPluginConfig().pickRandomMessage(Bukkit.getWorld(args[0]), playerName);
 				break;
 			}
 			default: //if world arg and message args
 			{
-				World w = Bukkit.getWorld(args[0]);
-				if(w == null) {
-					sender.sendMessage(this.config.getLog("invalidWorld", worldName));
-					return true;
-				}
-				worldName = args[0];
-
 				res = new Message[args.length-1];
 				Set<String> messageListNames = this.config.getMessageListNames();
 				for( int i = 0; i<res.length; i++)
@@ -116,21 +104,9 @@ public class Test implements CommandExecutor {
 
 		for( Message message : res) {
 			if(message == null) continue;
-			World world = Bukkit.getWorld(message.worldName);
-			if(world == null) {
-				sender.sendMessage(this.config.getLog("invalidWorld", message.worldName));
-				continue;
-			}
-
 			List<String> msgToWorldNames = this.config.getMsgToWorlds(worldName);
 			for(String msgToWorldName : msgToWorldNames) {
-				World msgToWorld = Bukkit.getWorld(msgToWorldName);
-				if(msgToWorld == null) {
-					sender.sendMessage(this.config.getLog("invalidWorld", message.worldName));
-					continue;
-				}
-
-				new AnnounceSleep(this.plugin,this.config,playerName,msgToWorld,message).runTaskAsynchronously(this.plugin);
+				new AnnounceSleep(this.plugin,this.config,playerName,Bukkit.getWorld(msgToWorldName),message).runTaskAsynchronously(this.plugin);
 			}
 		}
 		return true;

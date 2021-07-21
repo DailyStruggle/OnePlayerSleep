@@ -33,12 +33,12 @@ public class PAPI_expansion extends PlaceholderExpansion{
 
 	@Override
 	public @NotNull String getIdentifier() {
-		return "oneplayersleep";
+		return "onePlayerSleep";
 	}
 
 	@Override
     public @NotNull String getVersion(){
-        return "3.1.2";
+        return "3.1.3";
     }
 	
 	@Override

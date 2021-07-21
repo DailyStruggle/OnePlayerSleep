@@ -14,9 +14,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import OnePlayerSleep.tools.Config;
 import OnePlayerSleep.types.Message;
-import org.bukkit.event.player.PlayerBedLeaveEvent;
-
-import java.util.logging.Level;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -42,27 +39,30 @@ public class Wakeup implements CommandExecutor {
 		String myWorldName = isPlayer
 				? ((Player)sender).getWorld().getName()
 				: config.getServerWorldName();
+		this.config.checkWorldExists(myWorldName);
 
 		Boolean cantKickAPlayer = false;
 
-		String cmdWorldName;
+		String cmdWorldName = isPlayer
+				? ((Player)sender).getWorld().getName()
+				: this.config.getServerWorldName();
+		if(args.length > 0) cmdWorldName = args[0];
+		if(!this.config.checkWorldExists(cmdWorldName)) {
+			if(isPlayer) sender.sendMessage(this.config.getLog("invalidWorld", cmdWorldName));
+			return true;
+		};
 		Message msg;
 		switch(args.length) {
 			case 0: { //no args, use last message given to player
 				if(isPlayer) msg = this.plugin.wakeData.get(sender);
 				else msg = config.pickRandomMessage(Bukkit.getWorld(myWorldName), playerName);
-				cmdWorldName = (isPlayer) ?
-						((Player)sender).getWorld().getName() :
-						this.config.getServerWorldName();
 				break;
 			}
 			case 1: { //only world name
-				cmdWorldName = args[0];
 				msg = config.pickRandomMessage(Bukkit.getWorld(args[0]), playerName);
 				break;
 			}
 			default: { //world name + message name
-				cmdWorldName = args[0];
 				Set<String> listNames = this.config.getMessageListNames();
 				Integer delimiterIdx = args[1].indexOf('.');
 				if(delimiterIdx > 0) {

@@ -24,8 +24,7 @@ public class onPlayerJoin implements Listener {
             return;
 
         World myWorld = event.getPlayer().getWorld();
-        if(!this.plugin.numPlayers.containsKey(myWorld))
-            this.plugin.numPlayers.put(myWorld,Long.valueOf(1));
+        this.plugin.numPlayers.putIfAbsent(myWorld,Long.valueOf(1));
 
         this.plugin.numPlayers.put( event.getPlayer().getWorld() , this.plugin.numPlayers.get(event.getPlayer().getWorld())+1 );
     }

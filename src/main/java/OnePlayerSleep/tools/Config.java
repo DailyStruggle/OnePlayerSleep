@@ -1,7 +1,6 @@
 package OnePlayerSleep.tools;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -54,7 +53,7 @@ public class Config {
 		}
 		this.lang = YamlConfiguration.loadConfiguration(f);
 
-		if( 	(this.lang.getDouble("version") < 1.0) ) {
+		if( 	(this.lang.getDouble("version") < 1.1) ) {
 			Bukkit.getLogger().log(Level.WARNING, this.getLog("oldFile", "lang.yml"));
 			updateLang();
 
@@ -95,26 +94,6 @@ public class Config {
 			this.messages = YamlConfiguration.loadConfiguration(f);
 		}
 
-		//load worlds.yml file
-		f = new File(this.plugin.getDataFolder(), "worlds.yml");
-		if(!f.exists())
-		{
-			plugin.saveResource("worlds.yml", false);
-		}
-		this.worlds = YamlConfiguration.loadConfiguration(f);
-
-		if( 	(this.worlds.getDouble("version") < 1.1) ) {
-			Bukkit.getLogger().log(Level.WARNING, this.getLog("oldFile", "worlds.yml"));
-			this.renameFileInPluginDir("worlds.yml","worlds.old.yml");
-
-			this.plugin.saveResource("worlds.yml", false);
-			this.worlds = YamlConfiguration.loadConfiguration(f);
-		}
-
-		//update world list and save
-		this.fillWorldsFile();
-		this.worlds = YamlConfiguration.loadConfiguration(f);
-
 		//load up message map for quick selection later
 		Set<String> messageListNames = this.messages.getConfigurationSection("messages").getKeys(false);
 		for(String messageListName : messageListNames) {
@@ -137,80 +116,42 @@ public class Config {
 			this.totalChance.putIfAbsent(messageListName,totalChance);
 		}
 
-		//table of worlds ordered by dimension for quick lookup
-		Map<World.Environment,List<String>> dimWorldList = new HashMap<>();
-		for(World.Environment e : World.Environment.values()) {
-			dimWorldList.put(e, new ArrayList<>());
+
+		//load worlds.yml file
+		f = new File(this.plugin.getDataFolder(), "worlds.yml");
+		if(!f.exists())
+		{
+			plugin.saveResource("worlds.yml", false);
 		}
-		for(String worldName : this.worlds.getKeys(false)) {
-			if(worldName.equals("default") || worldName.equals("version")) continue;
-			World w = Bukkit.getWorld(worldName);
-			if(w == null) {
-				Bukkit.getLogger().log(Level.WARNING, this.getLog("invalidWorld", worldName));
-				continue;
-			}
-			dimWorldList.get(w.getEnvironment()).add(worldName);
+		this.worlds = YamlConfiguration.loadConfiguration(f);
+
+		if( 	(this.worlds.getDouble("version") < 1.1) ) {
+			Bukkit.getLogger().log(Level.WARNING, this.getLog("oldFile", "worlds.yml"));
+			this.renameFileInPluginDir("worlds.yml","worlds.old.yml");
+
+			this.plugin.saveResource("worlds.yml", false);
+			this.worlds = YamlConfiguration.loadConfiguration(f);
 		}
 
-		//reconfigure placeholders as world names
-		for(String worldName : this.worlds.getKeys(false)) {
-			if(worldName.equals("default") || worldName.equals("version")) continue;
-			List<String> sendTo = this.worlds.getConfigurationSection(worldName).getStringList("sendTo");
-			List<String> timeSync = this.worlds.getConfigurationSection(worldName).getStringList("timeSync");
-			List<String> sendToNew = new ArrayList<>();
-			List<String> timeSyncNew = new ArrayList<>();
-			for(String p : sendTo) {
-				if(p.equals("ALL")) {
-					sendToNew.addAll(Bukkit.getWorlds().stream().map(world -> world.getName()).collect(Collectors.toList()));
-					continue;
-				}
-				try{
-					World.Environment env = World.Environment.valueOf(p);
-					sendToNew.addAll(dimWorldList.get(env));
-					continue;
-				}
-				catch (IllegalArgumentException ex) {
-					//was not an environment, do nothing
-				}
-				sendToNew.add(p);
-			}
-			for(String p : timeSync) {
-				if(p.equals("ALL")) {
-					timeSyncNew.addAll(Bukkit.getWorlds().stream().map(world -> world.getName()).collect(Collectors.toList()));
-					continue;
-				}
-				try{
-					World.Environment env = World.Environment.valueOf(p);
-					timeSyncNew.addAll(dimWorldList.get(env));
-					continue;
-				}
-				catch (IllegalArgumentException ex) {
-					//was not an environment, do nothing
-				}
-				timeSyncNew.add(p);
-			}
-
-			this.worlds.getConfigurationSection(worldName).set("sendTo", sendToNew);
-			this.worlds.getConfigurationSection(worldName).set("timeSync", timeSyncNew);
-
-			this.getMsgToWorlds(worldName);
-		}
+		//update world list and save
+		this.fillWorldsFile();
 	}
 
 	public Message pickRandomMessage(World world, String playerName) {
+		if(!this.worlds.contains(world.getName()))
+			this.worlds.set(world.getName(),this.worlds.getConfigurationSection("default"));
 		Message res;
-		String worldName = world.getName();
-		if(!this.worlds.contains(worldName))
-			return null;
-		String listName = this.worlds.getConfigurationSection(worldName).getString("msgGroup");
+		String listName = this.worlds.getConfigurationSection(world.getName()).getString("msgGroup");
 		res = pickRandomMessage(listName, playerName);
 		res.setWorld(world.getName());
 		return res;
 	}
 
 	public Message pickRandomMessage(String listName, String playerName) {
-		if(!this.messages.getConfigurationSection("messages").contains(listName))
+		if(!this.messages.getConfigurationSection("messages").contains(listName)){
+			Bukkit.getLogger().log(Level.WARNING, this.getLog("invalidList", listName));
 			return null;
+		}
 
 		Random r2 = new Random();
 		Double randomValue2 = (this.totalChance.get(listName)) * r2.nextDouble();
@@ -246,7 +187,7 @@ public class Config {
 	private void updateLang() {
 		this.renameFileInPluginDir("lang.yml","lang.old.yml");
 		plugin.saveResource("lang.yml", false);
-		Map<String, Object> oldValues = this.config.getValues(false);
+		Map<String, Object> oldValues = this.lang.getValues(false);
 		// Read default config to keep comments
 		ArrayList<String> linesInDefaultConfig = new ArrayList<>();
 		try {
@@ -264,11 +205,11 @@ public class Config {
 		for (String line : linesInDefaultConfig) {
 			String newline = line;
 			if (line.startsWith("version:")) {
-				newline = "version: 1.0";
+				newline = "version: 1.1";
 			} else {
 				for (String node : oldValues.keySet()) {
 					if (line.startsWith(node + ":")) {
-						String quotes = "";
+						String quotes = "\"";
 						newline = node + ": " + quotes + oldValues.get(node).toString() + quotes;
 						break;
 					}
@@ -337,13 +278,16 @@ public class Config {
 		}
 	}
 
-	private void fillWorldsFile() {
+	public void fillWorldsFile() {
+		this.worlds = YamlConfiguration.loadConfiguration(new File(this.plugin.getDataFolder(), "worlds.yml"));
 		renameFileInPluginDir("worlds.yml","worlds.temp.yml");
 
 		ArrayList<String> linesInWorlds = new ArrayList<>();
 		String defaultMessageGroup = this.worlds.getConfigurationSection("default").getString("msgGroup");
 		List<String> defaultTarget = this.worlds.getConfigurationSection("default").getStringList("sendTo");
 		List<String> defaultSync = this.worlds.getConfigurationSection("default").getStringList("timeSync");
+		Integer defaultStartTime = this.worlds.getConfigurationSection("default").getInt("startTime");
+		Integer defaultStopTime = this.worlds.getConfigurationSection("default").getInt("stopTime");
 
 		try {
 			Scanner scanner = new Scanner(
@@ -356,8 +300,10 @@ public class Config {
 				if(!s.matches(".*[a-z].*")) {
 					//for each missing world, add some default data
 					for(World w : Bukkit.getWorlds()) {
-						if(this.worlds.contains(w.getName())) continue;
 						String worldName = w.getName();
+						if(this.worlds.contains(worldName)) continue;
+						this.worlds.set(worldName, this.worlds.getConfigurationSection("default"));
+
 						if(linesInWorlds.get(linesInWorlds.size()-1).length() < 4)
 							linesInWorlds.set(linesInWorlds.size()-1,"    " + worldName + ":");
 						else linesInWorlds.add(worldName + ":");
@@ -379,8 +325,8 @@ public class Config {
 							linesInWorlds.add("        - \"" + sync + "\"");
 						}
 
-						linesInWorlds.add("    startTime: 12010");
-						linesInWorlds.add("    stopTime: 23992");
+						linesInWorlds.add("    startTime: " + defaultStartTime);
+						linesInWorlds.add("    stopTime: " + defaultStopTime);
 
 						if(w.getEnvironment() != World.Environment.NORMAL)
 						{
@@ -411,6 +357,64 @@ public class Config {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		//-------------UPDATE INTERNAL VERSION ACCORDINGLY-------------
+		this.worlds = YamlConfiguration.loadConfiguration(new File(this.plugin.getDataFolder(), "worlds.yml"));
+
+		//table of worlds ordered by dimension for quick lookup
+		Map<World.Environment,List<String>> dimWorldList = new HashMap<>();
+		for(World.Environment e : World.Environment.values()) {
+			dimWorldList.put(e, new ArrayList<>());
+		}
+		for(String worldName : this.worlds.getKeys(false)) {
+			if(worldName.equals("default") || worldName.equals("version")) continue;
+			if(this.checkWorldExists(worldName))
+				dimWorldList.get(Bukkit.getWorld(worldName).getEnvironment()).add(worldName);
+		}
+
+		//reconfigure placeholders as world names
+		for(String worldName : this.worlds.getKeys(false)) {
+			if(worldName.equals("default") || worldName.equals("version")) continue;
+			List<String> sendTo = this.worlds.getConfigurationSection(worldName).getStringList("sendTo");
+			List<String> timeSync = this.worlds.getConfigurationSection(worldName).getStringList("timeSync");
+			List<String> sendToNew = new ArrayList<>();
+			List<String> timeSyncNew = new ArrayList<>();
+			for(String p : sendTo) {
+				if(p.equals("ALL")) {
+					sendToNew.addAll(Bukkit.getWorlds().stream().map(world -> world.getName()).collect(Collectors.toList()));
+					continue;
+				}
+				try{
+					World.Environment env = World.Environment.valueOf(p);
+					sendToNew.addAll(dimWorldList.get(env));
+					continue;
+				}
+				catch (IllegalArgumentException ex) {
+					//was not an environment, do nothing
+				}
+				sendToNew.add(p);
+			}
+			for(String p : timeSync) {
+				if(p.equals("ALL")) {
+					timeSyncNew.addAll(Bukkit.getWorlds().stream().map(world -> world.getName()).collect(Collectors.toList()));
+					continue;
+				}
+				try{
+					World.Environment env = World.Environment.valueOf(p);
+					timeSyncNew.addAll(dimWorldList.get(env));
+					continue;
+				}
+				catch (IllegalArgumentException ex) {
+					//was not an environment, do nothing
+				}
+				timeSyncNew.add(p);
+			}
+
+			this.worlds.getConfigurationSection(worldName).set("sendTo", sendToNew);
+			this.worlds.getConfigurationSection(worldName).set("timeSync", timeSyncNew);
+
+			this.getMsgToWorlds(worldName);
+		}
 	}
 	
 	private void renameFileInPluginDir(String oldName, String newName) {
@@ -427,7 +431,7 @@ public class Config {
 	public List<String> getMessageNames(String listName) {
 		List<String> res = new ArrayList<>();
 		if(listName == null || listName.isEmpty()) {
-			listName = this.worlds.getConfigurationSection("world").getString("msgGroup");
+			listName = this.worlds.getConfigurationSection(this.getServerWorldName()).getString("msgGroup");
 		}
 		if(!this.messages.getConfigurationSection("messages").contains(listName)) {
 			Bukkit.getLogger().log(Level.WARNING, getLog("invalidList",listName));
@@ -437,16 +441,10 @@ public class Config {
 	}
 
 	public List<String> getMsgToWorlds(String worldName) {
-		if(worldName == null || worldName.isEmpty()) {
-			worldName = this.getServerWorldName();
-		}
 		return worlds.getConfigurationSection(worldName).getStringList("sendTo");
 	}
 
 	public List<String> getSyncWorlds(String worldName) {
-		if(worldName == null || worldName.isEmpty()) {
-			worldName = this.getServerWorldName();
-		}
 		return worlds.getConfigurationSection(worldName).getStringList("timeSync");
 	}
 
@@ -465,7 +463,7 @@ public class Config {
 				? Bukkit.getPlayer(playerName).getWorld()
 				: Bukkit.getWorld( this.getServerWorldName() );
 
-		String worldName = dims.matcher(world.getName()).replaceAll("");
+		String worldName = this.getWorldPlaceholder(world.getName());
 		String dimName = this.getDimensionPlaceholder(world.getEnvironment());
 
 		res = res.replace("[username]", playerName);
@@ -478,6 +476,9 @@ public class Config {
 		return res;
 	}
 
+	public String getWorldPlaceholder(String worldName) {
+		return this.worlds.getConfigurationSection(worldName).getString("name");
+	}
 	public String getDimensionPlaceholder(World.Environment environment) {
 		return this.messages.getConfigurationSection("dimensions").getString(environment.name());
 	}
@@ -511,7 +512,8 @@ public class Config {
 		switch(key) {
 			case "oldFile": replace = "[filename]"; break;
 			case "noGlobalPerms":
-			case "invalidWorld": replace = "[worldName]"; break;
+			case "invalidWorld":
+			case "newWorld": replace = "[worldName]"; break;
 			case "invalidList": replace = "[list]"; break;
 			case "invalidMsg": replace = "[msg]"; break;
 			case "noPerms":
@@ -519,30 +521,18 @@ public class Config {
 			default: replace = "[placeholder]";
 		}
 
-		return msg.replaceAll(replace, placeholder);
+		return msg.replace(replace, placeholder);
 	}
 
 	public Integer getStartTime (String worldName) {
-		if(!this.worlds.contains(worldName)) {
-			Bukkit.getLogger().log(Level.WARNING, getLog("invalidWorld",worldName));
-			return 12010;
-		}
 		return this.worlds.getConfigurationSection(worldName).getInt("startTime", 12010);
 	}
 
 	public Integer getStopTime (String worldName) {
-		if(!this.worlds.contains(worldName)) {
-			Bukkit.getLogger().log(Level.WARNING, getLog("invalidWorld",worldName));
-			return 23992;
-		}
 		return this.worlds.getConfigurationSection(worldName).getInt("stopTime", 23992);
 	}
 
 	public Boolean getCancelBedExplode(String worldName) {
-		if(!this.worlds.contains(worldName)) {
-			Bukkit.getLogger().log(Level.WARNING, getLog("invalidWorld",worldName));
-			return false;
-		}
 		return this.worlds.getConfigurationSection(worldName).getBoolean("cancelBedExplode", false);
 	}
 
@@ -552,5 +542,27 @@ public class Config {
 
 	public Set<String> getMessageListNames() {
 		return this.messages.getConfigurationSection("messages").getKeys(false);
+	}
+
+	public Boolean checkWorldExists(String worldName) {
+		Boolean bukkitWorldExists = Bukkit.getWorld(worldName)!=null;
+		Boolean worldKnown = this.worlds.contains(worldName);
+		if( !bukkitWorldExists ) {
+			Bukkit.getLogger().log(Level.WARNING, this.getLog("invalidWorld", worldName));
+			return false;
+		}
+		else if( !worldKnown ) {
+			Bukkit.getLogger().log(Level.WARNING, this.getLog("newWorld", worldName));
+			this.worlds.set(worldName,this.worlds.getConfigurationSection("default"));
+			ConfigurationSection worldCfg = this.worlds.getConfigurationSection("default");
+			worldCfg.set("name", worldName);
+			worldCfg.set("sendTo", worldCfg.getStringList("sendTo").add(worldName));
+			worldCfg.set("timeSync", worldCfg.getStringList("timeSync").add(worldName));
+			if(!(Bukkit.getWorld(worldName).getEnvironment().equals(World.Environment.NORMAL)))
+				worldCfg.set("cancelBedExplode", false);
+			this.worlds.set(worldName, worldCfg);
+			this.fillWorldsFile(); //not optimal but it works
+		}
+		return true;
 	}
 }

@@ -34,6 +34,8 @@ public class onPlayerChangeWorld implements Listener {
         Player me = event.getPlayer();
         World from = event.getFrom();
         World to = me.getWorld();
+        this.config.checkWorldExists(from.getName());
+        this.config.checkWorldExists(to.getName());
         if(me.isSleeping()){
             Integer numSleepingPlayers = 0;
             this.plugin.sleepingPlayers.get(from).remove(me);

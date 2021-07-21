@@ -39,16 +39,18 @@ public class onPlayerQuit implements Listener {
             Integer numSleepingPlayers = 0;
             this.plugin.sleepingPlayers.get(me.getWorld()).remove(me);
 
+            this.config.checkWorldExists(myWorldName);
             for(String worldName : this.config.getSyncWorlds(myWorldName))
             {
                 numSleepingPlayers += this.plugin.sleepingPlayers.get(Bukkit.getWorld(worldName)).size();
             }
 
             if(numSleepingPlayers == 0) {
-                for (String worldName : this.config.getSyncWorlds(myWorldName)) {
-                    if( this.plugin.doSleep.containsKey(Bukkit.getWorld(worldName))) {
-                        this.plugin.doSleep.get(Bukkit.getWorld(worldName)).cancel();
-                    }
+                if( this.plugin.doSleep.containsKey(me.getWorld())) {
+                    this.plugin.doSleep.get(me.getWorld()).cancel();
+                }
+                if( this.plugin.clearWeather.containsKey(me.getWorld())) {
+                    this.plugin.clearWeather.get(me.getWorld()).cancel();
                 }
             }
         }

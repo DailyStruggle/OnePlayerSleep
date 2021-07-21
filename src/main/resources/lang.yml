@@ -11,9 +11,13 @@ cooldownMessage: "&eYou can't sleep again yet"
 # placeholder: [filename] - name of file, including file extension
 oldFile: "&b[sleep] old [filename] detected. Updating"
 
-# an invalid world lookup somewhere or on command
+# bukkit world lookup is null, i.e. not a world
 # placeholder: [worldName] - name of world attempted
 invalidWorld: "&e[sleep] could not find world '[worldName]'"
+
+# World is detected by bukkit but not by sleep, so update worlds config
+# placeholder: [worldName] - name of world attempted
+newWorld: "&e[sleep] could not find bukkit world '[worldName]' in worlds.yml. Adding..."
 
 # an invalid message list
 # placeholder: [list] - name of list attempted
@@ -48,4 +52,4 @@ wakeup: "&b/sleep wakeup - wake sleeping players"
 reload: "&b/sleep reload - reload config files"
 test: "&b/sleep test - test sleep messages"
 
-version: 1.0
+version: 1.1

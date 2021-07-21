@@ -34,7 +34,7 @@ public class onPlayerBedLeave implements Listener {
 
 		//remove player from sleep lookup table
 		World myWorld = event.getPlayer().getWorld();
-		String myWorldName = dims.matcher(myWorld.getName()).replaceAll("");
+		String myWorldName = myWorld.getName();
 		if(		this.plugin.sleepingPlayers.containsKey(myWorld) &&
 				this.plugin.sleepingPlayers.get(myWorld).contains(event.getPlayer())){
 			this.plugin.sleepingPlayers.get(myWorld).remove(event.getPlayer());

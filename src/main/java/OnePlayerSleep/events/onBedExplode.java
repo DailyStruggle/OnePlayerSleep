@@ -21,6 +21,7 @@ public class onBedExplode implements Listener {
         if (!(block.getType().toString().toLowerCase().contains("bed") && block.getType() != Material.BEDROCK))
             return;
 
+        this.config.checkWorldExists(event.getBlock().getWorld().getName());
         if(this.config.getCancelBedExplode(event.getBlock().getWorld().getName())) event.setCancelled(true);
     }
 }

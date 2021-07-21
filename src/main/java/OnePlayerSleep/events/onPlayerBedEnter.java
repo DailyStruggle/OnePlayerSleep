@@ -34,6 +34,7 @@ public class onPlayerBedEnter implements Listener {
 		if(event.getPlayer().hasPermission("sleep.ignore")) return;
 
 		World myWorld = event.getBed().getWorld();
+		this.config.checkWorldExists(myWorld.getName());
 
 		//check config to prevent explosion in a dimension, otherwise we can't do anything there
 		if(		(myWorld.getEnvironment() == World.Environment.NETHER || myWorld.getEnvironment() == World.Environment.THE_END)
