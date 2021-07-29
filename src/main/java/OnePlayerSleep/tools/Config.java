@@ -161,7 +161,7 @@ public class Config {
 		String wakeup = fillPlaceHolders(res.wakeup, playerName);
 		String cantWakeup = fillPlaceHolders(res.cantWakeup, playerName);
 		Double chance = res.chance;
-		res = new Message(new String(), (listName+"."+res.name), msg, hover_msg, wakeup, cantWakeup, chance);
+		res = new Message(new String(), (res.name), msg, hover_msg, wakeup, cantWakeup, chance);
 
 		return res;
 	}
