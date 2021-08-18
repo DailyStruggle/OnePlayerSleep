@@ -44,7 +44,7 @@ permissions:
             sleep.wakeup: true
             sleep.bypass: true
             sleep.test: true
-            sleep.withoutBed: true
+            sleep.global: true
     sleep.see:
         description: can see the sleep help menu
         default: true

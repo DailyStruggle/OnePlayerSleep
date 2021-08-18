@@ -16,24 +16,25 @@ import OnePlayerSleep.tools.PAPI_expansion;
 import OnePlayerSleep.types.Message;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class OnePlayerSleep extends JavaPlugin implements Listener {
 	private Config config;
 
-	public Map<World,BukkitTask> doSleep;
-	public Map<World,BukkitTask> clearWeather;
-	public Map<Player, Message> wakeData; //list of players receiving messages
-	public Map<World, HashSet<Player>> sleepingPlayers; //list of sleeping players for each world
-	public Map<World,Long> numPlayers;
+	public ConcurrentHashMap<World,BukkitTask> doSleep;
+	public ConcurrentHashMap<World,BukkitTask> clearWeather;
+	public ConcurrentHashMap<Player, Message> wakeData; //list of players receiving messages
+	public ConcurrentHashMap<World, HashSet<Player>> sleepingPlayers; //list of sleeping players for each world
+	public ConcurrentHashMap<World,Long> numPlayers;
 
 	@Override
 	public void onEnable() {
 		this.config = new Config(this);
-		this.numPlayers = new HashMap<>();
-		this.doSleep = new HashMap<>();
-		this.clearWeather = new HashMap<>();
-		this.wakeData = new HashMap<>();
-		this.sleepingPlayers = new HashMap<>();
+		this.numPlayers = new ConcurrentHashMap<>();
+		this.doSleep = new ConcurrentHashMap<>();
+		this.clearWeather = new ConcurrentHashMap<>();
+		this.wakeData = new ConcurrentHashMap<>();
+		this.sleepingPlayers = new ConcurrentHashMap<>();
 
 		//make /sleep work
 		Objects.requireNonNull(getCommand("sleep")).setExecutor(new Sleep(this, this.config));

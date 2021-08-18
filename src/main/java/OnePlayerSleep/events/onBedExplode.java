@@ -4,6 +4,7 @@ import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import OnePlayerSleep.tools.Config;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockExplodeEvent;
 
@@ -16,6 +17,7 @@ public class onBedExplode implements Listener {
         this.config = config;
     }
 
+    @EventHandler
     public void onBedExplode(BlockExplodeEvent event) {
         Block block = event.getBlock();
         if (!(block.getType().toString().toLowerCase().contains("bed") && block.getType() != Material.BEDROCK))

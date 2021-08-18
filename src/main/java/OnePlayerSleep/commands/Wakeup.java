@@ -119,6 +119,7 @@ public class Wakeup implements CommandExecutor {
 			World world = Bukkit.getWorld(worldName);
 			if(	!this.plugin.sleepingPlayers.containsKey(world) ) continue;
 			HashSet<Player> players = this.plugin.sleepingPlayers.get(world);
+			if(players == null) continue;
 			//attempt to wake each player
 			for(Player p : players) {
 				if(!p.isSleeping()) {
