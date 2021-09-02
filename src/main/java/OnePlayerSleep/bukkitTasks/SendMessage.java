@@ -43,14 +43,14 @@ public class SendMessage extends BukkitRunnable{
 		if(this.targetPlayer.hasPermission("sleep.ignore")) {
 			return;
 		}
-		Boolean isPlayer = (this.sourcePlayerName != this.config.getServerName());
+		Boolean isPlayer = (!this.sourcePlayerName.equals(this.config.getServerName()));
 
 		String global = this.message.msg.getText();
 		String hover = this.message.hoverText;
 		if(this.message == null) this.message = this.config.pickRandomMessage(this.sourceWorld, sourcePlayerName);
 
 		Boolean hasPAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
-		if(hasPAPI) global = PlaceholderAPI.setPlaceholders(this.targetPlayer, global);
+		if(hasPAPI && isPlayer) global = PlaceholderAPI.setPlaceholders(Bukkit.getPlayer(this.sourcePlayerName), global);
 		if(hasPAPI && isPlayer) hover = PlaceholderAPI.setPlaceholders(Bukkit.getPlayer(this.sourcePlayerName), hover);
 		String wakeup = config.fillPlaceHolders(
 				this.message.wakeup,

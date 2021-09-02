@@ -161,7 +161,7 @@ public class Config {
 		String wakeup = fillPlaceHolders(res.wakeup, playerName);
 		String cantWakeup = fillPlaceHolders(res.cantWakeup, playerName);
 		Double chance = res.chance;
-		res = new Message(new String(), (res.name), msg, hover_msg, wakeup, cantWakeup, chance);
+		res = new Message(new String(), res.name, msg, hover_msg, wakeup, cantWakeup, chance);
 
 		return res;
 	}
@@ -327,7 +327,7 @@ public class Config {
 						linesInWorlds.add("    startTime: " + defaultStartTime);
 						linesInWorlds.add("    stopTime: " + defaultStopTime);
 
-						if(w.getEnvironment() != World.Environment.NORMAL)
+						if(!w.getEnvironment().equals(World.Environment.NORMAL))
 						{
 							linesInWorlds.add("    cancelBedExplode: false");
 						}

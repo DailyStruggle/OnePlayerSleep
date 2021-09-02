@@ -1,7 +1,9 @@
 package OnePlayerSleep.bukkitTasks;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -12,10 +14,10 @@ import java.util.logging.Level;
 
 //set up message threads for all relevant players
 public class AnnounceSleep extends BukkitRunnable{
-	private OnePlayerSleep plugin;
-	private Config config;
-	private String playerName;
-	private World world;
+	private final OnePlayerSleep plugin;
+	private final Config config;
+	private final String playerName;
+	private final World world;
 	private Message message;
 
 	public AnnounceSleep(OnePlayerSleep plugin, Config config, String playerName, World world) {
@@ -60,8 +62,12 @@ public class AnnounceSleep extends BukkitRunnable{
 				}
 			}
 		}
-		if(this.config.logMessages() || this.playerName == this.config.getServerName()) {
-			Bukkit.getLogger().log(Level.INFO, this.message.msg.getText());
+		if(this.config.logMessages() || this.playerName.equals(this.config.getServerName())) {
+			String consoleMsg = this.message.msg.getText();
+			consoleMsg = ChatColor.translateAlternateColorCodes('&',consoleMsg);
+			Boolean hasPAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
+			if(hasPAPI && !this.playerName.equals(this.config.getServerName())) consoleMsg = PlaceholderAPI.setPlaceholders(Bukkit.getPlayer(playerName),consoleMsg);
+			Bukkit.getLogger().log(Level.INFO, consoleMsg);
 		}
 	}
 }

@@ -20,7 +20,7 @@ public class onBedExplode implements Listener {
     @EventHandler
     public void onBedExplode(BlockExplodeEvent event) {
         Block block = event.getBlock();
-        if (!(block.getType().toString().toLowerCase().contains("bed") && block.getType() != Material.BEDROCK))
+        if (!(block.getType().toString().toLowerCase().contains("bed") && !block.getType().equals(Material.BEDROCK)))
             return;
 
         this.config.checkWorldExists(event.getBlock().getWorld().getName());
