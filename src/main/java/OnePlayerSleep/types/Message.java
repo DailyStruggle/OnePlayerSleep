@@ -1,6 +1,5 @@
 package OnePlayerSleep.types;
 
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -17,9 +16,9 @@ public class Message {
 
 	public Message(String worldName, String name, String global, String hover, String wakeup, String cantWakeup, Double chance) {
 		this.name = name;
-		this.wakeup = ChatColor.translateAlternateColorCodes('&',wakeup);
-		this.hoverText = ChatColor.translateAlternateColorCodes('&',hover);
-		this.cantWakeup = ChatColor.translateAlternateColorCodes('&',cantWakeup);
+		this.wakeup = wakeup;
+		this.hoverText = hover;
+		this.cantWakeup = cantWakeup;
 		this.chance = chance;
 
 		this.msg = new TextComponent(global);

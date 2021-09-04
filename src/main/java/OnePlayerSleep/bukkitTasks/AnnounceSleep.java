@@ -2,14 +2,13 @@ package OnePlayerSleep.bukkitTasks;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import OnePlayerSleep.tools.Config;
 import OnePlayerSleep.types.Message;
 
+import java.util.UUID;
 import java.util.logging.Level;
 
 //set up message threads for all relevant players
@@ -19,6 +18,8 @@ public class AnnounceSleep extends BukkitRunnable{
 	private final String playerName;
 	private final World world;
 	private Message message;
+	Boolean hasPAPI;
+
 
 	public AnnounceSleep(OnePlayerSleep plugin, Config config, String playerName, World world) {
 		this.plugin = plugin;
@@ -26,6 +27,7 @@ public class AnnounceSleep extends BukkitRunnable{
 		this.playerName = playerName;
 		this.world = world;
 		this.message = null;
+		this.hasPAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
 	}
 
 	public AnnounceSleep(OnePlayerSleep plugin, Config config, String playerName, World world, Message message) {
@@ -34,6 +36,7 @@ public class AnnounceSleep extends BukkitRunnable{
 		this.playerName = playerName;
 		this.world = world;
 		this.message = message;
+		this.hasPAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
 	}
 	
 	@Override
@@ -64,9 +67,9 @@ public class AnnounceSleep extends BukkitRunnable{
 		}
 		if(this.config.logMessages() || this.playerName.equals(this.config.getServerName())) {
 			String consoleMsg = this.message.msg.getText();
-			consoleMsg = ChatColor.translateAlternateColorCodes('&',consoleMsg);
-			Boolean hasPAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
-			if(hasPAPI && !this.playerName.equals(this.config.getServerName())) consoleMsg = PlaceholderAPI.setPlaceholders(Bukkit.getPlayer(playerName),consoleMsg);
+			consoleMsg = config.fillPlaceHolders(consoleMsg,playerName);
+			UUID playerID = (playerName.equals(config.getServerName())) ? new UUID(0,0) : Bukkit.getPlayer(playerName).getUniqueId();
+			if(hasPAPI) consoleMsg = PlaceholderAPI.setPlaceholders(Bukkit.getOfflinePlayer(playerID),consoleMsg);
 			Bukkit.getLogger().log(Level.INFO, consoleMsg);
 		}
 	}
