@@ -1,9 +1,7 @@
 package OnePlayerSleep.bukkitTasks;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
-import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import me.clip.placeholderapi.PlaceholderAPI;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -60,7 +58,8 @@ public class SendMessage extends BukkitRunnable{
 		if(hasPAPI) hover = PlaceholderAPI.setPlaceholders(Bukkit.getOfflinePlayer(playerID), hover);
 
 		BaseComponent[] components = TextComponent.fromLegacyText(global);
-		HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hover).create());
+		BaseComponent[] hoverComponents = TextComponent.fromLegacyText(hover);
+		HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverComponents);
 		ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/sleep wakeup " + message.worldName + " " + message.name);
 		for(BaseComponent component : components) {
 			component.setHoverEvent(hoverEvent);

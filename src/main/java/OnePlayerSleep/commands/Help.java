@@ -20,7 +20,7 @@ public class Help implements CommandExecutor{
 
 		BaseComponent[] msg = TextComponent.fromLegacyText(this.config.getLog("help"));
 		for(BaseComponent component : msg) {
-			component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("/sleep").create()));
+			component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("/sleep help").create()));
 			component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/sleep help"));
 		}
 		sender.spigot().sendMessage(msg);
