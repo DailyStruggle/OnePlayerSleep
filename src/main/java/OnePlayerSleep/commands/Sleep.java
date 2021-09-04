@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,7 +44,8 @@ public class Sleep implements CommandExecutor {
 		}
 		else {
 			String msg = this.config.getLog("badArg", args[0]);
-			msg = ChatColor.translateAlternateColorCodes('&',msg);
+			String senderName = (sender instanceof Player) ? sender.getName() : config.getServerName();
+			msg = config.fillPlaceHolders(msg,senderName);
 			sender.sendMessage(msg);
 		}
 		return true;

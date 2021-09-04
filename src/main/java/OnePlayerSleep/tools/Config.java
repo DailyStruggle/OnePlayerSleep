@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Config {
@@ -103,10 +105,10 @@ public class Config {
 			for ( String messageName : messageNames) {
 				ConfigurationSection message = this.messages.getConfigurationSection("messages")
 						.getConfigurationSection(messageListName).getConfigurationSection(messageName);
-				String msg 			= ChatColor.translateAlternateColorCodes('&', message.getString("global", "[player] &bis sleeping"));
-				String hover_msg 	= ChatColor.translateAlternateColorCodes('&', message.getString("hover", "&eWake up!"));
-				String response 	= ChatColor.translateAlternateColorCodes('&', message.getString("wakeup", "[player] says &cWake up!"));
-				String cantWakeup 	= ChatColor.translateAlternateColorCodes('&', message.getString("cantWakeup", "&csomeone's a deep sleeper"));
+				String msg 			= message.getString("global", "[player] &bis sleeping");
+				String hover_msg 	= message.getString("hover", "&eWake up!");
+				String response 	= message.getString("wakeup", "[player] says &cWake up!");
+				String cantWakeup 	= message.getString("cantWakeup", "&csomeone's a deep sleeper");
 				Double chance = message.getDouble("chance");
 				messageLookup.put(totalChance, new Message(new String(), messageListName+"."+message.getName(), msg, hover_msg, response, cantWakeup, chance));
 				totalChance += chance;
@@ -455,6 +457,8 @@ public class Config {
 		res = res.replace("[world]", worldName);
 		res = res.replace("[dimension]", dimName);
 
+		res = ChatColor.translateAlternateColorCodes('&', res);
+		res = Hex2Color(res);
 		return res;
 	}
 
@@ -482,7 +486,8 @@ public class Config {
 		if(dimName!=null) res = res.replace("[dimension]", dimName);
 
 		//bukkit color codes
-		res = ChatColor.translateAlternateColorCodes('&',res);
+		res = ChatColor.translateAlternateColorCodes('&', res);
+		res = Hex2Color(res);
 		return res;
 	}
 
@@ -511,7 +516,7 @@ public class Config {
 
 	public String getLog(String key) {
 		String msg = this.lang.getString(key);
-		msg = ChatColor.translateAlternateColorCodes('&',msg);
+//		msg = ChatColor.translateAlternateColorCodes('&',msg);
 		return msg;
 	}
 
@@ -564,5 +569,22 @@ public class Config {
 			this.fillWorldsFile(); //not optimal but it works
 		}
 		return true;
+	}
+
+	private static String Hex2Color(String text) {
+		Pattern pattern = Pattern.compile("(&?#[0-9a-fA-F]{6})");
+		Matcher matcher = pattern.matcher(text);
+		while (matcher.find()) {
+			String hexColor = text.substring(matcher.start(), matcher.end());
+			hexColor = hexColor.replace("&", "");
+			StringBuilder bukkitColorCode = new StringBuilder('\u00A7' + "x");
+			for (int i = 1; i < hexColor.length(); i++) {
+				bukkitColorCode.append(String.valueOf('\u00A7') + hexColor.charAt(i));
+			}
+			String bukkitColor = bukkitColorCode.toString().toLowerCase();
+			text = text.replaceAll(hexColor, bukkitColor);
+			matcher.reset(text);
+		}
+		return text;
 	}
 }
