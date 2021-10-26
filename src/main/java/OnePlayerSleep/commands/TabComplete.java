@@ -22,7 +22,7 @@ public class TabComplete implements TabCompleter {
 		subCommands.put("reload","sleep.reload");
 		subCommands.put("wakeup","sleep.wakeup");
 		subCommands.put("test","sleep.test");
-		subCommands.put("help","sleep.help");
+		subCommands.put("help","sleep.see");
 		this.config = config;
 	}
 	

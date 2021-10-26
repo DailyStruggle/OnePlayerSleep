@@ -27,7 +27,7 @@ public class onPlayerBedEnter implements Listener {
 	}
 	
 	@EventHandler
-	public void onPlayerBedEnter(PlayerBedEnterEvent event) {
+	public void OnPlayerBedEnter(PlayerBedEnterEvent event) {
 		//skip if player needs to be ignored by the plugin
 		if(		(!(Boolean)config.getConfigValue("messageFromSleepingIgnored", false))
 				&& event.getPlayer().isSleepingIgnored()) return;

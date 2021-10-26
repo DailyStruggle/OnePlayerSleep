@@ -25,7 +25,7 @@ public class Sleep implements CommandExecutor {
 		perms.put("reload","sleep.reload");
 		perms.put("wakeup","sleep.wakeup");
 		perms.put("test","sleep.test");
-		perms.put("help","sleep.help");
+		perms.put("help","sleep.see");
 	}
 	
 	@Override
