@@ -1,7 +1,7 @@
 name: OnePlayerSleep
 main: OnePlayerSleep.OnePlayerSleep.OnePlayerSleep
 version: ${project.version}
-api-version: 1.17
+api-version: 1.13
 author: leaf26
 website: https://github.com/DailyStruggle
 
