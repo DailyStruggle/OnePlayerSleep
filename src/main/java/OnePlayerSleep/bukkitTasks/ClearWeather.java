@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Random;
 
 public class ClearWeather extends BukkitRunnable{
-	private World world;
-	private Long duration = Long.valueOf(0);
+	private final World world;
+	private Long duration = 0L;
 	
 	public ClearWeather(World world) {
 		this.world = world;
@@ -25,8 +25,8 @@ public class ClearWeather extends BukkitRunnable{
 		this.world.setStorm(false);
 		this.world.setThundering(false);
 		if(this.duration == 0) {
-			Double randomFactor = new Random().nextDouble()*168000;
-			this.duration = 12000 + randomFactor.longValue();
+			double randomFactor = new Random().nextDouble()*168000;
+			this.duration = 12000 + (long)randomFactor;
 		}
 		this.world.setWeatherDuration(this.duration.intValue());
 		this.cancel();

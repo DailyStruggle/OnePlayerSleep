@@ -2,24 +2,22 @@ package OnePlayerSleep.commands;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import OnePlayerSleep.bukkitTasks.AnnounceSleep;
+import OnePlayerSleep.tools.SendMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import OnePlayerSleep.tools.Config;
-import OnePlayerSleep.types.Message;
+import OnePlayerSleep.tools.Config.Config;
+import OnePlayerSleep.types.MessageImpl;
 
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 
 public class Test implements CommandExecutor {
-	private OnePlayerSleep plugin;
-	private Config config;
+	private final OnePlayerSleep plugin;
+	private final Config config;
 
 	public Test(OnePlayerSleep plugin, Config config) {
 		this.plugin = plugin;
@@ -39,28 +37,28 @@ public class Test implements CommandExecutor {
 				: this.config.getServerWorldName();
 		if(args.length > 0) worldName = args[0];
 		if(!this.config.checkWorldExists(worldName)) {
-			if(isPlayer) sender.sendMessage(this.config.getLog("invalidWorld", worldName));
+			if(isPlayer) SendMessage.sendMessage(sender,this.config.getLog("invalidWorld", worldName));
 			return true;
 		}
 
 
-		Message[] res;
+		MessageImpl[] res;
 		switch(args.length) {
 			case 0: //if just /sleep test, pick 1 random message from player's world
 			{
-				res = new Message[1];
+				res = new MessageImpl[1];
 				res[0] = this.plugin.getPluginConfig().pickRandomMessage(Bukkit.getWorld(worldName), playerName);
 				break;
 			}
 			case 1: //if world arg, pick 1 random message from the world's list
 			{
-				res = new Message[1];
+				res = new MessageImpl[1];
 				res[0] = this.plugin.getPluginConfig().pickRandomMessage(Bukkit.getWorld(args[0]), playerName);
 				break;
 			}
 			default: //if world arg and message args
 			{
-				res = new Message[args.length-1];
+				res = new MessageImpl[args.length-1];
 				Set<String> messageListNames = this.config.getMessageListNames();
 				for( int i = 0; i<res.length; i++)
 				{
@@ -74,14 +72,14 @@ public class Test implements CommandExecutor {
 
 						if(!messageListNames.contains(listName))
 						{
-							sender.sendMessage(this.config.getLog("invalidList", listName));
+							SendMessage.sendMessage(sender,this.config.getLog("invalidList", listName));
 							continue;
 						}
 
-						Message msg = this.config.getMessage(listName,msgName,playerName);
+						MessageImpl msg = this.config.getMessage(listName,msgName,playerName);
 						if(msg==null)
 						{
-							sender.sendMessage(this.config.getLog("invalidMsg", msgName));
+							SendMessage.sendMessage(sender,this.config.getLog("invalidMsg", msgName));
 							continue;
 						}
 
@@ -92,7 +90,7 @@ public class Test implements CommandExecutor {
 						listName = args[i+1];
 						if(!messageListNames.contains(listName))
 						{
-							sender.sendMessage(this.config.getLog("invalidList", listName));
+							SendMessage.sendMessage(sender,this.config.getLog("invalidList", listName));
 							continue;
 						}
 						res[i] = this.config.pickRandomMessage(listName,playerName);
@@ -102,7 +100,7 @@ public class Test implements CommandExecutor {
 			}
 		}
 
-		for( Message message : res) {
+		for( MessageImpl message : res) {
 			if(message == null) continue;
 			if(!isPlayer) {
 				World w = Bukkit.getWorld(worldName);

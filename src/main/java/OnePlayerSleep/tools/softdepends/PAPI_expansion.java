@@ -1,4 +1,4 @@
-package OnePlayerSleep.tools;
+package OnePlayerSleep.tools.softdepends;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -38,7 +38,7 @@ public class PAPI_expansion extends PlaceholderExpansion{
 
 	@Override
     public @NotNull String getVersion(){
-        return "3.1.8";
+        return "3.1.9";
     }
 	
 	@Override

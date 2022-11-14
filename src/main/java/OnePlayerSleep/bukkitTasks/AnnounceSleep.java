@@ -1,15 +1,15 @@
 package OnePlayerSleep.bukkitTasks;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
+import OnePlayerSleep.tools.SendMessage;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import OnePlayerSleep.tools.Config;
-import OnePlayerSleep.types.Message;
+import OnePlayerSleep.tools.Config.Config;
+import OnePlayerSleep.types.MessageImpl;
 
 import java.util.UUID;
-import java.util.logging.Level;
 
 //set up message threads for all relevant players
 public class AnnounceSleep extends BukkitRunnable{
@@ -17,7 +17,7 @@ public class AnnounceSleep extends BukkitRunnable{
 	private final Config config;
 	private final String playerName;
 	private final World world;
-	private Message message;
+	private MessageImpl message;
 	Boolean hasPAPI;
 
 
@@ -30,7 +30,7 @@ public class AnnounceSleep extends BukkitRunnable{
 		this.hasPAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
 	}
 
-	public AnnounceSleep(OnePlayerSleep plugin, Config config, String playerName, World world, Message message) {
+	public AnnounceSleep(OnePlayerSleep plugin, Config config, String playerName, World world, MessageImpl message) {
 		this.plugin = plugin;
 		this.config = config;
 		this.playerName = playerName;
@@ -58,10 +58,10 @@ public class AnnounceSleep extends BukkitRunnable{
 				if(p.hasPermission("sleep.ignore")) continue;
 				
 				if(perPlayer) {
-					new SendMessage(this.plugin, this.config, this.world, this.playerName, p).runTaskAsynchronously(this.plugin);
+					new SendMessageRunable(this.plugin, this.config, this.world, this.playerName, p).runTaskAsynchronously(this.plugin);
 				}
 				else {
-					new SendMessage(this.plugin, this.config, this.world, this.playerName, p,  this.message).runTaskAsynchronously(this.plugin);
+					new SendMessageRunable(this.plugin, this.config, this.world, this.playerName, p,  this.message).runTaskAsynchronously(this.plugin);
 				}
 			}
 		}
@@ -70,7 +70,7 @@ public class AnnounceSleep extends BukkitRunnable{
 			consoleMsg = config.fillPlaceHolders(consoleMsg,playerName);
 			UUID playerID = (playerName.equals(config.getServerName())) ? new UUID(0,0) : Bukkit.getPlayer(playerName).getUniqueId();
 			if(hasPAPI) consoleMsg = PlaceholderAPI.setPlaceholders(Bukkit.getOfflinePlayer(playerID),consoleMsg);
-			Bukkit.getLogger().log(Level.INFO, consoleMsg);
+			SendMessage.sendMessage(Bukkit.getConsoleSender(),consoleMsg);
 		}
 	}
 }

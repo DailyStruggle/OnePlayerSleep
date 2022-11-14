@@ -1,14 +1,14 @@
-package OnePlayerSleep.events;
+package OnePlayerSleep.Listeners.spigotEventListeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.weather.WeatherChangeEvent;
-import OnePlayerSleep.tools.Config;
+import OnePlayerSleep.tools.Config.Config;
 
 public class onWeatherChange implements Listener {
-	private Config config;
+	private final Config config;
 
 	public onWeatherChange(Config config) {
 		this.config = config;

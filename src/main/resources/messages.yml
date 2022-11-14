@@ -33,6 +33,15 @@ server:
     name: "[server]"
     world: "world"
 
+#show title while in bed
+# remove or set title to "" to disable
+title: "&aSleeping"
+subtitle: "&bzzz"
+fadeIn: 20
+fadeOut: 20
+
+actionbar: ""
+
 #Messages to announce on sleep
 #message001: arbitrary unique message name
 #    global: thing to say in global chat on player sleep.           
@@ -43,6 +52,8 @@ server:
 #               ^player calling wakeup.
 #    cantWakeup: message to send if someone had sleep.bypass
 #               ^player calling wakeup
+#    cancel: message to send if the last sleeping player gets out of bed
+#               ^Sleeper
 #    chance: floating point chance to use this message, out of the sum of all chances
 messages:
     default:
@@ -51,91 +62,106 @@ messages:
             hover: "&eWake up!"
             wakeup: "[username] says &cGet back to work!"
             cantWakeup: "&csomeone's a deep sleeper"
+            cancel: "[username] cancelled sleep"
             chance: 0.067
         slacking:
             global: "[username] &bis slacking"
             hover: "&eWake up!"
             wakeup: "[username] says &cWake up!"
             cantWakeup: "&csomeone's a deep sleeper"
+            cancel: "[username] cancelled sleep"
             chance: 0.067
         at_the_wheel:
             global: "[username] &bis asleep at the wheel"
             hover: "&eWake up!"
             wakeup: "[username] says &4WHO'S DRIVING!?"
             cantWakeup: "&csomeone's a deep sleeper"
+            cancel: "[username] cancelled sleep"
             chance: 0.067
         crashed:
             global: "[username] &bcrashed...hard..."
             hover: "&eWake up!"
             wakeup: "[username] says &chave some caffeine!"
             cantWakeup: "&csomeone's a deep sleeper"
+            cancel: "[username] cancelled sleep"
             chance: 0.067
         counting_sheep:
             global: "[username] &bis counting sheep"
             hover: "&eWake up!"
             wakeup: "[username] says &cWake up!"
             cantWakeup: "&csomeone's a deep sleeper"
+            cancel: "[username] cancelled sleep"
             chance: 0.067
         sawing_logs:
             global: "[username] &bis sawing logs"
             hover: "&eWake up!"
             wakeup: "[username] says &cWake up!"
             cantWakeup: "&csomeone's a deep sleeper"
+            cancel: "[username] cancelled sleep"
             chance: 0.067
         cat_napping:
             global: "[username] &bis cat napping"
             hover: "&eWake up!"
             wakeup: "[username] says &cdogs are better!"
             cantWakeup: "&csomeone's a deep sleeper"
+            cancel: "[username] cancelled sleep"
             chance: 0.067
         hit_the_hay:
             global: "[username] &bhas hit the hay"
             hover: "&eWake up!"
             wakeup: "[username] says &cHay is for horses!"
             cantWakeup: "&csomeone's a deep sleeper"
+            cancel: "[username] cancelled sleep"
             chance: 0.067
         nodded_off:
             global: "[username] &bnodded off"
             hover: "&eWake up!"
             wakeup: "[username] &esmacks desk"
             cantWakeup: "&csomeone's a deep sleeper"
+            cancel: "[username] cancelled sleep"
             chance: 0.067
         beauty_rest:
             global: "[username] &bneeds a beauty rest"
             hover: "&eWake up!"
             wakeup: "[username] says &cyou're handsome enough already!"
             cantWakeup: "&csomeone's a deep sleeper"
+            cancel: "[username] cancelled sleep"
             chance: 0.067
         snooze:
             global: "[username] &bkeeps hitting snooze..."
             hover: "&eWake up!"
             wakeup: "[username] &cpulled the sheets!"
             cantWakeup: "&csomeone's a deep sleeper"
+            cancel: "[username] cancelled sleep"
             chance: 0.067
         peaceful_slumber:
             global: "[username] &bis enjoying peaceful slumber"
             hover: "&eWake up!"
             wakeup: "[username] says &cWake up!"
             cantWakeup: "&csomeone's a deep sleeper"
+            cancel: "[username] cancelled sleep"
             chance: 0.067
         catching_Zs:
             global: "[username] &bis catching Z's"
             hover: "&eWake up!"
             wakeup: "[username] says &cWake up!"
             cantWakeup: "&csomeone's a deep sleeper"
+            cancel: "[username] cancelled sleep"
             chance: 0.067
         dozed_off:
             global: "[username] &bdozed off"
             hover: "&eWake up!"
             wakeup: "[username] says &cWake up!"
             cantWakeup: "&csomeone's a deep sleeper"
+            cancel: "[username] cancelled sleep"
             chance: 0.067
         sleeping:
             global: "[username] &bis sleeping"
             hover: "&eWake up!"
             wakeup: "[username] says &cWake up!"
             cantWakeup: "&csomeone's a deep sleeper"
+            cancel: "[username] cancelled sleep"
             chance: 0.067
 
 #DO NOT TOUCH VERSION NUMBER
-version: 2.1
+version: 2.2

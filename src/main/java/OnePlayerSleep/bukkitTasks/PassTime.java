@@ -4,15 +4,15 @@ import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
-import OnePlayerSleep.tools.Config;
+import OnePlayerSleep.tools.Config.Config;
 
 import java.util.List;
 
 public class PassTime extends BukkitRunnable{
-	private OnePlayerSleep plugin;
-	private Config config;
-	private World world;
-	private Boolean didNightPass;
+	private final OnePlayerSleep plugin;
+	private final Config config;
+	private final World world;
+	private final Boolean didNightPass;
 
 	public PassTime(OnePlayerSleep plugin, Config config, World world) {
 		this.plugin = plugin;

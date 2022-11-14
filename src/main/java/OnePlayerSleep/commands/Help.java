@@ -1,7 +1,7 @@
 package OnePlayerSleep.commands;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
-import OnePlayerSleep.tools.Config;
+import OnePlayerSleep.tools.Config.Config;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

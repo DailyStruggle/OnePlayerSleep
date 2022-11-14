@@ -1,7 +1,7 @@
-package OnePlayerSleep.events;
+package OnePlayerSleep.Listeners.spigotEventListeners;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
-import OnePlayerSleep.tools.Config;
+import OnePlayerSleep.tools.Config.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -10,8 +10,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 
 public class onPlayerChangeWorld implements Listener {
-    private OnePlayerSleep plugin;
-    private Config config;
+    private final OnePlayerSleep plugin;
+    private final Config config;
 
     public onPlayerChangeWorld(OnePlayerSleep plugin, Config config) {
         this.plugin = plugin;

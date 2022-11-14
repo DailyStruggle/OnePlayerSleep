@@ -1,18 +1,18 @@
 package OnePlayerSleep.commands;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
+import OnePlayerSleep.tools.SendMessage;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import OnePlayerSleep.tools.Config;
+import OnePlayerSleep.tools.Config.Config;
 
 public class Reload implements CommandExecutor {
-	private OnePlayerSleep plugin;
-	private Config config;
+	private final OnePlayerSleep plugin;
+	private final Config config;
 	
 	public Reload(OnePlayerSleep plugin, Config config) {
 		this.plugin = plugin;
@@ -23,19 +23,19 @@ public class Reload implements CommandExecutor {
 		if(sender.hasPermission("sleep.reload"))
 		{
 			String str = this.config.getLog("reloading");
-			Bukkit.getConsoleSender().sendMessage(str);
+			SendMessage.sendMessage(Bukkit.getConsoleSender(),str);
 			if(sender instanceof Player) {
 				if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) str = PlaceholderAPI.setPlaceholders((Player)sender, str);
-				sender.sendMessage(str);
+				SendMessage.sendMessage(sender,str);
 			}
 			
 			this.config.refreshConfigs();
 			
 			str = this.config.getLog("reloaded");
-			Bukkit.getConsoleSender().sendMessage(str);
+			SendMessage.sendMessage(Bukkit.getConsoleSender(),str);
 			if(sender instanceof Player) {
 				if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) str = PlaceholderAPI.setPlaceholders((Player)sender, str);
-				sender.sendMessage(str);
+				SendMessage.sendMessage(sender,str);
 			}
 			
 			return true;

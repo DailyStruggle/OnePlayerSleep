@@ -2,6 +2,7 @@ package OnePlayerSleep.commands;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import OnePlayerSleep.bukkitTasks.AnnounceWakeup;
+import OnePlayerSleep.tools.SendMessage;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -9,8 +10,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import OnePlayerSleep.tools.Config;
-import OnePlayerSleep.types.Message;
+import OnePlayerSleep.tools.Config.Config;
+import OnePlayerSleep.types.MessageImpl;
 
 import java.util.*;
 
@@ -43,13 +44,13 @@ public class Wakeup implements CommandExecutor {
 				: this.config.getServerWorldName();
 		if(args.length > 0) cmdWorldName = args[0];
 		if(!this.config.checkWorldExists(cmdWorldName)) {
-			if(isPlayer) sender.sendMessage(this.config.getLog("invalidWorld", cmdWorldName));
+			if(isPlayer) SendMessage.sendMessage(sender,this.config.getLog("invalidWorld", cmdWorldName));
 			return true;
-		};
-		Message msg;
+		}
+		MessageImpl msg;
 		switch(args.length) {
 			case 0: { //no args, use last message given to player
-				if(isPlayer) msg = this.plugin.wakeData.get(sender);
+				if(isPlayer) msg = this.plugin.wakeData.get(((Player) sender).getUniqueId());
 				else msg = config.pickRandomMessage(Bukkit.getWorld(myWorldName), playerName);
 				break;
 			}
@@ -66,21 +67,21 @@ public class Wakeup implements CommandExecutor {
 
 					if(!listNames.contains(listName))
 					{
-						sender.sendMessage(this.config.getLog("invalidList", listName));
+						SendMessage.sendMessage(sender,this.config.getLog("invalidList", listName));
 						return true;
 					}
 
 					msg = this.config.getMessage(listName, msgName, playerName);
 					if(msg == null)
 					{
-						sender.sendMessage(this.config.getLog("invalidMsg", msgName));
+						SendMessage.sendMessage(sender,this.config.getLog("invalidMsg", msgName));
 						return true;
 					}
 				}
 				else {
 					if(!listNames.contains(args[1]))
 					{
-						sender.sendMessage(this.config.getLog("invalidList", args[1]));
+						SendMessage.sendMessage(sender,this.config.getLog("invalidList", args[1]));
 						return true;
 					}
 					msg = this.config.pickRandomMessage(args[1], playerName);
@@ -94,7 +95,7 @@ public class Wakeup implements CommandExecutor {
 
 		//check if user should have a say in this
 		if((!config.getMsgToWorlds(myWorldName).contains(cmdWorldName))&&(!sender.hasPermission("sleep.global"))) {
-			sender.sendMessage(this.config.getLog("noGlobalPerms", cmdWorldName));
+			SendMessage.sendMessage(sender,this.config.getLog("noGlobalPerms", cmdWorldName));
 			return true;
 		}
 
@@ -111,7 +112,7 @@ public class Wakeup implements CommandExecutor {
 			String onNoPlayersSleeping = config.getLog("onNoPlayersSleeping");
 			if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null)
 				onNoPlayersSleeping = PlaceholderAPI.setPlaceholders((Player)sender, onNoPlayersSleeping);
-			sender.sendMessage(onNoPlayersSleeping);
+			SendMessage.sendMessage(sender,onNoPlayersSleeping);
 			return true;
 		}
 
@@ -140,11 +141,12 @@ public class Wakeup implements CommandExecutor {
 			if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null)
 				send = PlaceholderAPI.setPlaceholders((Player)sender, msg.cantWakeup);
 			else send = msg.cantWakeup;
-			sender.sendMessage(send);
+			SendMessage.sendMessage(sender,send);
 			return true;
 		}
 
 		//send a wakeup message
+		plugin.wakeupCommandTime.set(System.currentTimeMillis());
 		for(String worldName : this.config.getMsgToWorlds(myWorldName)) {
 			World world = Bukkit.getWorld(worldName);
 			new AnnounceWakeup(this.plugin, this.config, playerName, msg, world).runTaskAsynchronously(this.plugin);

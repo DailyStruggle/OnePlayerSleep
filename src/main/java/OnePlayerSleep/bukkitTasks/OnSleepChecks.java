@@ -1,22 +1,21 @@
 package OnePlayerSleep.bukkitTasks;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
+import OnePlayerSleep.tools.SendMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import OnePlayerSleep.tools.Config;
+import OnePlayerSleep.tools.Config.Config;
 
 import java.util.*;
-import java.util.logging.Level;
 
 public class OnSleepChecks extends BukkitRunnable{
-	private OnePlayerSleep plugin;
-	private Config config;
-	private Player player;
-	private World world;
-	private Boolean bypassSleep = false; //flag for testing messages
-	
+	private final OnePlayerSleep plugin;
+	private final Config config;
+	private final Player player;
+	private final World world;
+
 	public OnSleepChecks(OnePlayerSleep plugin, Config config, Player player, World world) {
 		this.plugin = plugin;
 		this.config = config;
@@ -28,8 +27,8 @@ public class OnSleepChecks extends BukkitRunnable{
 	public void run() {
 		//if player isn't sleeping anymore when the server gets here, pull out
 		// also skip if called by a test function
-		if( 	bypassSleep
-				|| (this.player != null && !this.player.isSleeping()))
+		//flag for testing messages
+		if(this.player != null && !this.player.isSleeping())
 		{
 			this.cancel();
 			return;
@@ -51,7 +50,8 @@ public class OnSleepChecks extends BukkitRunnable{
 			World w = Bukkit.getWorld(worldName);
 			if(w == null)
 			{
-				Bukkit.getLogger().log(Level.WARNING, this.config.getLog("invalidWorld",worldName));
+				SendMessage.sendMessage(Bukkit.getConsoleSender(),this.config.getLog("invalidWorld",worldName));
+				SendMessage.sendMessage(Bukkit.getConsoleSender(),this.config.getLog("invalidWorld",worldName));
 			}
 
 			if( this.plugin.sleepingPlayers.containsKey(w) ) numSleepingPlayers += this.plugin.sleepingPlayers.get(w).size();
@@ -63,9 +63,11 @@ public class OnSleepChecks extends BukkitRunnable{
 		if(numSleepingPlayers < 2 && numPlayers >= this.config.getMinPlayers()) {
 			//async message selection and delivery
 			new AnnounceSleep(this.plugin, this.config, this.player.getName(), this.world).runTaskAsynchronously(this.plugin);
-			
+
+
+
 			//start sleep task
-			if(plugin.doSleep.containsKey(this.world)) plugin.doSleep.remove(this.world);
+			plugin.doSleep.remove(this.world);
 			plugin.doSleep.put(this.world, new PassTime(this.plugin, this.config, this.world)
 					.runTaskLater(this.plugin, sleepDelay));
 		}

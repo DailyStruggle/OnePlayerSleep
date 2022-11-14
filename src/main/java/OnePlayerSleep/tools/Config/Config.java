@@ -1,13 +1,14 @@
-package OnePlayerSleep.tools;
+package OnePlayerSleep.tools.Config;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
+import OnePlayerSleep.tools.SendMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import OnePlayerSleep.types.Message;
+import OnePlayerSleep.types.MessageImpl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,16 +29,22 @@ public class Config {
 	private FileConfiguration lang;
 	public String version;
 
+	public String title;
+	public String subtitle;
+	public int fadeIn;
+	public int fadeOut;
+	public String actionbar;
+
 	//key: message list name
 	//value: lookup table for values
-	private Map<String,NavigableMap<Double,Message>> messageLookup = new HashMap<>();
+	private Map<String,NavigableMap<Double, MessageImpl>> messageLookup = new HashMap<>();
 
 	//key: message list name
 	//value: maximum random value to work with
 	private Map<String,Double> totalChance = new HashMap<>();
 
-	public Config(OnePlayerSleep plugin) {
-		this.plugin = plugin;
+	public Config() {
+		this.plugin = OnePlayerSleep.getInstance();
 		String s = this.plugin.getServer().getClass().getPackage().getName();
 		this.version = s.substring(s.lastIndexOf('.')+1);
 	}
@@ -53,11 +60,11 @@ public class Config {
 		this.lang = YamlConfiguration.loadConfiguration(f);
 
 		if( 	(this.lang.getDouble("version") < 1.0) ) {
-			Bukkit.getLogger().log(Level.WARNING, this.getLog("oldFile", "lang.yml"));
+			SendMessage.sendMessage(Bukkit.getConsoleSender(),this.getLog("oldFile", "lang.yml"));
 			updateLang();
 
 			f = new File(this.plugin.getDataFolder(), "lang.yml");
-			this.lang = YamlConfiguration.loadConfiguration(f);;
+			this.lang = YamlConfiguration.loadConfiguration(f);
 		}
 
 		//load config.yml file
@@ -69,7 +76,7 @@ public class Config {
 		this.config = YamlConfiguration.loadConfiguration(f);
 
 		if( 	(this.config.getDouble("version") < 2.1) ) {
-			Bukkit.getLogger().log(Level.WARNING, this.getLog("oldFile", "config.yml"));
+			SendMessage.sendMessage(Bukkit.getConsoleSender(),this.getLog("oldFile", "config.yml"));
 
 			updateConfig();
 
@@ -85,13 +92,20 @@ public class Config {
 		}
 		this.messages = YamlConfiguration.loadConfiguration(f);
 
-		if( 	(this.messages.getDouble("version") < 2.1) ) {
-			Bukkit.getLogger().log(Level.WARNING, this.getLog("oldFile", "messages.yml"));
+		if( 	(this.messages.getDouble("version") < 2.2) ) {
+			SendMessage.sendMessage(Bukkit.getConsoleSender(),this.getLog("oldFile", "messages.yml"));
 			this.renameFileInPluginDir("messages.yml","messages.old.yml");
 			
 			this.plugin.saveResource("messages.yml", false);
 			this.messages = YamlConfiguration.loadConfiguration(f);
 		}
+
+		this.title = this.messages.getString("title","");
+		this.subtitle = this.messages.getString("subtitle","");
+		this.fadeIn = this.messages.getInt("fadeIn",0);
+		this.fadeOut = this.messages.getInt("fadeOut",0);
+
+		this.actionbar = this.messages.getString("actiobar","");
 
 		//load up message map for quick selection later
 		Set<String> messageListNames = this.messages.getConfigurationSection("messages").getKeys(false);
@@ -100,17 +114,18 @@ public class Config {
 		for(String messageListName : messageListNames) {
 			Set<String> messageNames = this.messages.getConfigurationSection("messages").getConfigurationSection(messageListName).getKeys(false);
 
-			Double totalChance = 0.0;
-			NavigableMap<Double,Message> messageLookup = new TreeMap<>();
+			double totalChance = 0.0;
+			NavigableMap<Double, MessageImpl> messageLookup = new TreeMap<>();
 			for ( String messageName : messageNames) {
 				ConfigurationSection message = this.messages.getConfigurationSection("messages")
 						.getConfigurationSection(messageListName).getConfigurationSection(messageName);
-				String msg 			= message.getString("global", "[player] &bis sleeping");
-				String hover_msg 	= message.getString("hover", "&eWake up!");
-				String response 	= message.getString("wakeup", "[player] says &cWake up!");
-				String cantWakeup 	= message.getString("cantWakeup", "&csomeone's a deep sleeper");
-				Double chance = message.getDouble("chance");
-				messageLookup.put(totalChance, new Message(new String(), messageListName+"."+message.getName(), msg, hover_msg, response, cantWakeup, chance));
+				String msg 			= message.getString("global", "");
+				String hover_msg 	= message.getString("hover", "");
+				String response 	= message.getString("wakeup", "");
+				String cantWakeup 	= message.getString("cantWakeup", "");
+				String cancel 	= message.getString("cancel", "");
+				double chance = message.getDouble("chance", 1.0);
+				messageLookup.put(totalChance, new MessageImpl("", messageListName+"."+message.getName(), msg, hover_msg, response, cantWakeup, cancel, chance));
 				totalChance += chance;
 			}
 			this.messageLookup.putIfAbsent(messageListName,messageLookup);
@@ -127,7 +142,7 @@ public class Config {
 		this.worlds = YamlConfiguration.loadConfiguration(f);
 
 		if( 	(this.worlds.getDouble("version") < 1.2) ) {
-			Bukkit.getLogger().log(Level.WARNING, this.getLog("oldFile", "worlds.yml"));
+			SendMessage.sendMessage(Bukkit.getConsoleSender(),this.getLog("oldFile", "worlds.yml"));
 			this.renameFileInPluginDir("worlds.yml","worlds.old.yml");
 
 			this.plugin.saveResource("worlds.yml", false);
@@ -138,47 +153,49 @@ public class Config {
 		this.fillWorldsFile();
 	}
 
-	public Message pickRandomMessage(World world, String playerName) {
+	public MessageImpl pickRandomMessage(World world, String playerName) {
 		if(!this.worlds.contains(world.getName()))
 			this.worlds.set(world.getName(),this.worlds.getConfigurationSection("default"));
-		Message res;
+		MessageImpl res;
 		String listName = this.worlds.getConfigurationSection(world.getName()).getString("msgGroup");
 		res = pickRandomMessage(listName, playerName);
 		res.setWorld(world.getName());
 		return res;
 	}
 
-	public Message pickRandomMessage(String listName, String playerName) {
+	public MessageImpl pickRandomMessage(String listName, String playerName) {
 		if(!this.messages.getConfigurationSection("messages").contains(listName)){
-			Bukkit.getLogger().log(Level.WARNING, this.getLog("invalidList", listName));
+			SendMessage.sendMessage(Bukkit.getConsoleSender(),this.getLog("invalidList", listName));
 			return null;
 		}
 
 		Random r = new Random();
 		Double randomValue = (this.totalChance.get(listName)) * r.nextDouble();
-		Message res = this.messageLookup.get(listName).floorEntry(randomValue).getValue();
+		MessageImpl res = this.messageLookup.get(listName).floorEntry(randomValue).getValue();
 
 		String msg = fillPlaceHolders(res.msg.getText(), playerName);
 		String hover_msg = fillPlaceHolders(res.hoverText, playerName);
 		String wakeup = fillPlaceHolders(res.wakeup, playerName);
 		String cantWakeup = fillPlaceHolders(res.cantWakeup, playerName);
+		String cancel = fillPlaceHolders(res.cancel, playerName);
 		Double chance = res.chance;
-		res = new Message(new String(), res.name, msg, hover_msg, wakeup, cantWakeup, chance);
+		res = new MessageImpl("", res.name, msg, hover_msg, wakeup, cantWakeup, cancel, chance);
 
 		return res;
 	}
 
-	public Message getMessage(String listName, String messageName, String playerName) {
-		Message res;
+	public MessageImpl getMessage(String listName, String messageName, String playerName) {
+		MessageImpl res;
 
 		ConfigurationSection cfg = this.messages.getConfigurationSection("messages").getConfigurationSection(listName).getConfigurationSection(messageName);
 		if(cfg != null) {
-			String msg = fillPlaceHolders(cfg.getString("global", "[player] &bis sleeping"), playerName);
-			String hover_msg = fillPlaceHolders(cfg.getString("hover", "&eWake up!"), playerName);
-			String response = fillPlaceHolders(cfg.getString("wakeup", "[player] says &cWake up!"), playerName);
-			String cantWakeup = fillPlaceHolders(cfg.getString("cantWakeup", "&csomeone's a deep sleeper"), playerName);
+			String msg = fillPlaceHolders(cfg.getString("global", ""), playerName);
+			String hover_msg = fillPlaceHolders(cfg.getString("hover", ""), playerName);
+			String response = fillPlaceHolders(cfg.getString("wakeup", ""), playerName);
+			String cantWakeup = fillPlaceHolders(cfg.getString("cantWakeup", ""), playerName);
+			String cancel = fillPlaceHolders(cfg.getString("cancel", ""), playerName);
 			Double chance = cfg.getDouble("chance");
-			res = new Message(new String(), listName+"."+messageName, msg, hover_msg, response, cantWakeup, chance);
+			res = new MessageImpl("", listName+"."+messageName, msg, hover_msg, response, cantWakeup, cancel, chance);
 		} else res = null;
 
 		return res;
@@ -435,7 +452,7 @@ public class Config {
 			listName = this.worlds.getConfigurationSection(this.getServerWorldName()).getString("msgGroup");
 		}
 		if(!this.messages.getConfigurationSection("messages").contains(listName)) {
-			Bukkit.getLogger().log(Level.WARNING, getLog("invalidList",listName));
+			SendMessage.sendMessage(Bukkit.getConsoleSender(),getLog("invalidList",listName));
 		}
 		res.addAll(this.messages.getConfigurationSection("messages").getConfigurationSection(listName).getKeys(false));
 		return res;
@@ -535,7 +552,7 @@ public class Config {
 			default: replace = "[placeholder]";
 		}
 
-		return msg.replace(replace, placeholder);
+		return fillPlaceHolders(msg.replace(replace, placeholder),getServerName());
 	}
 
 	public Integer getStartTime (String worldName) {
@@ -562,7 +579,7 @@ public class Config {
 		Boolean bukkitWorldExists = Bukkit.getWorld(worldName)!=null;
 		Boolean worldKnown = this.worlds.contains(worldName);
 		if( !bukkitWorldExists ) {
-			Bukkit.getLogger().log(Level.WARNING, this.getLog("invalidWorld", worldName));
+			SendMessage.sendMessage(Bukkit.getConsoleSender(),this.getLog("invalidWorld", worldName));
 			return false;
 		}
 		else if( !worldKnown ) {

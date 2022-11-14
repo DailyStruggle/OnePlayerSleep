@@ -1,7 +1,11 @@
-package OnePlayerSleep.events;
+package OnePlayerSleep.Listeners.spigotEventListeners;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
+import OnePlayerSleep.bukkitTasks.AnnounceCancel;
+import OnePlayerSleep.bukkitTasks.AnnounceWakeup;
 import OnePlayerSleep.bukkitTasks.ClearWeather;
+import OnePlayerSleep.types.MessageImpl;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
 import org.bukkit.World;
@@ -9,11 +13,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
-import OnePlayerSleep.tools.Config;
+import OnePlayerSleep.tools.Config.Config;
+
+import java.util.Objects;
 
 public class onPlayerBedLeave implements Listener {
-	private OnePlayerSleep plugin;
-	private Config config;
+	private final OnePlayerSleep plugin;
+	private final Config config;
 	
 	public onPlayerBedLeave(OnePlayerSleep plugin, Config config) {
 		this.plugin = plugin;
@@ -25,6 +31,7 @@ public class onPlayerBedLeave implements Listener {
 		Boolean messageFromSleepingIgnored = (Boolean) config.getConfigValue("messageFromSleepingIgnored", true);
 		if(!messageFromSleepingIgnored && event.getPlayer().isSleepingIgnored()) return;
 		if(event.getPlayer().hasPermission("sleep.ignore")) return;
+		long dt = System.currentTimeMillis() - plugin.wakeupCommandTime.get();
 
 		//remove player from sleep lookup table
 		World myWorld = event.getPlayer().getWorld();
@@ -46,8 +53,13 @@ public class onPlayerBedLeave implements Listener {
 
 		if(numSleepingPlayers == 0) {
 			for(String worldName : this.config.getSyncWorlds(myWorldName)) {
-				if( this.plugin.doSleep.containsKey(Bukkit.getWorld(worldName))) {
-					this.plugin.doSleep.get(Bukkit.getWorld(worldName)).cancel();
+				World world = Bukkit.getWorld(worldName);
+				if( this.plugin.doSleep.containsKey(world)) {
+					this.plugin.doSleep.get(world).cancel();
+					if(dt>100) {
+						MessageImpl msg = this.plugin.wakeData.get(event.getPlayer().getUniqueId());
+						new AnnounceCancel(this.config, msg, world).runTaskAsynchronously(this.plugin);
+					}
 				}
 			}
 		}

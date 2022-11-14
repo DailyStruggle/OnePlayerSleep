@@ -1,15 +1,15 @@
-package OnePlayerSleep.events;
+package OnePlayerSleep.Listeners.spigotEventListeners;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import OnePlayerSleep.tools.Config;
+import OnePlayerSleep.tools.Config.Config;
 
 public class onPlayerJoin implements Listener {
-    private OnePlayerSleep plugin;
-    private Config config;
+    private final OnePlayerSleep plugin;
+    private final Config config;
 
     public onPlayerJoin(OnePlayerSleep plugin, Config config) {
         this.plugin = plugin;

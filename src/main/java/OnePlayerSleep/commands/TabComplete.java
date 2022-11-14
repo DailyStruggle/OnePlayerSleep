@@ -7,15 +7,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
-import OnePlayerSleep.tools.Config;
+import OnePlayerSleep.tools.Config.Config;
 
 import java.util.*;
-import java.util.logging.Level;
 
 public class TabComplete implements TabCompleter {
-	private Map<String,String> subCommands = new HashMap<String,String>();
+	private final Map<String,String> subCommands = new HashMap<String,String>();
 	
-	private Config config;
+	private final Config config;
 	
 	public TabComplete(Config config) {
 		//load OnePlayerSleep.commands and permission nodes into map

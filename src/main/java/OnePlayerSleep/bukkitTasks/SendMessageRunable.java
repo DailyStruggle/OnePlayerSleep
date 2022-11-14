@@ -7,24 +7,23 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import OnePlayerSleep.tools.Config;
-import OnePlayerSleep.types.Message;
+import OnePlayerSleep.tools.Config.Config;
+import OnePlayerSleep.types.MessageImpl;
 
-import java.util.Arrays;
 import java.util.UUID;
 
 
 //send message to a player
 //choose a message if per-player randomization is active
-public class SendMessage extends BukkitRunnable{
-	private OnePlayerSleep plugin;
-	private Config config;
-	private Message message;
-	private String sourcePlayerName;
-	private Player targetPlayer;
-	private World sourceWorld;
+public class SendMessageRunable extends BukkitRunnable{
+	private final OnePlayerSleep plugin;
+	private final Config config;
+	private MessageImpl message;
+	private final String sourcePlayerName;
+	private final Player targetPlayer;
+	private final World sourceWorld;
 
-	public SendMessage(OnePlayerSleep plugin, Config config, World sourceWorld, String sourcePlayerName, Player targetPlayer) {
+	public SendMessageRunable(OnePlayerSleep plugin, Config config, World sourceWorld, String sourcePlayerName, Player targetPlayer) {
 		this.plugin = plugin;
 		this.config = config;
 		this.sourceWorld = sourceWorld;
@@ -33,7 +32,7 @@ public class SendMessage extends BukkitRunnable{
 		this.message = null;
 	}
 	
-	public SendMessage(OnePlayerSleep plugin, Config config, World sourceWorld, String sourcePlayerName, Player targetPlayer, Message message) {
+	public SendMessageRunable(OnePlayerSleep plugin, Config config, World sourceWorld, String sourcePlayerName, Player targetPlayer, MessageImpl message) {
 		this.plugin = plugin;
 		this.config = config;
 		this.sourceWorld = sourceWorld;
@@ -41,7 +40,7 @@ public class SendMessage extends BukkitRunnable{
 		this.targetPlayer = targetPlayer;
 		this.message = message;
 	}
-	
+
 	@Override
 	public void run() {
 		if(this.targetPlayer.hasPermission("sleep.ignore")) {
@@ -67,9 +66,7 @@ public class SendMessage extends BukkitRunnable{
 		}
 		this.targetPlayer.spigot().sendMessage(components);
 
-		if(this.plugin.wakeData.containsKey(targetPlayer)) {
-			this.plugin.wakeData.remove(targetPlayer);
-		}
-		this.plugin.wakeData.put(this.targetPlayer, this.message);
+		this.plugin.wakeData.remove(targetPlayer.getUniqueId());
+		this.plugin.wakeData.put(this.targetPlayer.getUniqueId(), this.message);
 	}
 }

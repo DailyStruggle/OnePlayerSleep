@@ -1,7 +1,7 @@
-package OnePlayerSleep.events;
+package OnePlayerSleep.Listeners.spigotEventListeners;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
-import OnePlayerSleep.tools.Config;
+import OnePlayerSleep.tools.Config.Config;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -9,8 +9,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockExplodeEvent;
 
 public class onBedExplode implements Listener {
-    private OnePlayerSleep plugin;
-    private Config config;
+    private final OnePlayerSleep plugin;
+    private final Config config;
 
     public onBedExplode(OnePlayerSleep plugin, Config config) {
         this.plugin = plugin;
