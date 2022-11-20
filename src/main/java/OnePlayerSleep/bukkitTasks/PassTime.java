@@ -36,29 +36,31 @@ public class PassTime extends BukkitRunnable{
 		Integer incrementAmount = (Integer) config.getConfigValue("increment",150);
 		if (this.world.getTime() < this.config.getStopTime(this.world.getName())
 				&& this.world.getTime() >= this.config.getStartTime(this.world.getName())) {
-			Long newTime = this.world.getTime() + incrementAmount;
-			this.plugin.doSleep.remove(this.world);
-			this.plugin.doSleep.put(this.world,
+			long newTime = this.world.getTime() + incrementAmount;
+			this.plugin.doSleep.remove(this.world.getUID());
+			this.plugin.doSleep.put(this.world.getUID(),
 					new PassTime(this.plugin, this.config, this.world, true)
 							.runTaskLater(this.plugin, timeBetweenIncrements));
 
 			//update all synced worlds
 			for(String worldName : worldNames) {
 				World targetWorld = Bukkit.getWorld(worldName);
+				if(targetWorld==null) continue;
 				targetWorld.setTime(newTime);
 			}
 			return;
 		}
 
 		//else clear weather and stop
-		this.plugin.doSleep.remove(this.world);
+		this.plugin.doSleep.remove(this.world.getUID());
 		for(String worldName : worldNames) {
 			World targetWorld = Bukkit.getWorld(worldName);
-			if (didNightPass) this.plugin.clearWeather.put(targetWorld, new ClearWeather(targetWorld).runTask(this.plugin));
-			else this.plugin.clearWeather.put(this.world, new ClearWeather(targetWorld).runTaskLater(this.plugin, (Integer)this.config.getConfigValue("sleepDelay",60)));
+			if(targetWorld==null) continue;
+			if (didNightPass) this.plugin.clearWeather.put(targetWorld.getUID(), new ClearWeather(targetWorld).runTask(this.plugin));
+			else this.plugin.clearWeather.put(this.world.getUID(), new ClearWeather(targetWorld).runTaskLater(this.plugin, (Integer)this.config.getConfigValue("sleepDelay",60)));
 		}
 
 		this.cancel();
-		this.plugin.doSleep.remove(this.world);
+		this.plugin.doSleep.remove(this.world.getUID());
 	}
 }

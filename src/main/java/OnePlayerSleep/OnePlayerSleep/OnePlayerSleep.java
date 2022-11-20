@@ -5,7 +5,6 @@ import OnePlayerSleep.commands.*;
 import OnePlayerSleep.tools.Config.Config;
 import OnePlayerSleep.tools.Config.Configs;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -27,11 +26,11 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 	private static Configs configs;
 
 	public ConcurrentSkipListSet<UUID> titles;
-	public ConcurrentHashMap<World,BukkitTask> doSleep;
-	public ConcurrentHashMap<World,BukkitTask> clearWeather;
+	public ConcurrentHashMap<UUID,BukkitTask> doSleep;
+	public ConcurrentHashMap<UUID,BukkitTask> clearWeather;
 	public ConcurrentHashMap<UUID, MessageImpl> wakeData; //list of players receiving messages
-	public ConcurrentHashMap<World, HashSet<Player>> sleepingPlayers; //list of sleeping players for each world
-	public ConcurrentHashMap<World,Long> numPlayers;
+	public ConcurrentHashMap<UUID, HashSet<Player>> sleepingPlayers; //list of sleeping players for each world
+	public ConcurrentHashMap<UUID,Long> numPlayers;
 	public AtomicLong wakeupCommandTime = new AtomicLong(0L);
 
 	public static OnePlayerSleep getInstance() {
@@ -76,13 +75,14 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		}
 		
 		//register all the spigot OnePlayerSleep.events I need
-		getServer().getPluginManager().registerEvents(new onBedExplode(this, configs.config), this);
-		getServer().getPluginManager().registerEvents(new onPlayerBedEnter(this, configs.config), this);
-		getServer().getPluginManager().registerEvents(new onPlayerBedLeave(this, configs.config), this);
-		getServer().getPluginManager().registerEvents(new onPlayerJoin(this, configs.config), this);
-		getServer().getPluginManager().registerEvents(new onPlayerQuit(this, configs.config), this);
-		getServer().getPluginManager().registerEvents(new onPlayerChangeWorld(this, configs.config), this);
-		getServer().getPluginManager().registerEvents(new onWeatherChange(configs.config), this);
+		getServer().getPluginManager().registerEvents(new OnBedExplode(configs.config), this);
+		getServer().getPluginManager().registerEvents(new OnPlayerBedEnter(this, configs.config), this);
+		getServer().getPluginManager().registerEvents(new OnPlayerBedLeave(this, configs.config), this);
+		getServer().getPluginManager().registerEvents(new OnPlayerJoin(this, configs.config), this);
+		getServer().getPluginManager().registerEvents(new OnPlayerQuit(this, configs.config), this);
+		getServer().getPluginManager().registerEvents(new OnPlayerChangeWorld(this, configs.config), this);
+		getServer().getPluginManager().registerEvents(new OnWeatherChange(configs.config), this);
+		getServer().getPluginManager().registerEvents(new OnNightSkip(this), this);
 		getServer().getPluginManager().registerEvents(this, this);
 		
 		if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
@@ -95,19 +95,19 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		//fix player counts on reload
 		boolean messageFromSleepingIgnored = (Boolean) configs.config.getConfigValue("messageFromSleepingIgnored", true);
 		for (org.bukkit.World w : Bukkit.getWorlds()) {
-			this.numPlayers.put(w, 0L);
+			this.numPlayers.put(w.getUID(), 0L);
 			for (Player p : w.getPlayers()){
 				if(p.hasPermission("sleep.ignore")) continue;
-				this.numPlayers.put(w, this.numPlayers.get(w)+1);
+				this.numPlayers.put(w.getUID(), this.numPlayers.get(w.getUID())+1);
 				if(!messageFromSleepingIgnored && p.isSleepingIgnored()) continue;
 				if(p.isSleeping()){
-					if(!this.sleepingPlayers.containsKey(w)){
-						this.sleepingPlayers.put(w, new HashSet<>());
+					if(!this.sleepingPlayers.containsKey(w.getUID())){
+						this.sleepingPlayers.put(w.getUID(), new HashSet<>());
 					}
-					this.sleepingPlayers.get(w).add(p);
+					this.sleepingPlayers.get(w.getUID()).add(p);
 				}
 			}
-			if(numPlayers.get(w) == 0) numPlayers.remove(w);
+			if(numPlayers.get(w.getUID()) == 0) numPlayers.remove(w.getUID());
 		}
 	}
 	

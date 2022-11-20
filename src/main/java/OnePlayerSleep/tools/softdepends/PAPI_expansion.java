@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.UUID;
 
 public class PAPI_expansion extends PlaceholderExpansion{
 	private final OnePlayerSleep plugin;
@@ -38,7 +39,7 @@ public class PAPI_expansion extends PlaceholderExpansion{
 
 	@Override
     public @NotNull String getVersion(){
-        return "3.1.9";
+        return "3.1.10";
     }
 	
 	@Override
@@ -49,17 +50,17 @@ public class PAPI_expansion extends PlaceholderExpansion{
 
         // %oneplayersleep_sleeping_player_count%
         if(identifier.equalsIgnoreCase("sleeping_player_count")){
-            Integer res = 0;
-            for(Map.Entry<World, HashSet<Player>> entry : this.plugin.sleepingPlayers.entrySet()){
+            int res = 0;
+            for(Map.Entry<UUID, HashSet<Player>> entry : this.plugin.sleepingPlayers.entrySet()){
                 res += entry.getValue().size();
             }
-            return res.toString();
+            return Integer.toString(res);
         }
 
         // %oneplayersleep_total_player_count%
         if(identifier.equalsIgnoreCase("total_player_count")){
-            Long res = Long.valueOf(0);
-            for(Map.Entry<World,Long> entry : this.plugin.numPlayers.entrySet()){
+            Long res = 0L;
+            for(Map.Entry<UUID,Long> entry : this.plugin.numPlayers.entrySet()){
                 res += entry.getValue();
             }
             return res.toString();

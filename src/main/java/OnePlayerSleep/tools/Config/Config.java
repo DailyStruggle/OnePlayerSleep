@@ -9,6 +9,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import OnePlayerSleep.types.MessageImpl;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -108,17 +109,26 @@ public class Config {
 		this.actionbar = this.messages.getString("actiobar","");
 
 		//load up message map for quick selection later
-		Set<String> messageListNames = this.messages.getConfigurationSection("messages").getKeys(false);
+		ConfigurationSection messages = this.messages.getConfigurationSection("messages");
+		if(messages == null) {
+			new IllegalStateException("missing messages section").printStackTrace();
+			return;
+		}
+		Set<String> messageListNames = messages.getKeys(false);
 		this.messageLookup = new HashMap<>();
 		this.totalChance = new HashMap<>();
 		for(String messageListName : messageListNames) {
-			Set<String> messageNames = this.messages.getConfigurationSection("messages").getConfigurationSection(messageListName).getKeys(false);
+			ConfigurationSection section = messages.getConfigurationSection(messageListName);
+			if(section == null) {
+				new IllegalStateException("missing message section - " + messageListName).printStackTrace();
+				return;
+			}
+			Set<String> messageNames = section.getKeys(false);
 
 			double totalChance = 0.0;
 			NavigableMap<Double, MessageImpl> messageLookup = new TreeMap<>();
 			for ( String messageName : messageNames) {
-				ConfigurationSection message = this.messages.getConfigurationSection("messages")
-						.getConfigurationSection(messageListName).getConfigurationSection(messageName);
+				ConfigurationSection message = section.getConfigurationSection(messageName);
 				String msg 			= message.getString("global", "");
 				String hover_msg 	= message.getString("hover", "");
 				String response 	= message.getString("wakeup", "");
@@ -301,11 +311,13 @@ public class Config {
 		renameFileInPluginDir("worlds.yml","worlds.temp.yml");
 
 		ArrayList<String> linesInWorlds = new ArrayList<>();
-		String defaultMessageGroup = this.worlds.getConfigurationSection("default").getString("msgGroup");
-		List<String> defaultTarget = this.worlds.getConfigurationSection("default").getStringList("sendTo");
-		List<String> defaultSync = this.worlds.getConfigurationSection("default").getStringList("timeSync");
-		Integer defaultStartTime = this.worlds.getConfigurationSection("default").getInt("startTime");
-		Integer defaultStopTime = this.worlds.getConfigurationSection("default").getInt("stopTime");
+		ConfigurationSection worldsConfigurationSection = this.worlds.getConfigurationSection("default");
+		Objects.requireNonNull(worldsConfigurationSection);
+		String defaultMessageGroup = worldsConfigurationSection.getString("msgGroup");
+		List<String> defaultTarget = worldsConfigurationSection.getStringList("sendTo");
+		List<String> defaultSync = worldsConfigurationSection.getStringList("timeSync");
+		Integer defaultStartTime = worldsConfigurationSection.getInt("startTime");
+		Integer defaultStopTime = worldsConfigurationSection.getInt("stopTime");
 
 		try {
 			Scanner scanner = new Scanner(
@@ -320,7 +332,7 @@ public class Config {
 					for(World w : Bukkit.getWorlds()) {
 						String worldName = w.getName();
 						if(this.worlds.contains(worldName)) continue;
-						this.worlds.set(worldName, this.worlds.getConfigurationSection("default"));
+						this.worlds.set(worldName, worldsConfigurationSection);
 
 						if(linesInWorlds.get(linesInWorlds.size()-1).length() < 4)
 							linesInWorlds.set(linesInWorlds.size()-1,"    " + worldName + ":");
@@ -459,20 +471,39 @@ public class Config {
 	}
 
 	public List<String> getMsgToWorlds(String worldName) {
-		return worlds.getConfigurationSection(worldName).getStringList("sendTo");
+		ConfigurationSection section = worlds.getConfigurationSection(worldName);
+		if(section == null) {
+			fillWorldsFile();
+			section = worlds.getConfigurationSection(worldName);
+			if(section == null){
+				new IllegalStateException("missing world - " + worldName).printStackTrace();
+				return new ArrayList<>();
+			}
+		}
+		return section.getStringList("sendTo");
 	}
 
 	public List<String> getSyncWorlds(String worldName) {
-		return worlds.getConfigurationSection(worldName).getStringList("timeSync");
+		ConfigurationSection section = worlds.getConfigurationSection(worldName);
+		if(section == null) {
+			fillWorldsFile();
+			section = worlds.getConfigurationSection(worldName);
+			if(section == null){
+				new IllegalStateException("missing world - " + worldName).printStackTrace();
+				return new ArrayList<>();
+			}
+		}
+		return section.getStringList("timeSync");
 	}
 
 	public String fillPlaceHolders(String res, World world) {
 		if(res == null || res.isEmpty()) return res;
-
-		String worldName = this.getWorldPlaceholder(world.getName());
-		String dimName = this.getDimensionPlaceholder(world.getEnvironment());
-		res = res.replace("[world]", worldName);
-		res = res.replace("[dimension]", dimName);
+		if(world != null) {
+			String worldName = this.getWorldPlaceholder(world.getName());
+			String dimName = this.getDimensionPlaceholder(world.getEnvironment());
+			res = res.replace("[world]", worldName);
+			res = res.replace("[dimension]", dimName);
+		}
 
 		res = ChatColor.translateAlternateColorCodes('&', res);
 		res = Hex2Color(res);
@@ -482,25 +513,30 @@ public class Config {
 	public String fillPlaceHolders(String res, String playerName) {
 		if(res == null || res.isEmpty()) return res;
 
-		Boolean isPlayer = !playerName.equals(this.getServerName());
+		boolean isPlayer = !playerName.equals(this.getServerName());
+
+		Player player = Bukkit.getPlayer(playerName);
+		if(player == null) isPlayer = false;
 
 		playerName = (isPlayer)
 				? playerName
 				: this.messages.getConfigurationSection("server").getString("name");
 		String playerDisplayName = (isPlayer)
-				? Bukkit.getPlayer(playerName).getDisplayName()
+				? player.getDisplayName()
 				: playerName;
 		World world = (isPlayer)
-				? Bukkit.getPlayer(playerName).getWorld()
+				? player.getWorld()
 				: Bukkit.getWorld( this.getServerWorldName() );
-
-		String worldName = this.getWorldPlaceholder(world.getName());
-		String dimName = this.getDimensionPlaceholder(world.getEnvironment());
 
 		res = res.replace("[username]", playerName);
 		res = res.replace("[displayname]", playerDisplayName);
-		if(worldName != null) res = res.replace("[world]", worldName);
-		if(dimName!=null) res = res.replace("[dimension]", dimName);
+		if(world!=null) {
+			String worldName = this.getWorldPlaceholder(world.getName());
+			String dimName = this.getDimensionPlaceholder(world.getEnvironment());
+
+			if(worldName != null) res = res.replace("[world]", worldName);
+			if(dimName!=null) res = res.replace("[dimension]", dimName);
+		}
 
 		//bukkit color codes
 		res = ChatColor.translateAlternateColorCodes('&', res);

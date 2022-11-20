@@ -8,12 +8,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockExplodeEvent;
 
-public class onBedExplode implements Listener {
-    private final OnePlayerSleep plugin;
+public class OnBedExplode implements Listener {
     private final Config config;
 
-    public onBedExplode(OnePlayerSleep plugin, Config config) {
-        this.plugin = plugin;
+    public OnBedExplode(Config config) {
         this.config = config;
     }
 

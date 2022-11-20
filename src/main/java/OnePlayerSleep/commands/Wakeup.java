@@ -116,6 +116,7 @@ public class Wakeup implements CommandExecutor {
 			return true;
 		}
 
+		List<UUID> wakeupPlayers = new ArrayList<>();
 		for(String worldName : syncWorlds) {
 			World world = Bukkit.getWorld(worldName);
 			if(	!this.plugin.sleepingPlayers.containsKey(world) ) continue;
@@ -131,7 +132,7 @@ public class Wakeup implements CommandExecutor {
 					cantKickAPlayer = true;
 					continue;
 				}
-				p.wakeup(true);
+				wakeupPlayers.add(p.getUniqueId());
 			}
 		}
 		
@@ -147,6 +148,11 @@ public class Wakeup implements CommandExecutor {
 
 		//send a wakeup message
 		plugin.wakeupCommandTime.set(System.currentTimeMillis());
+		for (UUID uuid : wakeupPlayers) {
+			Player p = Bukkit.getPlayer(uuid);
+			if (p != null) p.wakeup(true);
+		}
+
 		for(String worldName : this.config.getMsgToWorlds(myWorldName)) {
 			World world = Bukkit.getWorld(worldName);
 			new AnnounceWakeup(this.plugin, this.config, playerName, msg, world).runTaskAsynchronously(this.plugin);

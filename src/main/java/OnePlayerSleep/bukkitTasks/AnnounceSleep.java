@@ -50,7 +50,7 @@ public class AnnounceSleep extends BukkitRunnable{
 
 		for (String worldName : this.config.getMsgToWorlds(this.world.getName())) {
 			World w = Bukkit.getWorld(worldName);
-
+			if(w == null) continue;
 			for (Player p : w.getPlayers()) {
 				if(!messageToSleepingIgnored && p.isSleepingIgnored()) continue;
 
@@ -68,7 +68,12 @@ public class AnnounceSleep extends BukkitRunnable{
 		if(this.config.logMessages() || this.playerName.equals(this.config.getServerName())) {
 			String consoleMsg = this.message.msg.getText();
 			consoleMsg = config.fillPlaceHolders(consoleMsg,playerName);
-			UUID playerID = (playerName.equals(config.getServerName())) ? new UUID(0,0) : Bukkit.getPlayer(playerName).getUniqueId();
+			Player player = Bukkit.getPlayer(playerName);
+			if(player == null) {
+				new IllegalStateException().printStackTrace();
+				return;
+			}
+			UUID playerID = (playerName.equals(config.getServerName())) ? new UUID(0,0) : player.getUniqueId();
 			if(hasPAPI) consoleMsg = PlaceholderAPI.setPlaceholders(Bukkit.getOfflinePlayer(playerID),consoleMsg);
 			SendMessage.sendMessage(Bukkit.getConsoleSender(),consoleMsg);
 		}

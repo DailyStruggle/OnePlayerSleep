@@ -29,8 +29,9 @@ public class AnnounceWakeup extends BukkitRunnable{
 
 		//format and ship it
 		for (String worldName : this.config.getMsgToWorlds(this.world.getName())) {
-
-			for(Player p : Bukkit.getWorld(worldName).getPlayers()) {
+			World world = Bukkit.getWorld(worldName);
+			if(world == null) continue;
+			for(Player p : world.getPlayers()) {
 				if (!messageToSleepingIgnored && p.isSleepingIgnored()) continue;
 				if (p.hasPermission("sleep.ignore")) continue;
 				String wakeupMsg = config.fillPlaceHolders(

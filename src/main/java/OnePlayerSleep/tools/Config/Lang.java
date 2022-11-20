@@ -26,7 +26,7 @@ public class Lang {
         }
         this.config = YamlConfiguration.loadConfiguration(f);
 
-        if( 	(this.config.getDouble("version") < 2.2) ) {
+        if( 	(this.config.getDouble("version") < 1.0) ) {
             SendMessage.sendMessage(Bukkit.getConsoleSender(),getLog("oldFile", "lang.yml"));
             update(plugin);
 
@@ -87,7 +87,7 @@ public class Lang {
         for (String line : linesInDefaultConfig) {
             StringBuilder newline = new StringBuilder(line);
             if (line.startsWith("version:")) {
-                newline = new StringBuilder("version: 2.2");
+                newline = new StringBuilder("version: 1.0");
             } else {
                 for (String node : oldValues.keySet()) {
                     if(config.get(node) instanceof List) {

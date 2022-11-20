@@ -7,10 +7,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import OnePlayerSleep.tools.Config.Config;
 
-public class onWeatherChange implements Listener {
+public class OnWeatherChange implements Listener {
 	private final Config config;
 
-	public onWeatherChange(Config config) {
+	public OnWeatherChange(Config config) {
 		this.config = config;
 	}
 	
@@ -19,6 +19,7 @@ public class onWeatherChange implements Listener {
 		for(String worldName : this.config.getSyncWorlds(event.getWorld().getName())) {
 			if(worldName.equals(event.getWorld().getName())) continue;
 			World w = Bukkit.getWorld(worldName);
+			if(w == null) return;
 			if(w.getWeatherDuration() > event.getWorld().getWeatherDuration() - 10) continue; //prevent recursive events
 			w.setStorm(event.toWeatherState());
 

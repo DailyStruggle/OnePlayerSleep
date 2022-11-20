@@ -37,8 +37,8 @@ public class OnSleepChecks extends BukkitRunnable{
 		//add player to list of sleeping players for the world
 		if(player != null)
 		{
-			this.plugin.sleepingPlayers.putIfAbsent(this.world, new HashSet<>());
-			this.plugin.sleepingPlayers.get(this.world).add(this.player);
+			this.plugin.sleepingPlayers.putIfAbsent(this.world.getUID(), new HashSet<>());
+			this.plugin.sleepingPlayers.get(this.world.getUID()).add(this.player);
 		}
 
 		List<String> syncWorlds = this.config.getSyncWorlds(this.world.getName());
@@ -52,9 +52,11 @@ public class OnSleepChecks extends BukkitRunnable{
 			{
 				SendMessage.sendMessage(Bukkit.getConsoleSender(),this.config.getLog("invalidWorld",worldName));
 				SendMessage.sendMessage(Bukkit.getConsoleSender(),this.config.getLog("invalidWorld",worldName));
+				continue;
 			}
 
-			if( this.plugin.sleepingPlayers.containsKey(w) ) numSleepingPlayers += this.plugin.sleepingPlayers.get(w).size();
+			if( this.plugin.sleepingPlayers.containsKey(w.getUID()) )
+				numSleepingPlayers += this.plugin.sleepingPlayers.get(w.getUID()).size();
 			numPlayers += w.getPlayers().size();
 		}
 
@@ -67,24 +69,24 @@ public class OnSleepChecks extends BukkitRunnable{
 
 
 			//start sleep task
-			plugin.doSleep.remove(this.world);
-			plugin.doSleep.put(this.world, new PassTime(this.plugin, this.config, this.world)
+			plugin.doSleep.remove(this.world.getUID());
+			plugin.doSleep.put(this.world.getUID(), new PassTime(this.plugin, this.config, this.world)
 					.runTaskLater(this.plugin, sleepDelay));
 		}
 		
 		//set up clear weather task for later
-		if(!plugin.clearWeather.containsKey(this.world)) {
+		if(!plugin.clearWeather.containsKey(this.world.getUID())) {
 			//calculate how long to wait before clearing weather
-			Long dT = (this.config.getStopTime(this.world.getName()) - this.world.getTime()) / (Integer) this.config.getConfigValue("increment", 150);
-			Long cap = (this.world.getTime() - this.config.getStartTime(this.world.getName())) / (Integer) this.config.getConfigValue("increment", 150);
+			long dT = (this.config.getStopTime(this.world.getName()) - this.world.getTime()) / (Integer) this.config.getConfigValue("increment", 150);
+			long cap = (this.world.getTime() - this.config.getStartTime(this.world.getName())) / (Integer) this.config.getConfigValue("increment", 150);
 			
 			//calculate how long to clear weather for
-			Double randomFactor = new Random().nextDouble()*168000;
-			Long duration = 12000 + randomFactor.longValue();
+			double randomFactor = new Random().nextDouble()*168000;
+			Long duration = 12000 + (long)randomFactor;
 			
 			//start task
-			if(dT>1 && cap>=0) this.plugin.clearWeather.put(this.world, new ClearWeather(this.world,duration).runTaskLater(this.plugin, dT+sleepDelay));
-			else this.plugin.clearWeather.put(this.world, new ClearWeather(this.world,duration).runTaskLater(this.plugin, 2*sleepDelay));
+			if(dT>1 && cap>=0) this.plugin.clearWeather.put(this.world.getUID(), new ClearWeather(this.world,duration).runTaskLater(this.plugin, dT+sleepDelay));
+			else this.plugin.clearWeather.put(this.world.getUID(), new ClearWeather(this.world,duration).runTaskLater(this.plugin, 2L * sleepDelay));
 		}
 	}
 }

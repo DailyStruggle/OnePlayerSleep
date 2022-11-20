@@ -71,7 +71,7 @@ public class TabComplete implements TabCompleter {
 					res = new ArrayList<>();
 					List<String> names;
 
-					Integer delimiterIdx = args[args.length-1].indexOf('.');
+					int delimiterIdx = args[args.length-1].indexOf('.');
 					if(delimiterIdx > 0) {
 						String cmdListName = args[args.length-1].substring(0,delimiterIdx);
 

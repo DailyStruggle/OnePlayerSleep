@@ -28,7 +28,7 @@ public class Test implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!command.getName().equalsIgnoreCase("sleep test")) return true;
 
-		Boolean isPlayer = sender instanceof Player;
+		boolean isPlayer = sender instanceof Player;
 		String playerName = isPlayer
 				? sender.getName()
 				: this.config.getServerName();
@@ -41,19 +41,30 @@ public class Test implements CommandExecutor {
 			return true;
 		}
 
+		World world = Bukkit.getWorld(worldName);
+		if(world == null) {
+			new IllegalStateException().printStackTrace();
+			return true;
+		}
+
 
 		MessageImpl[] res;
 		switch(args.length) {
 			case 0: //if just /sleep test, pick 1 random message from player's world
 			{
 				res = new MessageImpl[1];
-				res[0] = this.plugin.getPluginConfig().pickRandomMessage(Bukkit.getWorld(worldName), playerName);
+				res[0] = this.plugin.getPluginConfig().pickRandomMessage(world, playerName);
 				break;
 			}
 			case 1: //if world arg, pick 1 random message from the world's list
 			{
 				res = new MessageImpl[1];
-				res[0] = this.plugin.getPluginConfig().pickRandomMessage(Bukkit.getWorld(args[0]), playerName);
+				World world1 = Bukkit.getWorld(args[0]);
+				if(world1 == null) {
+					new IllegalStateException().printStackTrace();
+					return true;
+				}
+				res[0] = this.plugin.getPluginConfig().pickRandomMessage(world1, playerName);
 				break;
 			}
 			default: //if world arg and message args
@@ -64,7 +75,7 @@ public class Test implements CommandExecutor {
 				{
 					//detect delimiter exists and where
 					String listName;
-					Integer delimiterIdx = args[i+1].indexOf('.');
+					int delimiterIdx = args[i+1].indexOf('.');
 					if(delimiterIdx > 0)
 					{
 						listName = args[i+1].substring(0, delimiterIdx);
@@ -103,10 +114,9 @@ public class Test implements CommandExecutor {
 		for( MessageImpl message : res) {
 			if(message == null) continue;
 			if(!isPlayer) {
-				World w = Bukkit.getWorld(worldName);
 				message.setWorld(worldName);
-				message.msg.setText(this.config.fillPlaceHolders(message.msg.getText(),w));
-				message.hoverText = this.config.fillPlaceHolders(message.hoverText,w);
+				message.msg.setText(this.config.fillPlaceHolders(message.msg.getText(), world));
+				message.hoverText = this.config.fillPlaceHolders(message.hoverText, world);
 			}
 
 			List<String> msgToWorldNames = this.config.getMsgToWorlds(worldName);

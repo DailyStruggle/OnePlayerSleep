@@ -7,11 +7,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import OnePlayerSleep.tools.Config.Config;
 
-public class onPlayerJoin implements Listener {
+public class OnPlayerJoin implements Listener {
     private final OnePlayerSleep plugin;
     private final Config config;
 
-    public onPlayerJoin(OnePlayerSleep plugin, Config config) {
+    public OnPlayerJoin(OnePlayerSleep plugin, Config config) {
         this.plugin = plugin;
         this.config = config;
     }
@@ -24,8 +24,9 @@ public class onPlayerJoin implements Listener {
             return;
 
         World myWorld = event.getPlayer().getWorld();
-        this.plugin.numPlayers.putIfAbsent(myWorld,Long.valueOf(1));
+        this.plugin.numPlayers.putIfAbsent(myWorld.getUID(),1L);
 
-        this.plugin.numPlayers.put( event.getPlayer().getWorld() , this.plugin.numPlayers.get(event.getPlayer().getWorld())+1 );
+        this.plugin.numPlayers.put( event.getPlayer().getWorld().getUID(),
+                this.plugin.numPlayers.get(event.getPlayer().getWorld().getUID())+1 );
     }
 }

@@ -16,12 +16,13 @@ import org.bukkit.event.player.PlayerBedLeaveEvent;
 import OnePlayerSleep.tools.Config.Config;
 
 import java.util.Objects;
+import java.util.UUID;
 
-public class onPlayerBedLeave implements Listener {
+public class OnPlayerBedLeave implements Listener {
 	private final OnePlayerSleep plugin;
 	private final Config config;
 	
-	public onPlayerBedLeave(OnePlayerSleep plugin, Config config) {
+	public OnPlayerBedLeave(OnePlayerSleep plugin, Config config) {
 		this.plugin = plugin;
 		this.config = config;
 	}
@@ -37,26 +38,30 @@ public class onPlayerBedLeave implements Listener {
 		World myWorld = event.getPlayer().getWorld();
 		String myWorldName = myWorld.getName();
 		this.config.checkWorldExists(myWorldName);
-		if(		this.plugin.sleepingPlayers.containsKey(myWorld) &&
-				this.plugin.sleepingPlayers.get(myWorld).contains(event.getPlayer())){
-			this.plugin.sleepingPlayers.get(myWorld).remove(event.getPlayer());
-			if(this.plugin.sleepingPlayers.get(myWorld).size() == 0) this.plugin.sleepingPlayers.remove(myWorld);
+		if(		this.plugin.sleepingPlayers.containsKey(myWorld.getUID()) &&
+				this.plugin.sleepingPlayers.get(myWorld.getUID()).contains(event.getPlayer())){
+			this.plugin.sleepingPlayers.get(myWorld.getUID()).remove(event.getPlayer());
+			if(this.plugin.sleepingPlayers.get(myWorld.getUID()).size() == 0) this.plugin.sleepingPlayers.remove(myWorld.getUID());
 		}
 
-		Long numSleepingPlayers = Long.valueOf(0);
+		long numSleepingPlayers = 0L;
 		for(String theirWorldName : this.config.getSyncWorlds(event.getBed().getWorld().getName()))
 		{
 			this.config.checkWorldExists(theirWorldName);
-			if(this.plugin.sleepingPlayers.containsKey(Bukkit.getWorld(theirWorldName)))
-				numSleepingPlayers += this.plugin.sleepingPlayers.get(Bukkit.getWorld(theirWorldName)).size();
+			World world = Bukkit.getWorld(theirWorldName);
+			if(world == null) continue;
+			if(this.plugin.sleepingPlayers.containsKey(world.getUID()))
+				numSleepingPlayers += this.plugin.sleepingPlayers.get(world.getUID()).size();
 		}
 
 		if(numSleepingPlayers == 0) {
+			int increment = 2 * (Integer)config.getConfigValue("increment",150);
 			for(String worldName : this.config.getSyncWorlds(myWorldName)) {
 				World world = Bukkit.getWorld(worldName);
-				if( this.plugin.doSleep.containsKey(world)) {
-					this.plugin.doSleep.get(world).cancel();
-					if(dt>100) {
+				if(world == null) continue;
+				if( this.plugin.doSleep.containsKey(world.getUID())) {
+					this.plugin.doSleep.get(world.getUID()).cancel();
+					if(dt>100 && world.getTime()<(this.config.getStopTime(worldName)-increment)) {
 						MessageImpl msg = this.plugin.wakeData.get(event.getPlayer().getUniqueId());
 						new AnnounceCancel(this.config, msg, world).runTaskAsynchronously(this.plugin);
 					}
@@ -66,11 +71,13 @@ public class onPlayerBedLeave implements Listener {
 		else if( event.getPlayer().getWorld().getTime() >= 23460) {
 			for(String worldName : this.config.getSyncWorlds(myWorldName)) {
 				World w = Bukkit.getWorld(worldName);
+				if(w == null) continue;
 				if(w.getTime()!= myWorld.getTime()) w.setTime(myWorld.getTime());
-				this.plugin.doSleep.get(w).cancel();
-				this.plugin.clearWeather.get(w).cancel();
-				this.plugin.clearWeather.remove(w);
-				this.plugin.clearWeather.put(w, new ClearWeather(w).runTask(this.plugin));
+				UUID uuid = w.getUID();
+				this.plugin.doSleep.get(uuid).cancel();
+				this.plugin.clearWeather.get(uuid).cancel();
+				this.plugin.clearWeather.remove(uuid);
+				this.plugin.clearWeather.put(uuid, new ClearWeather(w).runTask(this.plugin));
 				if((Boolean)this.config.getConfigValue("resetAllStatistics", true)) {
 					for (Player p : w.getPlayers()) {
 						if(p.hasPermission("sleep.ignore")) continue;
