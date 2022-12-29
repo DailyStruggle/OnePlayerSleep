@@ -69,11 +69,12 @@ public class AnnounceSleep extends BukkitRunnable{
 			String consoleMsg = this.message.msg.getText();
 			consoleMsg = config.fillPlaceHolders(consoleMsg,playerName);
 			Player player = Bukkit.getPlayer(playerName);
-			if(player == null) {
-				new IllegalStateException().printStackTrace();
-				return;
+			UUID playerID;
+			if(player!=null) playerID = player.getUniqueId();
+			else  {
+				if(playerName.equals(config.getServerName())) playerID = new UUID(0,0);
+				else return;
 			}
-			UUID playerID = (playerName.equals(config.getServerName())) ? new UUID(0,0) : player.getUniqueId();
 			if(hasPAPI) consoleMsg = PlaceholderAPI.setPlaceholders(Bukkit.getOfflinePlayer(playerID),consoleMsg);
 			SendMessage.sendMessage(Bukkit.getConsoleSender(),consoleMsg);
 		}

@@ -2,6 +2,7 @@ package OnePlayerSleep.commands;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import OnePlayerSleep.tools.Config.Config;
+import OnePlayerSleep.tools.SendMessage;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -18,7 +19,7 @@ public class Help implements CommandExecutor{
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!sender.hasPermission("sleep.see")) return false;
 
-		BaseComponent[] msg = TextComponent.fromLegacyText(this.config.getLog("help"));
+		BaseComponent[] msg = TextComponent.fromLegacyText(SendMessage.formatDry(this.config.getLog("help")));
 		for(BaseComponent component : msg) {
 			component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("/sleep help").create()));
 			component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/sleep help"));
@@ -26,7 +27,7 @@ public class Help implements CommandExecutor{
 		sender.spigot().sendMessage(msg);
 		
 		if(sender.hasPermission("sleep.wakeup")) {
-			msg = TextComponent.fromLegacyText(this.config.getLog("wakeup"));
+			msg = TextComponent.fromLegacyText(SendMessage.formatDry(this.config.getLog("wakeup")));
 			for(BaseComponent component : msg) {
 				component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("/sleep wakeup").create()));
 				component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/sleep wakeup"));
@@ -35,7 +36,7 @@ public class Help implements CommandExecutor{
 		}
 
 		if(sender.hasPermission("sleep.reload")) {
-			msg = TextComponent.fromLegacyText(this.config.getLog("reload"));
+			msg = TextComponent.fromLegacyText(SendMessage.formatDry(this.config.getLog("reload")));
 			for(BaseComponent component : msg) {
 				component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("/sleep reload").create()));
 				component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/sleep reload"));
@@ -45,7 +46,7 @@ public class Help implements CommandExecutor{
 
 
 		if(sender.hasPermission("sleep.test")) {
-			msg = TextComponent.fromLegacyText(this.config.getLog("test"));
+			msg = TextComponent.fromLegacyText(SendMessage.formatDry(this.config.getLog("test")));
 			for(BaseComponent component : msg) {
 				component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("/sleep test").create()));
 				component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/sleep test"));
