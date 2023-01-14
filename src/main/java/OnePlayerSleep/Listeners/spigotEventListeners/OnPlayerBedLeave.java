@@ -17,6 +17,7 @@ import OnePlayerSleep.tools.Config.Config;
 
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class OnPlayerBedLeave implements Listener {
 	private final OnePlayerSleep plugin;
@@ -33,6 +34,8 @@ public class OnPlayerBedLeave implements Listener {
 		if(!messageFromSleepingIgnored && event.getPlayer().isSleepingIgnored()) return;
 		if(event.getPlayer().hasPermission("sleep.ignore")) return;
 		long dt = System.currentTimeMillis() - plugin.wakeupCommandTime.get();
+		long dt2 = System.currentTimeMillis() - plugin.clearWeatherTime.getOrDefault(event.getPlayer().getWorld().getUID(),new AtomicLong(0L)).get();
+		dt = Math.min(dt,dt2);
 
 		//remove player from sleep lookup table
 		World myWorld = event.getPlayer().getWorld();

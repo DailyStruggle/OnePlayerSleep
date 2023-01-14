@@ -28,6 +28,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 	public ConcurrentSkipListSet<UUID> titles;
 	public ConcurrentHashMap<UUID,BukkitTask> doSleep;
 	public ConcurrentHashMap<UUID,BukkitTask> clearWeather;
+	public ConcurrentHashMap<UUID,AtomicLong> clearWeatherTime;
 	public ConcurrentHashMap<UUID, MessageImpl> wakeData; //list of players receiving messages
 	public ConcurrentHashMap<UUID, HashSet<Player>> sleepingPlayers; //list of sleeping players for each world
 	public ConcurrentHashMap<UUID,Long> numPlayers;
@@ -48,6 +49,7 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 		this.numPlayers = new ConcurrentHashMap<>();
 		this.doSleep = new ConcurrentHashMap<>();
 		this.clearWeather = new ConcurrentHashMap<>();
+		this.clearWeatherTime = new ConcurrentHashMap<>();
 		this.wakeData = new ConcurrentHashMap<>();
 		this.sleepingPlayers = new ConcurrentHashMap<>();
 

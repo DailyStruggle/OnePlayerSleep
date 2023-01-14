@@ -12,6 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import OnePlayerSleep.tools.Config.Config;
 import OnePlayerSleep.types.MessageImpl;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -25,10 +26,10 @@ public class Wakeup implements CommandExecutor {
 	}
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+	public boolean onCommand(CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
 		if(!sender.hasPermission("sleep.wakeup")) return false;
 
-		Boolean isPlayer = (sender instanceof Player);
+		boolean isPlayer = (sender instanceof Player);
 		String playerName = isPlayer
 				? sender.getName()
 				: this.config.getServerName();
@@ -37,7 +38,7 @@ public class Wakeup implements CommandExecutor {
 				: config.getServerWorldName();
 		this.config.checkWorldExists(myWorldName);
 
-		Boolean cantKickAPlayer = false;
+		boolean cantKickAPlayer = false;
 
 		String cmdWorldName = isPlayer
 				? ((Player)sender).getWorld().getName()
@@ -48,19 +49,23 @@ public class Wakeup implements CommandExecutor {
 			return true;
 		}
 		MessageImpl msg;
+		World world1 = Bukkit.getWorld(myWorldName);
+		if(world1 == null) return true;
 		switch(args.length) {
 			case 0: { //no args, use last message given to player
 				if(isPlayer) msg = this.plugin.wakeData.get(((Player) sender).getUniqueId());
-				else msg = config.pickRandomMessage(Bukkit.getWorld(myWorldName), playerName);
+				else msg = config.pickRandomMessage(world1, playerName);
 				break;
 			}
 			case 1: { //only world name
-				msg = config.pickRandomMessage(Bukkit.getWorld(args[0]), playerName);
+				World world = Bukkit.getWorld(args[0]);
+				if(world == null) return true;
+				msg = config.pickRandomMessage(world, playerName);
 				break;
 			}
 			default: { //world name + message name
 				Set<String> listNames = this.config.getMessageListNames();
-				Integer delimiterIdx = args[1].indexOf('.');
+				int delimiterIdx = args[1].indexOf('.');
 				if(delimiterIdx > 0) {
 					String listName = args[1].substring(0,delimiterIdx);
 					String msgName = args[1].substring(delimiterIdx+1);
@@ -91,7 +96,7 @@ public class Wakeup implements CommandExecutor {
 			}
 		}
 
-		if(msg == null) msg = config.pickRandomMessage(Bukkit.getWorld(myWorldName), playerName);
+		if(msg == null) msg = config.pickRandomMessage(world1, playerName);
 
 		//check if user should have a say in this
 		if((!config.getMsgToWorlds(myWorldName).contains(cmdWorldName))&&(!sender.hasPermission("sleep.global"))) {
@@ -101,17 +106,20 @@ public class Wakeup implements CommandExecutor {
 
 		//check if there's anything to do
 		List<String> syncWorlds = config.getSyncWorlds(myWorldName);
-		Integer numSleeping = 0;
+		int numSleeping = 0;
 		for(String worldName : syncWorlds) {
 			World world = Bukkit.getWorld(worldName);
-			if(	!this.plugin.sleepingPlayers.containsKey(world) ) continue;
-			numSleeping += this.plugin.sleepingPlayers.get(world).size();
+			if(world==null) continue;
+			if(	!this.plugin.sleepingPlayers.containsKey(world.getUID())) continue;
+			numSleeping += this.plugin.sleepingPlayers.get(world.getUID()).size();
 		}
 
 		if(numSleeping == 0) {
 			String onNoPlayersSleeping = config.getLog("onNoPlayersSleeping");
-			if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null)
+			if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+				assert sender instanceof Player;
 				onNoPlayersSleeping = PlaceholderAPI.setPlaceholders((Player)sender, onNoPlayersSleeping);
+			}
 			SendMessage.sendMessage(sender,onNoPlayersSleeping);
 			return true;
 		}
@@ -119,8 +127,9 @@ public class Wakeup implements CommandExecutor {
 		List<UUID> wakeupPlayers = new ArrayList<>();
 		for(String worldName : syncWorlds) {
 			World world = Bukkit.getWorld(worldName);
-			if(	!this.plugin.sleepingPlayers.containsKey(world) ) continue;
-			HashSet<Player> players = this.plugin.sleepingPlayers.get(world);
+			if(world == null) continue;
+			if(	!this.plugin.sleepingPlayers.containsKey(world.getUID()) ) continue;
+			HashSet<Player> players = this.plugin.sleepingPlayers.get(world.getUID());
 			if(players == null) continue;
 			//attempt to wake each player
 			for(Player p : players) {
@@ -139,8 +148,10 @@ public class Wakeup implements CommandExecutor {
 		//if failed to kick everyone
 		if(cantKickAPlayer) {
 			String send;
-			if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null)
+			if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+				assert sender instanceof Player;
 				send = PlaceholderAPI.setPlaceholders((Player)sender, msg.cantWakeup);
+			}
 			else send = msg.cantWakeup;
 			SendMessage.sendMessage(sender,send);
 			return true;

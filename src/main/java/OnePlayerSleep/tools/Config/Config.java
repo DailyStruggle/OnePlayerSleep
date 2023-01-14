@@ -160,7 +160,7 @@ public class Config {
 		}
 
 		//update world list and save
-		this.fillWorldsFile();
+		Bukkit.getScheduler().runTaskAsynchronously(OnePlayerSleep.getInstance(),this::fillWorldsFile);
 	}
 
 	public MessageImpl pickRandomMessage(World world, String playerName) {
