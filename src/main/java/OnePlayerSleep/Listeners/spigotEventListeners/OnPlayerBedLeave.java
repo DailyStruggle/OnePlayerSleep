@@ -18,6 +18,7 @@ import OnePlayerSleep.tools.Config.Config;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Level;
 
 public class OnPlayerBedLeave implements Listener {
 	private final OnePlayerSleep plugin;
@@ -64,14 +65,23 @@ public class OnPlayerBedLeave implements Listener {
 				if(world == null) continue;
 				if( this.plugin.doSleep.containsKey(world.getUID())) {
 					this.plugin.doSleep.get(world.getUID()).cancel();
-					if(dt>100 && world.getTime()<(this.config.getStopTime(worldName)-increment)) {
+					if(		dt>100
+							&& (myWorld.getTime() > this.config.getStartTime(myWorld.getName())+increment
+							&& myWorld.getTime() < this.config.getStopTime(myWorld.getName())-increment)
+							&& myWorld.getTime() < 22000
+					) {
 						MessageImpl msg = this.plugin.wakeData.get(event.getPlayer().getUniqueId());
 						new AnnounceCancel(this.config, msg, world).runTaskAsynchronously(this.plugin);
+					}
+					else {
+						new ClearWeather(myWorld).runTask(this.plugin);
 					}
 				}
 			}
 		}
-		else if( event.getPlayer().getWorld().getTime() >= 23460) {
+		else if((myWorld.getTime() < this.config.getStartTime(myWorld.getName())
+				|| myWorld.getTime() > this.config.getStopTime(myWorld.getName()))
+				&& !myWorld.hasStorm()) {
 			for(String worldName : this.config.getSyncWorlds(myWorldName)) {
 				World w = Bukkit.getWorld(worldName);
 				if(w == null) continue;
