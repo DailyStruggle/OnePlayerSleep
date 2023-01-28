@@ -604,7 +604,9 @@ public class Config {
 	}
 
 	public Object getConfigValue(String name, Object def) {
-		return this.config.get(name,def);
+		Object o = this.config.get(name, def);
+		if(o.getClass().equals(def.getClass())) return o;
+		return def;
 	}
 
 	public Set<String> getMessageListNames() {

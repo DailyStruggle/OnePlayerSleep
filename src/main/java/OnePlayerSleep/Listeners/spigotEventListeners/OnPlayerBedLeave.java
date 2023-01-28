@@ -2,10 +2,8 @@ package OnePlayerSleep.Listeners.spigotEventListeners;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import OnePlayerSleep.bukkitTasks.AnnounceCancel;
-import OnePlayerSleep.bukkitTasks.AnnounceWakeup;
 import OnePlayerSleep.bukkitTasks.ClearWeather;
 import OnePlayerSleep.types.MessageImpl;
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
 import org.bukkit.World;
@@ -15,10 +13,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import OnePlayerSleep.tools.Config.Config;
 
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Level;
 
 public class OnPlayerBedLeave implements Listener {
 	private final OnePlayerSleep plugin;
@@ -61,20 +57,31 @@ public class OnPlayerBedLeave implements Listener {
 		if(numSleepingPlayers == 0) {
 			int increment = 2 * (Integer)config.getConfigValue("increment",150);
 			for(String worldName : this.config.getSyncWorlds(myWorldName)) {
-				World world = Bukkit.getWorld(worldName);
-				if(world == null) continue;
-				if( this.plugin.doSleep.containsKey(world.getUID())) {
-					this.plugin.doSleep.get(world.getUID()).cancel();
+				World w = Bukkit.getWorld(worldName);
+				if(w == null) continue;
+				if( this.plugin.doSleep.containsKey(w.getUID())) {
+					this.plugin.doSleep.get(w.getUID()).cancel();
 					if(		dt>100
 							&& (myWorld.getTime() > this.config.getStartTime(myWorld.getName())+increment
 							&& myWorld.getTime() < this.config.getStopTime(myWorld.getName())-increment)
 							&& myWorld.getTime() < 22000
 					) {
 						MessageImpl msg = this.plugin.wakeData.get(event.getPlayer().getUniqueId());
-						new AnnounceCancel(this.config, msg, world).runTaskAsynchronously(this.plugin);
+						new AnnounceCancel(this.config, msg, w).runTaskAsynchronously(this.plugin);
 					}
 					else {
-						new ClearWeather(myWorld).runTask(this.plugin);
+						if(w.getTime() != myWorld.getTime()) w.setTime(myWorld.getTime());
+						UUID uuid = w.getUID();
+						this.plugin.doSleep.get(uuid).cancel();
+						this.plugin.clearWeather.get(uuid).cancel();
+						this.plugin.clearWeather.remove(uuid);
+						this.plugin.clearWeather.put(uuid, new ClearWeather(w).runTask(this.plugin));
+						if((Boolean)this.config.getConfigValue("resetPhantomStatistics", true)) {
+							for (Player p : w.getPlayers()) {
+								if(p.hasPermission("sleep.ignore")) continue;
+								p.setStatistic(Statistic.TIME_SINCE_REST, 0);
+							}
+						}
 					}
 				}
 			}
@@ -85,13 +92,13 @@ public class OnPlayerBedLeave implements Listener {
 			for(String worldName : this.config.getSyncWorlds(myWorldName)) {
 				World w = Bukkit.getWorld(worldName);
 				if(w == null) continue;
-				if(w.getTime()!= myWorld.getTime()) w.setTime(myWorld.getTime());
+				if(w.getTime() != myWorld.getTime()) w.setTime(myWorld.getTime());
 				UUID uuid = w.getUID();
 				this.plugin.doSleep.get(uuid).cancel();
 				this.plugin.clearWeather.get(uuid).cancel();
 				this.plugin.clearWeather.remove(uuid);
 				this.plugin.clearWeather.put(uuid, new ClearWeather(w).runTask(this.plugin));
-				if((Boolean)this.config.getConfigValue("resetAllStatistics", true)) {
+				if((Boolean)this.config.getConfigValue("resetPhantomStatistics", true)) {
 					for (Player p : w.getPlayers()) {
 						if(p.hasPermission("sleep.ignore")) continue;
 						p.setStatistic(Statistic.TIME_SINCE_REST, 0);
