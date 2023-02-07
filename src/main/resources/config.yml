@@ -32,8 +32,17 @@ logMessages: true
 messageFromSleepingIgnored: false
 messageToSleepingIgnored: true
 
+#allow sleeping outside defined times if weather is not currently clear
+weatherSleep: false
+
 #how many players online and awake before sleep messages are used
 minPlayers: 2
 
+#base length of time for clear weather, in seconds
+clearDuration: 600
+
+#random length of time added to clearDuration, in seconds
+clearRandomDuration: 9000
+
 #DO NOT TOUCH VERSION NUMBER
-version: 2.1
+version: 2.2

@@ -17,7 +17,6 @@ import OnePlayerSleep.types.MessageImpl;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicLong;
 
 public final class OnePlayerSleep extends JavaPlugin implements Listener {
@@ -25,7 +24,6 @@ public final class OnePlayerSleep extends JavaPlugin implements Listener {
 
 	private static Configs configs;
 
-	public ConcurrentSkipListSet<UUID> titles;
 	public ConcurrentHashMap<UUID,BukkitTask> doSleep;
 	public ConcurrentHashMap<UUID,BukkitTask> clearWeather;
 	public ConcurrentHashMap<UUID,AtomicLong> clearWeatherTime;

@@ -3,6 +3,7 @@ package OnePlayerSleep.Listeners.spigotEventListeners;
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import OnePlayerSleep.bukkitTasks.AnnounceCancel;
 import OnePlayerSleep.bukkitTasks.ClearWeather;
+import OnePlayerSleep.tools.Config.Config;
 import OnePlayerSleep.types.MessageImpl;
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
@@ -11,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
-import OnePlayerSleep.tools.Config.Config;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;

@@ -3,7 +3,7 @@
 #on wakeup command, no players are asleep
 onNoPlayersSleeping: "&eNo players sleeping!"
 
-badTimeMessage: "&eYou can't sleep during the day"
+badTimeMessage: "&eYou can only sleep at night or during thunderstorms"
 
 cooldownMessage: "&eYou can't sleep again yet"
 

@@ -25,12 +25,19 @@ public class ClearWeather extends BukkitRunnable{
 
 	@Override
 	public void run() {
+		if(world.isClearWeather()) return;
+
 		this.world.setStorm(false);
 		this.world.setThundering(false);
 		if(this.duration == 0) {
-			long randomFactor = ThreadLocalRandom.current().nextLong(18000);
-			this.duration = 6000 + randomFactor;
+			Integer clearDuration = OnePlayerSleep.getConfigs().config.getClearDuration();
+			Integer clearRandomDuration = OnePlayerSleep.getConfigs().config.getClearRandomDuration();
+			long randomFactor = ThreadLocalRandom.current().nextLong(clearRandomDuration);
+			this.duration = (clearDuration + randomFactor) * 20;
 		}
+
+		this.duration = Math.max(this.duration,world.getWeatherDuration());
+
 		this.world.setWeatherDuration(this.duration.intValue());
 		this.cancel();
 		long l = System.currentTimeMillis();

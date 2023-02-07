@@ -66,8 +66,6 @@ public class OnSleepChecks extends BukkitRunnable{
 			//async message selection and delivery
 			new AnnounceSleep(this.plugin, this.config, this.player.getName(), this.world).runTaskAsynchronously(this.plugin);
 
-
-
 			//start sleep task
 			plugin.doSleep.remove(this.world.getUID());
 			plugin.doSleep.put(this.world.getUID(), new PassTime(this.plugin, this.config, this.world)

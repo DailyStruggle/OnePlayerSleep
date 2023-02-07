@@ -2,6 +2,9 @@ package OnePlayerSleep.Listeners.spigotEventListeners;
 
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import OnePlayerSleep.bukkitTasks.OnSleepChecks;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -12,6 +15,7 @@ import OnePlayerSleep.tools.Config.Config;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 /*
 Class for filtering bed entry and setting up an async task for filtering world behaviors
@@ -43,20 +47,6 @@ public class OnPlayerBedEnter implements Listener {
 			return;
 		}
 
-		//check time
-		if(		(myWorld.getTime() < this.config.getStartTime(myWorld.getName())
-				|| myWorld.getTime() > this.config.getStopTime(myWorld.getName()))
-				&& !myWorld.hasStorm()		)
-		{
-			String msg = config.getLog("badTimeMessage");
-			msg = this.config.fillPlaceHolders(
-					msg,
-					event.getPlayer().getName());
-			event.getPlayer().sendMessage(msg);
-			event.setCancelled(true);
-			return;
-		}
-
 		//cooldown logic
 		long currentTime = System.currentTimeMillis();
 		if(		this.lastTme.containsKey(event.getPlayer()) &&
@@ -66,14 +56,59 @@ public class OnPlayerBedEnter implements Listener {
 			msg = this.config.fillPlaceHolders(
 					msg,
 					event.getPlayer().getName());
-			event.getPlayer().sendMessage(msg);
+			try {
+				event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(msg));
+			} catch (Throwable throwable) {
+				event.getPlayer().sendMessage(msg);
+			}
+			return;
+		}
+
+		if(event.getBedEnterResult().equals(PlayerBedEnterEvent.BedEnterResult.NOT_POSSIBLE_NOW)) {
 			event.setCancelled(true);
+			boolean weatherSleep = Boolean.parseBoolean(this.config.getConfigValue("weatherSleep", false).toString());
+			if(weatherSleep && !myWorld.isClearWeather()) {
+				event.setUseBed(Event.Result.ALLOW);
+				event.getPlayer().sleep(event.getBed().getLocation(), true);
+			}
+			else if (myWorld.getTime() >= this.config.getStartTime(myWorld.getName())
+					&& myWorld.getTime() <= this.config.getStopTime(myWorld.getName())) {
+				if (!myWorld.isClearWeather()) {
+					event.setUseBed(Event.Result.ALLOW);
+					event.getPlayer().sleep(event.getBed().getLocation(), true);
+				} else {
+					String msg = config.getLog("badTimeMessage");
+					msg = this.config.fillPlaceHolders(
+							msg,
+							event.getPlayer().getName());
+					try {
+						event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(msg));
+					} catch (Throwable throwable) {
+						event.getPlayer().sendMessage(msg);
+					}
+				}
+			}
+			else {
+				String msg = config.getLog("badTimeMessage");
+				msg = this.config.fillPlaceHolders(
+						msg,
+						event.getPlayer().getName());
+				try {
+					event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(msg));
+				} catch (Throwable throwable) {
+					event.getPlayer().sendMessage(msg);
+				}
+			}
+			return;
+		}
+
+		if(event.getBedEnterResult().equals(PlayerBedEnterEvent.BedEnterResult.NOT_POSSIBLE_HERE)) event.setUseBed(Event.Result.ALLOW);
+		else if(!event.getBedEnterResult().equals(PlayerBedEnterEvent.BedEnterResult.OK)) {
 			return;
 		}
 
 		this.lastTme.put(event.getPlayer(), currentTime);
-
-		if(event.getBedEnterResult().equals(PlayerBedEnterEvent.BedEnterResult.NOT_POSSIBLE_HERE)) event.setUseBed(Event.Result.ALLOW);
+		event.getPlayer().setPlayerTime(13000,false);
 
 		//do other relevant checks asynchronously
 		new OnSleepChecks(this.plugin, this.config, event.getPlayer(), myWorld).runTaskAsynchronously(plugin);

@@ -68,23 +68,6 @@ public class Config {
 			this.lang = YamlConfiguration.loadConfiguration(f);
 		}
 
-		//load config.yml file
-		f = new File(this.plugin.getDataFolder(), "config.yml");
-		if(!f.exists())
-		{
-			plugin.saveResource("config.yml", false);
-		}
-		this.config = YamlConfiguration.loadConfiguration(f);
-
-		if( 	(this.config.getDouble("version") < 2.1) ) {
-			SendMessage.sendMessage(Bukkit.getConsoleSender(),this.getLog("oldFile", "config.yml"));
-
-			updateConfig();
-
-			f = new File(this.plugin.getDataFolder(), "config.yml");
-			this.config = YamlConfiguration.loadConfiguration(f);
-		}
-
 		//load messages.yml file
 		f = new File(this.plugin.getDataFolder(), "messages.yml");
 		if(!f.exists())
@@ -96,9 +79,42 @@ public class Config {
 		if( 	(this.messages.getDouble("version") < 2.2) ) {
 			SendMessage.sendMessage(Bukkit.getConsoleSender(),this.getLog("oldFile", "messages.yml"));
 			this.renameFileInPluginDir("messages.yml","messages.old.yml");
-			
+
 			this.plugin.saveResource("messages.yml", false);
 			this.messages = YamlConfiguration.loadConfiguration(f);
+		}
+
+		//load worlds.yml file
+		f = new File(this.plugin.getDataFolder(), "worlds.yml");
+		if(!f.exists())
+		{
+			plugin.saveResource("worlds.yml", false);
+		}
+		this.worlds = YamlConfiguration.loadConfiguration(f);
+
+		if( 	(this.worlds.getDouble("version") < 1.2) ) {
+			SendMessage.sendMessage(Bukkit.getConsoleSender(),this.getLog("oldFile", "worlds.yml"));
+			this.renameFileInPluginDir("worlds.yml","worlds.old.yml");
+
+			this.plugin.saveResource("worlds.yml", false);
+			this.worlds = YamlConfiguration.loadConfiguration(f);
+		}
+
+		//load config.yml file
+		f = new File(this.plugin.getDataFolder(), "config.yml");
+		if(!f.exists())
+		{
+			plugin.saveResource("config.yml", false);
+		}
+		this.config = YamlConfiguration.loadConfiguration(f);
+
+		if( 	(this.config.getDouble("version") < 2.2) ) {
+			SendMessage.sendMessage(Bukkit.getConsoleSender(),this.getLog("oldFile", "config.yml"));
+
+			updateConfig();
+
+			f = new File(this.plugin.getDataFolder(), "config.yml");
+			this.config = YamlConfiguration.loadConfiguration(f);
 		}
 
 		this.title = this.messages.getString("title","");
@@ -140,23 +156,6 @@ public class Config {
 			}
 			this.messageLookup.putIfAbsent(messageListName,messageLookup);
 			this.totalChance.putIfAbsent(messageListName,totalChance);
-		}
-
-
-		//load worlds.yml file
-		f = new File(this.plugin.getDataFolder(), "worlds.yml");
-		if(!f.exists())
-		{
-			plugin.saveResource("worlds.yml", false);
-		}
-		this.worlds = YamlConfiguration.loadConfiguration(f);
-
-		if( 	(this.worlds.getDouble("version") < 1.2) ) {
-			SendMessage.sendMessage(Bukkit.getConsoleSender(),this.getLog("oldFile", "worlds.yml"));
-			this.renameFileInPluginDir("worlds.yml","worlds.old.yml");
-
-			this.plugin.saveResource("worlds.yml", false);
-			this.worlds = YamlConfiguration.loadConfiguration(f);
 		}
 
 		//update world list and save
@@ -280,7 +279,7 @@ public class Config {
 		for (String line : linesInDefaultConfig) {
 			String newline = line;
 			if (line.startsWith("version:")) {
-				newline = "version: 2.1";
+				newline = "version: 2.2";
 			} else {
 				for (String node : oldValues.keySet()) {
 					if (line.startsWith(node + ":")) {
@@ -552,7 +551,10 @@ public class Config {
 	}
 
 	public String getServerName() {
-		return this.messages.getConfigurationSection("server").getString("name");
+		if(this.messages == null) return "[server]";
+		ConfigurationSection server = this.messages.getConfigurationSection("server");
+		if(server == null) return "[server]";
+		return server.getString("name");
 	}
 
 	public String getServerWorldName() {
@@ -565,6 +567,13 @@ public class Config {
 
 	public Integer getMinPlayers() {
 		return this.config.getInt("minPlayers", 2);
+	}
+
+	public Integer getClearDuration() {
+		return this.config.getInt("clearDuration", 600);
+	}
+	public Integer getClearRandomDuration() {
+		return this.config.getInt("clearRandomDuration", 9000);
 	}
 
 	public String getLog(String key) {
@@ -605,8 +614,8 @@ public class Config {
 
 	public Object getConfigValue(String name, Object def) {
 		Object o = this.config.get(name, def);
-		if(o.getClass().equals(def.getClass())) return o;
-		return def;
+//		if(o.getClass().equals(def.getClass())) return o;
+		return o;
 	}
 
 	public Set<String> getMessageListNames() {
