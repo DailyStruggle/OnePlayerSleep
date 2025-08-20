@@ -3,13 +3,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.leafcraft</groupId>
-    <artifactId>OnePlayerSleep</artifactId>
-    <version>3.1.16</version>
+    <groupId>com.minekartastudio</groupId>
+    <artifactId>KartaSoloSlumber</artifactId>
+    <version>1.0.0</version>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -20,8 +20,8 @@
               <artifactId>maven-compiler-plugin</artifactId>
               <version>3.8.1</version>
               <configuration>
-                  <source>1.8</source>
-                  <target>1.8</target>
+                  <source>17</source>
+                  <target>17</target>
               </configuration>
             </plugin>
             <plugin>
@@ -33,11 +33,11 @@
                     <relocations>
                         <relocation>
                             <pattern>org.bstats</pattern>
-                            <shadedPattern>leafcraft.rtp.bstats</shadedPattern>
+                            <shadedPattern>com.minekartastudio.kartasoloslumber.bstats</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>com.iridium.IridiumColorAPI</pattern>
-                            <shadedPattern>leafcraft.rtp.IridiumColorAPI</shadedPattern> <!-- Replace this -->
+                            <shadedPattern>com.minekartastudio.kartasoloslumber.IridiumColorAPI</shadedPattern> <!-- Replace this -->
                         </relocation>
                     </relocations>
                     <filters>
@@ -73,12 +73,12 @@
 
     <repositories>
         <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
         <repository>
-            <id>placeholderapi</id>
-            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+            <id>cloudsmith</id>
+            <url>https://dl.cloudsmith.io/public/arcane/archive/maven/</url>
         </repository>
         <repository>
             <id>dmulloy2-repo</id>
@@ -88,9 +88,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.17.1-R0.1-SNAPSHOT</version>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>1.21-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

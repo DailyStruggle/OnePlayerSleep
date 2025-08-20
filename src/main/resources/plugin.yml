@@ -1,8 +1,8 @@
-name: OnePlayerSleep
-main: OnePlayerSleep.OnePlayerSleep.OnePlayerSleep
+name: KartaSoloSlumber
+main: com.minekartastudio.kartasoloslumber.KartaSoloSlumber
 version: ${project.version}
-api-version: 1.13
-author: leaf26
+api-version: 1.21
+author: MinekartaStudio
 website: https://github.com/DailyStruggle
 
 softdepend: [PlaceholderAPI]
