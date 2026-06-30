@@ -161,7 +161,9 @@ public class Wakeup implements CommandExecutor {
 		plugin.wakeupCommandTime.set(System.currentTimeMillis());
 		for (UUID uuid : wakeupPlayers) {
 			Player p = Bukkit.getPlayer(uuid);
-			if (p != null) p.wakeup(true);
+			if (p != null) {
+				p.wakeup(true);
+			}
 		}
 
 		for(String worldName : this.config.getMsgToWorlds(myWorldName)) {

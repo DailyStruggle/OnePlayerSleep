@@ -70,7 +70,7 @@ public class OnPlayerBedLeave implements Listener {
 						new AnnounceCancel(this.config, msg, w).runTaskAsynchronously(this.plugin);
 					}
 					else {
-						if(w.getTime() != myWorld.getTime()) w.setTime(myWorld.getTime());
+						if(w.getTime() != myWorld.getTime()) w.setFullTime(myWorld.getFullTime());
 						UUID uuid = w.getUID();
 						this.plugin.doSleep.get(uuid).cancel();
 						this.plugin.clearWeather.get(uuid).cancel();
@@ -92,7 +92,7 @@ public class OnPlayerBedLeave implements Listener {
 			for(String worldName : this.config.getSyncWorlds(myWorldName)) {
 				World w = Bukkit.getWorld(worldName);
 				if(w == null) continue;
-				if(w.getTime() != myWorld.getTime()) w.setTime(myWorld.getTime());
+				if(w.getTime() != myWorld.getTime()) w.setFullTime(myWorld.getFullTime());
 				UUID uuid = w.getUID();
 				this.plugin.doSleep.get(uuid).cancel();
 				this.plugin.clearWeather.get(uuid).cancel();

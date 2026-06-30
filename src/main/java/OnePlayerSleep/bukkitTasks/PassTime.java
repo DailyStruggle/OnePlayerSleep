@@ -3,6 +3,7 @@ package OnePlayerSleep.bukkitTasks;
 import OnePlayerSleep.OnePlayerSleep.OnePlayerSleep;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import OnePlayerSleep.tools.Config.Config;
 
@@ -49,7 +50,7 @@ public class PassTime extends BukkitRunnable{
 			for(String worldName : worldNames) {
 				World targetWorld = Bukkit.getWorld(worldName);
 				if(targetWorld==null) continue;
-				targetWorld.setTime(newTime);
+				targetWorld.setFullTime(targetWorld.getFullTime() - targetWorld.getTime() + newTime);
 			}
 			return;
 		}

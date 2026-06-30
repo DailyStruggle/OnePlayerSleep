@@ -18,7 +18,17 @@ public class OnNightSkip implements Listener {
 
     @EventHandler
     public void onNightSkip(TimeSkipEvent event) {
-        if(!event.getSkipReason().equals(TimeSkipEvent.SkipReason.NIGHT_SKIP)) return;
+        String reason;
+        try {
+            reason = event.getSkipReason().name();
+        } catch (NoSuchMethodError e) {
+            try {
+                reason = event.getClass().getMethod("getReason").invoke(event).toString();
+            } catch (Exception ex) {
+                return;
+            }
+        }
+        if(!reason.equals("NIGHT_SKIP")) return;
         plugin.wakeupCommandTime.set(System.currentTimeMillis());
     }
 }

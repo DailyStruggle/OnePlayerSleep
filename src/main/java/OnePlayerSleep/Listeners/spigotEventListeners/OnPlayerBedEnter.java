@@ -108,7 +108,6 @@ public class OnPlayerBedEnter implements Listener {
 		}
 
 		this.lastTme.put(event.getPlayer(), currentTime);
-		event.getPlayer().setPlayerTime(13000,false);
 
 		//do other relevant checks asynchronously
 		new OnSleepChecks(this.plugin, this.config, event.getPlayer(), myWorld).runTaskAsynchronously(plugin);
