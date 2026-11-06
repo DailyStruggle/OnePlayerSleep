@@ -1,0 +1,20 @@
+// LeafSleep - container (aggregator) project only.
+//
+// The installable multi-loader artifact is produced by
+// `:resource:LeafSleep:leafsleep-plugin` as `LeafSleep-<version>.jar`.
+// Disable the empty container jar so only the shaded assembly carries the
+// brand name.
+jar.enabled = false
+
+tasks.named('build') {
+    dependsOn ':resource:LeafSleep:leafsleep-common:build'
+    dependsOn ':resource:LeafSleep:leafsleep-paper:build'
+    dependsOn ':resource:LeafSleep:leafsleep-velocity:build'
+    dependsOn ':resource:LeafSleep:leafsleep-plugin:build'
+    if (findProject(':resource:LeafSleep:leafsleep-fabric') != null) {
+        dependsOn ':resource:LeafSleep:leafsleep-fabric:build'
+    }
+    if (findProject(':resource:LeafSleep:leafsleep-neoforge') != null) {
+        dependsOn ':resource:LeafSleep:leafsleep-neoforge:build'
+    }
+}

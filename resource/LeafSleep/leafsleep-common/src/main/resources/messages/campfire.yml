@@ -1,0 +1,8 @@
+# LeafSleep Weighted Sleep Message Theme: campfire (ADR-002)
+
+version: "1.0"
+weight: 15
+sleepText: "[player] banked the campfire embers and lay down (Sleeping: [sleepingPlayers]) - [requirements] [cancelPrompt] [sleepPrompt]"
+wakeupText: "Morning smoke rises from the campfires of [world]!"
+cancelPrompt: "[Keep Watch]"
+sleepPrompt: "[Rest]"

@@ -1,0 +1,8 @@
+# LeafSleep Weighted Sleep Message Theme: nightmare (ADR-002)
+
+version: "1.0"
+weight: 10
+sleepText: "[player] is tossing and turning in a nightmare (Sleeping: [sleepingPlayers]) - [requirements] [cancelPrompt] [sleepPrompt]"
+wakeupText: "[player] woke up relieved as daylight returned to [world]!"
+cancelPrompt: "[Wake Them]"
+sleepPrompt: "[Sleep]"

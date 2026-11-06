@@ -1,0 +1,32 @@
+# LeafSleep Weighted Sleep Message Theme (ADR-002)
+
+# Sleep message schema version.
+# @type string
+# @default 1.0
+version: "1.0"
+
+# Relative selection weight when choosing a random sleep message theme.
+# @type integer
+# @range [1, 1000]
+# @default 40
+weight: 40
+
+# Broadcast template when a player enters a bed or votes to sleep with this theme.
+# @type string
+# @default [player] is sleeping (Sleeping: [sleepingPlayers]) - [requirements] [cancelPrompt] [sleepPrompt]
+sleepText: "[player] is sleeping (Sleeping: [sleepingPlayers]) - [requirements] [cancelPrompt] [sleepPrompt]"
+
+# Broadcast template when dawn is committed across the shard group with this theme.
+# @type string
+# @default Rise and shine, [world]! [player] helped skip the night.
+wakeupText: "Rise and shine, [world]! [player] helped skip the night."
+
+# Clickable cancel button label for this theme.
+# @type string
+# @default [Cancel]
+cancelPrompt: "[Cancel]"
+
+# Clickable sleep vote button label for this theme.
+# @type string
+# @default [Sleep]
+sleepPrompt: "[Sleep]"

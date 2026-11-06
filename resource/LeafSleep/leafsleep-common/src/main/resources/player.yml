@@ -1,0 +1,101 @@
+# LeafSleep Player-Facing Sleep, Prompt & ActionBar/BossBar Messages (REQ-RTP-F-013, S-007, ADR-002)
+
+# Player message schema version.
+# @type string
+# @default 1.0
+version: "1.0"
+
+# Chat prefix prepended to plugin messages.
+# @type string
+# @default [LeafSleep]
+prefix: "[LeafSleep] "
+
+# Fallback broadcast template when a player enters a bed or votes to sleep (used if messages/*.yml is empty).
+# @type string
+# @default [player] is sleeping (Sleeping: [sleepingPlayers]) - [requirements] [cancelPrompt] [sleepPrompt]
+sleepBroadcast: "[player] is sleeping (Sleeping: [sleepingPlayers]) - [requirements] [cancelPrompt] [sleepPrompt]"
+
+# Fallback broadcast template when dawn is committed across the shard group (used if messages/*.yml is empty).
+# @type string
+# @default Good morning, [world]! Night skipped (epoch [epoch]).
+wakeupBroadcast: "Good morning, [world]! Night skipped (epoch [epoch])."
+
+# Broadcast template when enough players cancel an active sleep warmup.
+# @type string
+# @default Night skip cancelled by [cancellingPlayers] in [shardGroup]!
+cancelBroadcast: "Night skip cancelled by [cancellingPlayers] in [shardGroup]!"
+
+# Broadcast template when a player clicks [Cancel] and offsets sleep or adds toward the cancel threshold.
+# @type string
+# @default [player] wants night (Cancelling: [cancellingPlayers]) - [requirements] [cancelPrompt] [sleepPrompt]
+cancelVoteBroadcast: "[player] wants night (Cancelling: [cancellingPlayers]) - [requirements] [cancelPrompt] [sleepPrompt]"
+
+# Sent when /sleep cancel is used while no sleep countdown is active.
+# @type string
+# @default No active sleep countdown to cancel.
+cannotCancel: "No active sleep countdown to cancel."
+
+# Sent when a player is already counted as sleeping.
+# @type string
+# @default You are already sleeping or voting to sleep.
+alreadySleeping: "You are already sleeping or voting to sleep."
+
+# Sent when a player attempts to sleep during daytime and clear weather.
+# @type string
+# @default You can only sleep at night or during a thunderstorm.
+notNight: "You can only sleep at night or during a thunderstorm."
+
+# Sent when a player triggers a sleep or cancel action while on cooldown.
+# @type string
+# @default Please wait [seconds]s before using that sleep action again.
+onCooldown: "Please wait [seconds]s before using that sleep action again."
+
+# Sent when a player enables sleep-ignore opt-out.
+# @type string
+# @default Sleep ignore enabled: you are now excluded from sleep quorum counts.
+ignoreEnabled: "Sleep ignore enabled: you are now excluded from sleep quorum counts."
+
+# Sent when a player disables sleep-ignore opt-out.
+# @type string
+# @default Sleep ignore disabled: you are now included in sleep quorum counts.
+ignoreDisabled: "Sleep ignore disabled: you are now included in sleep quorum counts."
+
+# Default clickable cancel button label in chat prompts.
+# @type string
+# @default [Cancel]
+clickCancelLabel: "[Cancel]"
+
+# Hover text for the clickable cancel button.
+# @type string
+# @default Click to run /sleep cancel
+clickCancelHover: "Click to run /sleep cancel"
+
+# Default clickable sleep vote button label in chat prompts.
+# @type string
+# @default [Sleep]
+clickSleepLabel: "[Sleep]"
+
+# Hover text for the clickable sleep button.
+# @type string
+# @default Click to run /sleep sleep
+clickSleepHover: "Click to run /sleep sleep"
+
+# Actionbar countdown template displayed during warmupDelayTicks when warmupActionBar is enabled.
+# @type string
+# @default &eSkipping night in &f[seconds]s &7([sleeping]/[required] sleeping) - &c/sleep cancel
+warmupActionBar: "&eSkipping night in &f[seconds]s &7([sleeping]/[required] sleeping) - &c/sleep cancel"
+
+# Bossbar countdown title template displayed during warmupDelayTicks when warmupBossBar is enabled (& color prefix selects bar color).
+# @type string
+# @default &aSkipping night in [seconds]s ([sleeping]/[required] sleeping)
+warmupBossBar: "&aSkipping night in [seconds]s ([sleeping]/[required] sleeping)"
+
+# Sent when a player queries their personal sleep/wakeup message theme via /sleep message.
+# @type string
+# @default Current sleep message theme: [message] (Available: [available]).
+messagePrefCurrent: "Current sleep message theme: [message] (Available: [available])."
+
+# Sent when a player updates or resets their personal sleep/wakeup message theme via /sleep message <id|random>.
+# @type string
+# @default Preferred sleep message theme set to '[message]'.
+messagePrefUpdated: "Preferred sleep message theme set to '[message]'."

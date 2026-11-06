@@ -1,0 +1,51 @@
+# LeafSleep Command, Status & Administrative Messages (REQ-RTP-F-013, S-007, ADR-002)
+
+# Command message schema version.
+# @type string
+# @default 1.0
+version: "1.0"
+
+# Sent when /sleep reload succeeds with zero validation errors.
+# @type string
+# @default LeafSleep configuration reloaded successfully.
+reloadSuccess: "LeafSleep configuration reloaded successfully."
+
+# Sent when /sleep reload aborts due to configuration validation errors.
+# @type string
+# @default LeafSleep reload aborted due to configuration errors: [errors]
+reloadFailed: "LeafSleep reload aborted due to configuration errors: [errors]"
+
+# Sent when a caller lacks permission for a subcommand.
+# @type string
+# @default You do not have permission to execute that command.
+noPermission: "You do not have permission to execute that command."
+
+# Sent when an unknown subcommand is supplied (S-007).
+# @type string
+# @default Unknown subcommand '[arg]'. Use /sleep <status|sleep|cancel|ignore|message|reload|test|version|help>.
+invalidCommand: "Unknown subcommand '[arg]'. Use /sleep <status|sleep|cancel|ignore|message|reload|test|version|help>."
+
+# Sent when an invalid parameter value is supplied (S-007).
+# @type string
+# @default Invalid value '[value]' for parameter '[param]'.
+badParameter: "Invalid value '[value]' for parameter '[param]'."
+
+# Sent when a sleep operation is busy or rate-limited by BudgetPacer (S-007).
+# @type string
+# @default Sleep coordinator is busy processing another transition; please try again shortly.
+busy: "Sleep coordinator is busy processing another transition; please try again shortly."
+
+# Header for /sleep status output.
+# @type string
+# @default --- LeafSleep Status ---
+statusHeader: "--- LeafSleep Status ---"
+
+# Per-world status line template for /sleep status.
+# @type string
+# @default World [world] ([shardGroup], policy=[policy]/[cancelPolicy]): [requirements] | sleeping=[sleeping]/[required] ([sleepingPlayers]), cancelling=[cancelling]/[cancelRequired] ([cancellingPlayers]), eligible=[eligible]/[maxPlayers], epoch=[epoch]
+statusWorldLine: "World [world] ([shardGroup], policy=[policy]/[cancelPolicy]): [requirements] | sleeping=[sleeping]/[required] ([sleepingPlayers]), cancelling=[cancelling]/[cancelRequired] ([cancellingPlayers]), eligible=[eligible]/[maxPlayers], epoch=[epoch]"
+
+# Transport and storage status line template for /sleep status.
+# @type string
+# @default Transport=[transport] (shards=[shards]) | Storage=[storage]
+statusTransportLine: "Transport=[transport] (shards=[shards]) | Storage=[storage]"

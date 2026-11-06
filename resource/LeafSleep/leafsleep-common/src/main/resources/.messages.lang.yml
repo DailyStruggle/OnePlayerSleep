@@ -1,0 +1,6 @@
+version: version
+weight: weight
+sleepText: sleepText
+wakeupText: wakeupText
+cancelPrompt: cancelPrompt
+sleepPrompt: sleepPrompt

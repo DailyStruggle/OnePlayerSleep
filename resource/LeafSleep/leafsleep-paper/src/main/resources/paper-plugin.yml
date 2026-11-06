@@ -1,0 +1,55 @@
+name: LeafSleep
+version: 1.0.0
+main: net.leaf.sleep.paper.PaperLeafSleepPlugin
+api-version: '1.21'
+folia-supported: true
+description: Cross-server sharded sequel to OnePlayerSleep (Paper/Folia platform).
+permissions:
+  leafsleep.status:
+    description: Allows viewing /sleep status, /sleep version, and /sleep help.
+    default: true
+  oneplayersleep.status:
+    description: Legacy alias allowing /sleep status, /sleep version, and /sleep help.
+    default: true
+  leafsleep.sleep:
+    description: Allows initiating or voting for sleep via /sleep sleep.
+    default: true
+  oneplayersleep.sleep:
+    description: Legacy alias allowing initiating or voting for sleep.
+    default: true
+  leafsleep.cancel:
+    description: Allows cancelling an active sleep warmup countdown.
+    default: true
+  oneplayersleep.cancel:
+    description: Legacy alias allowing cancelling an active sleep warmup countdown.
+    default: true
+  leafsleep.ignore:
+    description: Allows toggling personal sleep-ignore status.
+    default: true
+  oneplayersleep.ignore:
+    description: Legacy alias allowing toggling personal sleep-ignore status.
+    default: true
+  leafsleep.bypass:
+    description: Excludes player from sleep quorum counts automatically.
+    default: false
+  oneplayersleep.bypass:
+    description: Legacy alias excluding player from sleep quorum counts automatically.
+    default: false
+  leafsleep.reload:
+    description: Allows validating and hot-reloading LeafSleep YAML configurations.
+    default: op
+  oneplayersleep.reload:
+    description: Legacy alias allowing /sleep reload.
+    default: op
+  leafsleep.test:
+    description: Allows executing [OPS bit] PBIT/CBIT/IBIT self-tests via /sleep test.
+    default: op
+  oneplayersleep.test:
+    description: Legacy alias allowing /sleep test.
+    default: op
+  leafsleep.admin:
+    description: Allows administrative access to /sleep reload and /sleep test.
+    default: op
+  oneplayersleep.admin:
+    description: Legacy alias allowing administrative access to /sleep reload and /sleep test.
+    default: op

@@ -1,0 +1,8 @@
+# LeafSleep Weighted Sleep Message Theme: cozy (ADR-002)
+
+version: "1.0"
+weight: 20
+sleepText: "[player] curled up in bed (Sleeping: [sleepingPlayers]) - [requirements] [cancelPrompt] [sleepPrompt]"
+wakeupText: "A warm dawn breaks over [world]!"
+cancelPrompt: "[Stay Up]"
+sleepPrompt: "[Snuggle In]"

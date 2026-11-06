@@ -1,0 +1,141 @@
+// LeafSleep - single multi-loader assembly jar.
+//
+// Bundles the platform-neutral core (leafsleep-common), its standalone SDK
+// dependencies (server-api, yaml-api, units-api, bit-api, config-bit-api,
+// commands-api, menu-api, effects-api, predict-api), and every platform
+// carrier (Paper/Spigot/Folia, Fabric, NeoForge, Velocity) into a single
+// LeafSleep-<version>.jar.
+plugins {
+    id 'java-library'
+    id 'com.gradleup.shadow'
+}
+
+group = 'io.github.dailystruggle'
+version = '1.0.0'
+
+base {
+    archivesName = 'LeafSleep'
+}
+
+def hasJdk25Carriers = findProject(':resource:LeafSleep:leafsleep-fabric') != null ||
+        findProject(':resource:LeafSleep:leafsleep-neoforge') != null
+
+java {
+    if (hasJdk25Carriers) {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(25)
+        }
+    } else {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+}
+
+dependencies {
+    implementation project(':resource:LeafSleep:leafsleep-common')
+    api project(':resource:LeafSleep:leafsleep-paper')
+    api project(':resource:LeafSleep:leafsleep-velocity')
+    implementation(project(':bukkit:bukkit-common')) { transitive = false }
+
+    if (findProject(':resource:LeafSleep:leafsleep-fabric') != null) {
+        api(project(':resource:LeafSleep:leafsleep-fabric')) { transitive = false }
+        implementation(project(':fabric:fabric-common-unobf')) { transitive = false }
+        implementation(project(':effects-api:effects-api-fabric-unobf')) { transitive = false }
+    }
+    if (findProject(':resource:LeafSleep:leafsleep-neoforge') != null) {
+        api(project(':resource:LeafSleep:leafsleep-neoforge')) { transitive = false }
+        implementation(project(':neoforge:neoforge-v26_1_R1')) { transitive = false }
+        implementation(project(':neoforge:neoforge-common')) { transitive = false }
+    }
+}
+
+shadowJar {
+    archiveBaseName.set('LeafSleep')
+    archiveClassifier.set('')
+    mergeServiceFiles()
+
+    from(project(':resource:LeafSleep').projectDir) {
+        include 'LICENSE'
+        into 'META-INF/leafsleep'
+    }
+
+    exclude 'org/jetbrains/annotations/**'
+    exclude 'org/intellij/lang/annotations/**'
+    exclude 'META-INF/maven/**'
+    exclude 'META-INF/versions/*/module-info.class'
+
+    minimize()
+}
+
+tasks.named('jar') { enabled = false }
+assemble.dependsOn shadowJar
+
+// ADR-126: Generate SHA-256 and SHA-512 checksums and in-memory PGP signatures for release deliverables.
+tasks.register('generateChecksums') {
+    group = 'build'
+    description = 'Generates SHA-256 and SHA-512 checksums for LeafSleep release deliverables (ADR-126).'
+    dependsOn tasks.named('shadowJar')
+
+    doLast {
+        File jarFile = tasks.named('shadowJar').get().archiveFile.get().asFile
+        if (jarFile.exists()) {
+            ['SHA-256': '.sha256', 'SHA-512': '.sha512'].each { algo, ext ->
+                def digest = java.security.MessageDigest.getInstance(algo)
+                jarFile.withInputStream { is ->
+                    byte[] buffer = new byte[8192]
+                    int read
+                    while ((read = is.read(buffer)) > 0) {
+                        digest.update(buffer, 0, read)
+                    }
+                }
+                def hex = digest.digest().collect { String.format('%02x', it) }.join('')
+                def checksumFile = new File(jarFile.parentFile, jarFile.name + ext)
+                checksumFile.text = "${hex}  ${jarFile.name}\n"
+                logger.lifecycle("[ADR-126] Generated ${algo} checksum for ${jarFile.name} -> ${checksumFile.name}")
+            }
+        }
+    }
+}
+
+apply plugin: 'signing'
+
+signing {
+    def signingKey = findProperty('signingKey') as String
+    def signingPassword = findProperty('signingPassword') as String
+    if (findProperty('signWithGpgCmd') != null) {
+        useGpgCmd()
+    } else if (signingKey) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+    }
+}
+
+tasks.register('signDeliverables') {
+    group = 'signing'
+    description = 'Signs the LeafSleep shaded release deliverable if signing keys are present (ADR-126).'
+    dependsOn tasks.named('shadowJar')
+
+    doLast {
+        def signingKey = findProperty('signingKey') as String
+        def useGpg = findProperty('signWithGpgCmd') != null
+        if (!signingKey && !useGpg) {
+            logger.info('[ADR-126] Skipping signDeliverables: no signing credentials configured.')
+            return
+        }
+
+        File jarFile = tasks.named('shadowJar').get().archiveFile.get().asFile
+        if (jarFile.exists()) {
+            try {
+                project.signing.sign(jarFile)
+                logger.lifecycle("[ADR-126] Signed deliverable: ${jarFile.name}")
+            } catch (Exception e) {
+                logger.warn("[ADR-126] Failed to sign deliverable ${jarFile.name}: ${e.message}")
+                if (project.hasProperty('strictSigning')) {
+                    throw e
+                }
+            }
+        }
+    }
+}
+
+assemble.dependsOn tasks.named('generateChecksums')

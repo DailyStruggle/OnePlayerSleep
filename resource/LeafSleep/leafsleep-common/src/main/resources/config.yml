@@ -1,0 +1,289 @@
+# LeafSleep Main Configuration (OnePlayerSleep Superset - ADR-001, ADR-002)
+
+# Configuration schema version.
+# @type string
+# @default 1.0
+version: "1.0"
+
+# Unique identifier for this server shard inside a multi-server cluster.
+# @type string
+# @default shard-1
+serverShardId: "shard-1"
+
+# Default quorum policy for worlds that do not specify an override in sleep.yml.
+# @type enum
+# @options ["one player", "percentage", "fixed count", "absolute majority", "curve", ONE_PLAYER, PERCENTAGE, FIXED_COUNT, ABSOLUTE_MAJORITY, CURVE]
+# @default curve
+defaultQuorumPolicy: "curve"
+
+# Default quorum value (percentage 1..100 for "percentage", or player count for "fixed count").
+# @type integer
+# @range [1, 100]
+# @default 25
+defaultQuorumValue: 25
+
+# Default cancel policy governing how /sleep cancel clicks interact with an active sleep proposal.
+# "tug of war" (both): each cancel offsets 1 sleep vote and reaching cancelCurve aborts the skip.
+# "curve": reaching cancelCurve aborts the skip.
+# "veto": a single cancel click immediately aborts the skip.
+# @type enum
+# @options ["tug of war", "curve", "veto", TUG_OF_WAR, CURVE, VETO]
+# @default tug of war
+defaultCancelPolicy: "tug of war"
+
+# Sleep quorum curve scaled against the server's max-players setting (backed by predict-api UnitCurve).
+# At 1 eligible player, 1 sleeper is always required.
+# @type map
+sleepCurve:
+  # Shaping function over normalized population t = (eligible - 1) / (serverMaxPlayers - 1).
+  # @type enum
+  # @options ["logarithmic", "power", "smootherstep", "sigmoid", "linear", LOGARITHMIC, POWER, SMOOTHERSTEP, SIGMOID, LINEAR]
+  # @default logarithmic
+  type: "logarithmic"
+
+  # Minimum sleepers required at low population (t = 0.0).
+  # @type integer
+  # @range [1, 100]
+  # @default 1
+  minRequired: 1
+
+  # Maximum sleepers required when online eligible players reach server max-players (t = 1.0).
+  # @type integer
+  # @range [1, 500]
+  # @default 8
+  maxRequired: 8
+
+  # Curve shape parameter: logarithmic base (> 1.0), power exponent (0.5 = sqrt), or sigmoid steepness.
+  # @type number
+  # @range [0.05, 100.0]
+  # @default 10.0
+  parameter: 10.0
+
+  # Inflection midpoint in [0.0, 1.0] (used when type is "sigmoid").
+  # @type number
+  # @range [0.0, 1.0]
+  # @default 0.35
+  midpoint: 0.35
+
+# Cancel response curve scaled against the server's max-players setting (backed by predict-api UnitCurve).
+# At 1 eligible player, 1 cancel click is always required.
+# @type map
+cancelCurve:
+  # Shaping function over normalized population t = (eligible - 1) / (serverMaxPlayers - 1).
+  # @type enum
+  # @options ["logarithmic", "power", "smootherstep", "sigmoid", "linear", LOGARITHMIC, POWER, SMOOTHERSTEP, SIGMOID, LINEAR]
+  # @default logarithmic
+  type: "logarithmic"
+
+  # Minimum cancel clicks required to abort at low population (t = 0.0).
+  # @type integer
+  # @range [1, 100]
+  # @default 1
+  minRequired: 1
+
+  # Maximum cancel clicks required to abort when online eligible players reach server max-players (t = 1.0).
+  # @type integer
+  # @range [1, 500]
+  # @default 5
+  maxRequired: 5
+
+  # Curve shape parameter: logarithmic base (> 1.0), power exponent, or sigmoid steepness.
+  # @type number
+  # @range [0.05, 100.0]
+  # @default 10.0
+  parameter: 10.0
+
+  # Inflection midpoint in [0.0, 1.0] (used when type is "sigmoid").
+  # @type number
+  # @range [0.0, 1.0]
+  # @default 0.35
+  midpoint: 0.35
+
+# Warmup countdown in ticks before committing a night skip once quorum is reached.
+# @type integer
+# @range [0, 1200]
+# @default 60
+warmupDelayTicks: 60
+
+# Whether to display a live actionbar countdown during warmupDelayTicks.
+# @type boolean
+# @default true
+warmupActionBar: true
+
+# Whether to display a live bossbar progress bar during warmupDelayTicks.
+# @type boolean
+# @default true
+warmupBossBar: true
+
+# Amount of world time in ticks to advance per increment step after warmup completes (0 = instant snap to dawn; 150 = OnePlayerSleep smooth transition).
+# @type integer
+# @range [0, 24000]
+# @default 150
+increment: 150
+
+# Number of server ticks between smooth time-advance increments (minimum 1).
+# @type integer
+# @range [1, 100]
+# @default 2
+timeBetweenIncrements: 2
+
+# Cooldown in seconds between sleep votes or bed-enter broadcasts per player.
+# @type integer
+# @range [0, 3600]
+# @default 10
+sleepCooldownSeconds: 10
+
+# Cooldown in seconds between /sleep cancel actions per player.
+# @type integer
+# @range [0, 3600]
+# @default 30
+cancelCooldownSeconds: 30
+
+# Whether /sleep cancel wakes currently sleeping players across the shard group.
+# @type boolean
+# @default true
+wakeOnCancel: true
+
+# Whether to clear rain when a night skip commits.
+# @type boolean
+# @default true
+clearWeatherOnSkip: true
+
+# Whether to clear thunder when a night skip commits.
+# @type boolean
+# @default true
+clearThunderOnSkip: true
+
+# Whether to reset TIME_SINCE_REST for eligible online players on dawn commit so Phantoms do not spawn.
+# @type boolean
+# @default true
+resetPhantomStatistic: true
+
+# Whether AFK and vanished players are excluded from eligible quorum counts.
+# @type boolean
+# @default true
+excludeAfkAndVanished: true
+
+# Whether Creative and Spectator mode players are excluded from eligible quorum counts.
+# @type boolean
+# @default true
+excludeCreativeAndSpectator: true
+
+# Target time-of-day in ticks when advancing the world clock to dawn.
+# @type integer
+# @range [0, 23999]
+# @default 0
+targetDawnTimeTicks: 0
+
+# Start of the sleepable night window in world ticks.
+# @type integer
+# @range [0, 23999]
+# @default 12542
+nightStartTicks: 12542
+
+# End of the sleepable night window in world ticks.
+# @type integer
+# @range [0, 23999]
+# @default 23459
+nightEndTicks: 23459
+
+# Whether players can sleep during thunderstorms regardless of time of day.
+# @type boolean
+# @default true
+allowSleepDuringThunder: true
+
+# Maximum outbound sync frames per tick admitted by BudgetPacer.
+# @type integer
+# @range [1, 1024]
+# @default 32
+budgetMaxFramesPerTick: 32
+
+# Cross-shard fast transient synchronization settings (ADR-001).
+# @type map
+sharding:
+  # Enable cross-server shard synchronization.
+  # @type boolean
+  # @default false
+  enabled: false
+
+  # Fast transient transport mode.
+  # @type enum
+  # @options ["local only", "direct socket", "plugin messaging", "redis pubsub", LOCAL_ONLY, DIRECT_SOCKET, PLUGIN_MESSAGING, REDIS_PUBSUB]
+  # @default local only
+  transport: "local only"
+
+  # Plugin messaging or pub/sub channel identifier.
+  # @type string
+  # @default leafsleep:sync
+  channel: "leafsleep:sync"
+
+  # Local bind host for DIRECT_SOCKET UDP/TCP peer gossip.
+  # @type string
+  # @default 127.0.0.1
+  bindHost: "127.0.0.1"
+
+  # Local bind port for DIRECT_SOCKET UDP/TCP peer gossip.
+  # @type integer
+  # @range [1024, 65535]
+  # @default 25620
+  bindPort: 25620
+
+  # Peer host:port endpoints for DIRECT_SOCKET gossip.
+  # @type list<string>
+  peers: []
+
+  # Environment variable holding the shared HMAC-SHA256 secret for DIRECT_SOCKET frames.
+  # @type string
+  # @default LEAFSLEEP_HMAC_SECRET
+  hmacSecretEnv: "LEAFSLEEP_HMAC_SECRET"
+
+  # Heartbeat broadcast period in ticks across shards.
+  # @type integer
+  # @range [20, 6000]
+  # @default 100
+  heartbeatIntervalTicks: 100
+
+# Asynchronous durable SQL storage settings (ADR-001).
+# @type map
+storage:
+  # SQL backend dialect.
+  # @type enum
+  # @options [SQLITE, MYSQL, MARIADB, POSTGRESQL]
+  # @default SQLITE
+  type: "SQLITE"
+
+  # Relative SQLite database file path inside the plugin directory.
+  # @type string
+  # @default leafsleep.db
+  sqliteFile: "leafsleep.db"
+
+  # Remote SQL database host.
+  # @type string
+  # @default 127.0.0.1
+  host: "127.0.0.1"
+
+  # Remote SQL database port.
+  # @type integer
+  # @range [1, 65535]
+  # @default 3306
+  port: 3306
+
+  # Remote SQL database name.
+  # @type string
+  # @default leafsleep
+  database: "leafsleep"
+
+  # Remote SQL username.
+  # @type string
+  # @default root
+  username: "root"
+
+  # Environment variable supplying the remote SQL password.
+  # @type string
+  # @default LEAFSLEEP_DB_PASSWORD
+  passwordEnv: "LEAFSLEEP_DB_PASSWORD"
+
+  # Table name prefix for LeafSleep SQL tables.
+  # @type string
+  # @default leafsleep_
+  tablePrefix: "leafsleep_"

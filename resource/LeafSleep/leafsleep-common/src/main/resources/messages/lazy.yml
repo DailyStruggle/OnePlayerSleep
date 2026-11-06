@@ -1,0 +1,8 @@
+# LeafSleep Weighted Sleep Message Theme: lazy (ADR-002)
+
+version: "1.0"
+weight: 10
+sleepText: "[player] flopped onto the mattress (Sleeping: [sleepingPlayers]) - [requirements] [cancelPrompt] [sleepPrompt]"
+wakeupText: "Time to drag yourself out of bed, [world]!"
+cancelPrompt: "[Five More Mins]"
+sleepPrompt: "[Nap]"

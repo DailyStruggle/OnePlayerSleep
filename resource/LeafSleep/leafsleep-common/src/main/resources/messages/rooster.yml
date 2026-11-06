@@ -1,0 +1,8 @@
+# LeafSleep Weighted Sleep Message Theme: rooster (ADR-002)
+
+version: "1.0"
+weight: 10
+sleepText: "[player] turned in early for the dawn chorus (Sleeping: [sleepingPlayers]) - [requirements] [cancelPrompt] [sleepPrompt]"
+wakeupText: "Cock-a-doodle-doo! A brand new day begins in [world]!"
+cancelPrompt: "[Snooze]"
+sleepPrompt: "[Early Bird]"

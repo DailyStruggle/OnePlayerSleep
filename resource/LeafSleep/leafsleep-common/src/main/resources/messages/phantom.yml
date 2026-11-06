@@ -1,0 +1,8 @@
+# LeafSleep Weighted Sleep Message Theme: phantom (ADR-002)
+
+version: "1.0"
+weight: 10
+sleepText: "[player] is hiding under the covers from phantoms (Sleeping: [sleepingPlayers]) - [requirements] [cancelPrompt] [sleepPrompt]"
+wakeupText: "Sunlight burns the phantoms away across [world]!"
+cancelPrompt: "[Hunt Phantoms]"
+sleepPrompt: "[Take Cover]"

@@ -1,0 +1,103 @@
+# LeafSleep Cross-Server Network, Sharding, and SQL Storage Configuration (ADR-001, ADR-002)
+# Additive network companion to OnePlayerSleep's config.yml, messages.yml, and sleep.yml.
+# Values customized here take precedence over the legacy sharding/storage blocks in config.yml.
+
+# Network configuration schema version.
+# @type string
+# @default 1.0
+version: "1.0"
+
+# Unique identifier for this server shard inside a multi-server cluster.
+# @type string
+# @default shard-1
+serverShardId: "shard-1"
+
+# Cross-shard fast transient synchronization settings (ADR-001).
+# @type map
+sharding:
+  # Enable cross-server shard synchronization.
+  # @type boolean
+  # @default false
+  enabled: false
+
+  # Fast transient transport mode ("local only", "direct socket", "plugin messaging", or "redis pubsub").
+  # @type enum
+  # @options ["local only", "direct socket", "plugin messaging", "redis pubsub", LOCAL_ONLY, DIRECT_SOCKET, PLUGIN_MESSAGING, REDIS_PUBSUB]
+  # @default local only
+  transport: "local only"
+
+  # Plugin messaging or pub/sub channel identifier.
+  # @type string
+  # @default leafsleep:sync
+  channel: "leafsleep:sync"
+
+  # Local bind host for DIRECT_SOCKET UDP/TCP peer gossip or REDIS_PUBSUB host:port.
+  # @type string
+  # @default 127.0.0.1
+  bindHost: "127.0.0.1"
+
+  # Local bind port for DIRECT_SOCKET UDP/TCP peer gossip or REDIS_PUBSUB port.
+  # @type integer
+  # @range [1024, 65535]
+  # @default 25620
+  bindPort: 25620
+
+  # Peer host:port endpoints for DIRECT_SOCKET gossip (or redis://host:port for REDIS_PUBSUB).
+  # @type list<string>
+  peers: []
+
+  # Environment variable holding the shared HMAC-SHA256 secret (or Redis password).
+  # @type string
+  # @default LEAFSLEEP_HMAC_SECRET
+  hmacSecretEnv: "LEAFSLEEP_HMAC_SECRET"
+
+  # Heartbeat broadcast period in ticks across shards.
+  # @type integer
+  # @range [20, 6000]
+  # @default 100
+  heartbeatIntervalTicks: 100
+
+# Asynchronous durable SQL storage settings (ADR-001).
+# @type map
+storage:
+  # SQL backend dialect.
+  # @type enum
+  # @options [SQLITE, MYSQL, MARIADB, POSTGRESQL]
+  # @default SQLITE
+  type: "SQLITE"
+
+  # Relative SQLite database file path inside the plugin directory.
+  # @type string
+  # @default leafsleep.db
+  sqliteFile: "leafsleep.db"
+
+  # Remote SQL database host.
+  # @type string
+  # @default 127.0.0.1
+  host: "127.0.0.1"
+
+  # Remote SQL database port.
+  # @type integer
+  # @range [1, 65535]
+  # @default 3306
+  port: 3306
+
+  # Remote SQL database name.
+  # @type string
+  # @default leafsleep
+  database: "leafsleep"
+
+  # Remote SQL username.
+  # @type string
+  # @default root
+  username: "root"
+
+  # Environment variable supplying the remote SQL password.
+  # @type string
+  # @default LEAFSLEEP_DB_PASSWORD
+  passwordEnv: "LEAFSLEEP_DB_PASSWORD"
+
+  # Table name prefix for LeafSleep SQL tables.
+  # @type string
+  # @default leafsleep_
+  tablePrefix: "leafsleep_"

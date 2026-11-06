@@ -1,0 +1,60 @@
+# LeafSleep Wakeup Buffs and Per-World Shard Definitions (ADR-001, ADR-002)
+# Weighted sleep/wakeup message themes live in messages/*.yml (loaded via MultiConfigParser).
+
+# Sleep configuration schema version.
+# @type string
+# @default 1.0
+version: "1.0"
+
+# Effects-API wakeup buffs, sounds, and particles dispatched to eligible players on dawn commit.
+# @type list<string>
+wakeupEffects:
+  - "SOUND ENTITY_PLAYER_LEVELUP 1.0 1.0"
+  - "PARTICLE VILLAGER_HAPPY 10"
+  - "POTION REGENERATION 100 1"
+
+# Per-world shard group mappings and quorum overrides.
+# @type map
+worlds:
+  world:
+    # Enable or disable LeafSleep night-skip management in this world. Set false on creative, lobby, Nether, or End worlds.
+    # @type boolean
+    # @default true
+    enabled: true
+
+    # Logical shard group identifier. Worlds and backend shards sharing the same shardGroupId aggregate quorum and skip to dawn together; use distinct shardGroupId values to isolate separate worlds or realms.
+    # @type string
+    # @default overworld-main
+    shardGroupId: "overworld-main"
+
+    # Optional per-world overrides (when omitted, inherits defaultQuorumPolicy, defaultCancelPolicy, defaultQuorumValue, warmupDelayTicks, warmupActionBar, warmupBossBar, increment, and timeBetweenIncrements from config.yml):
+    # policy: "curve"
+    # cancelPolicy: "tug of war"
+    # quorumValue: 25
+    # warmupDelayTicks: 60
+    # warmupActionBar: true
+    # warmupBossBar: true
+    # increment: 150
+    # timeBetweenIncrements: 2
+  world_nether:
+    enabled: false
+    shardGroupId: "nether-main"
+    policy: "one player"
+    cancelPolicy: "veto"
+    quorumValue: 1
+    warmupDelayTicks: 60
+    warmupActionBar: true
+    warmupBossBar: true
+    increment: 150
+    timeBetweenIncrements: 2
+  world_the_end:
+    enabled: false
+    shardGroupId: "end-main"
+    policy: "one player"
+    cancelPolicy: "veto"
+    quorumValue: 1
+    warmupDelayTicks: 60
+    warmupActionBar: true
+    warmupBossBar: true
+    increment: 150
+    timeBetweenIncrements: 2

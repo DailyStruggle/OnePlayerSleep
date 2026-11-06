@@ -1,0 +1,8 @@
+# LeafSleep Weighted Sleep Message Theme: starlight (ADR-002)
+
+version: "1.0"
+weight: 15
+sleepText: "[player] is counting stars (Sleeping: [sleepingPlayers]) - [requirements] [cancelPrompt] [sleepPrompt]"
+wakeupText: "The stars fade and morning arrives in [world]!"
+cancelPrompt: "[Stargaze]"
+sleepPrompt: "[Dream]"
